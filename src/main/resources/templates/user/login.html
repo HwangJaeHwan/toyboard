@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en" th:replace="~{layout/base :: layout(~{::content})}" xmlns:th="http://www.thymeleaf.org">
+
+
+
+<div class="flex-box justify-content-center align-items-center" th:fragment="content">
+
+    <form>
+    <div>
+        <input type="text" placeholder="아이디">
+        <input type="password" placeholder="비밀번호">
+    </div>
+
+    <button type="submit">로그인</button>
+    </form>
+</div>
+
+
+
+</html>
