@@ -44,6 +44,10 @@ body {
 .flex-box {
     display: flex;
 }
+.flex-c {
+    display: flex;
+    flex-direction: column;
+}
 .justify-content-center{
     justify-content: center
 }
@@ -61,12 +65,33 @@ body {
 .w80{
     width: 80%;
 }
+.h100 {
+    height: 100%;
+}
 .margin-right-10{
     margin-right: 10px;
 }
 
+.w-300 {
+    width: 300px;
+}
+
+.h-500 {
+    height: 500px;
+}
 
 
 .makeBlock {
     display: block;
+}
+
+.login-input{
+    display: block;
+    width: 100%;
+    height: 51px;
+    border: solid 1px #dadada;
+    padding: 10px 14px 10px 14px;
+    box-sizing: border-box;
+    background: #fff;
+    /*position: relative; */
 }
