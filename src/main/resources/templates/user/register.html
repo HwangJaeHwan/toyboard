@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en" th:replace="~{layout/base :: layout(~{::content})}" xmlns:th="http://www.thymeleaf.org">
+
+
+
+<div class="flex-box justify-content-center align-items-center" th:fragment="content">
+
+    <div class="flex-c h-800 justify-content-center align-items-center">
+
+        <h2>회원가입</h2>
+        <br>
+
+
+        <form>
+            <div class="w-300">
+                <input class="login-input" type="text" placeholder="아이디">
+                <br>
+                <input class="login-input" type="password" placeholder="비밀번호">
+                <br>
+                <input class="login-input" type="password" placeholder="비밀번호 확인">
+                <br>
+                <input class="login-input" type="text" placeholder="닉네임">
+                <br>
+                <input class="login-input" type="email" placeholder="이메일">
+
+            </div>
+            <br>
+            <br>
+            <button class="w-300 btn btn-primary" type="submit">회원가입</button>
+        </form>
+
+    </div>
+</div>
+
+
+
+</html>
