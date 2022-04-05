@@ -11,21 +11,28 @@
         <br>
 
 
-        <form>
+        <form action method="post" th:object="${user}">
             <div class="w-300">
-                <input class="login-input" type="text" placeholder="아이디">
+                <input class="login-input" type="text" placeholder="아이디" th:field="*{loginId}">
+                <p th:errors="*{loginId}" class="field-error">아이디 오류</p>
                 <br>
-                <input class="login-input" type="password" placeholder="비밀번호">
+                <input class="login-input" type="password" placeholder="비밀번호" th:field="*{password}">
+                <p th:errors="*{password}" class="field-error">비밀번호 오류</p>
                 <br>
-                <input class="login-input" type="password" placeholder="비밀번호 확인">
+                <input class="login-input" type="password" placeholder="비밀번호 확인" th:field="*{passwordCheck}">
+                <p th:errors="*{passwordCheck}" class="field-error">비밀번호 확인 오류</p>
                 <br>
-                <input class="login-input" type="text" placeholder="닉네임">
+                <input class="login-input" type="text" placeholder="닉네임" th:field="*{nickname}">
+                <p th:errors="*{nickname}" class="field-error">닉네임 오류</p>
                 <br>
-                <input class="login-input" type="email" placeholder="이메일">
+                <input class="login-input" type="email" placeholder="이메일" th:field="*{email}">
+                <p th:errors="*{email}" class="field-error">이메일 오류</p>
 
             </div>
             <br>
             <br>
+
+
             <button class="w-300 btn btn-primary" type="submit">회원가입</button>
         </form>
 

@@ -40,6 +40,22 @@ public class UserService {
 
     }
 
+    public Boolean loginIdDuplicationCheck(String loginId) {
+
+        return userRepository.findByLoginId(loginId).isPresent();
+    }
+
+
+    public Boolean nicknameDuplicationCheck(String nickname) {
+
+        return userRepository.findByNickname(nickname).isPresent();
+    }
+
+    public Boolean emailDuplicationCheck(String email) {
+
+        return userRepository.findByEmail(email).isPresent();
+    }
+
 
     public User login(LoginDTO loginDTO) {
 
