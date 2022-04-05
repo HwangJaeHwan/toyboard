@@ -21,7 +21,7 @@ public class UserService {
     private final PasswordEncoder encoder;
 
 
-    private Long save(RegisterDTO registerDTO) {
+    public Long save(RegisterDTO registerDTO) {
 
         String encode = encoder.encode(registerDTO.getPassword());
 
@@ -41,9 +41,9 @@ public class UserService {
     }
 
 
-    private User login(LoginDTO loginDTO) {
+    public User login(LoginDTO loginDTO) {
 
-        return userRepository.findByNickname(loginDTO.getLoginId())
+        return userRepository.findByLoginId(loginDTO.getLoginId())
                 .filter(m -> encoder.matches(loginDTO.getPassword(), m.getPassword()))
                 .orElse(null);
 

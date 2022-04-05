@@ -99,3 +99,7 @@ body {
     background: #fff;
     /*position: relative; */
 }
+
+.field-error {
+    color: red;
+}
