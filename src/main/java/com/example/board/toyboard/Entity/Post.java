@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,6 +25,12 @@ public class Post {
 
     @Column(length = 1000)
     private String content;
+
+    private LocalDateTime createTime;
+
+    private int hits;
+
+    private int recommendedNumber;
 
 
     @ManyToOne
