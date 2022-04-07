@@ -2,6 +2,11 @@ ul {
     list-style: none;
 }
 
+textarea {
+    height: 800px;
+    resize: none;
+}
+
 li > a {
     color: white;
 }
