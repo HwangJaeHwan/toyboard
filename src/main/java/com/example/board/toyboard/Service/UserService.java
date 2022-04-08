@@ -8,12 +8,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
 
 @Service
 @Slf4j
-@Transactional
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class UserService {
 
@@ -21,6 +21,14 @@ public class UserService {
     private final PasswordEncoder encoder;
 
 
+    public User findById(Long userId) {
+
+        return userRepository.findById(userId).orElse(null);
+
+
+    }
+
+    @Transactional
     public Long save(RegisterDTO registerDTO) {
 
         String encode = encoder.encode(registerDTO.getPassword());
@@ -45,7 +53,6 @@ public class UserService {
         return userRepository.findByLoginId(loginId).isPresent();
     }
 
-
     public Boolean nicknameDuplicationCheck(String nickname) {
 
         return userRepository.findByNickname(nickname).isPresent();
@@ -56,14 +63,11 @@ public class UserService {
         return userRepository.findByEmail(email).isPresent();
     }
 
-
     public User login(LoginDTO loginDTO) {
 
         return userRepository.findByLoginId(loginDTO.getLoginId())
                 .filter(m -> encoder.matches(loginDTO.getPassword(), m.getPassword()))
                 .orElse(null);
-
-
 
     }
 

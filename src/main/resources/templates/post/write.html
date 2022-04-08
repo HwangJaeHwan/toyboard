@@ -4,22 +4,23 @@
 
 <div class="flex-box justify-content-center" th:fragment="content">
 
-    <div class="flex-c w80 align-items-center">
-        <input type="text" class="form-control" placeholder="제목을 입력해주세요.">
+    <form action th:object="${post}" method="post" class="flex-c w80 align-items-center">
+
+        <input type="text" class="form-control" placeholder="제목을 입력해주세요." th:field="*{title}">
         <br>
         <br>
 
-        <textarea class="col-md-12" placeholder="내용을 입력해주세요.">
+        <textarea class="col-md-12" placeholder="내용을 입력해주세요." th:field="*{content}">
 
         </textarea>
         <div>
-            <a href="#" class="w-300 btn btn-success">글쓰기</a>
-            <a href="#" class="w-300 btn btn-danger">취소</a>
+            <button href="#" class="w-300 btn btn-success" type="submit">글쓰기</button>
+            <a href="@{/login}" class="w-300 btn btn-danger">취소</a>
 
         </div>
 
 
-    </div>
+    </form>
 
 
 

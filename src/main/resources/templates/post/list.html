@@ -16,12 +16,15 @@
         </thead>
 
         <tbody class="text-center">
-        <td class="text-left">김갑인</td>
-        <td>김갑인</td>
-        <td>2016-25-30</td>
-        <td>1</td>
-        <td>0</td>
 
+        <tr th:each="post : ${posts}">
+        <td class="text-left"><a th:href="@{/post/{id}(id=${post.id})}" th:text="${post.title}"></a></td>
+        <td th:text="${post.nickname}">김갑인</td>
+        <td th:text="${post.createTime}">2016-25-30</td>
+        <td th:text="${post.hits}" >1</td>
+        <td th:text="${post.recommendedNumber}">0</td>
+
+        </tr>
         </tbody>
 
     </table>

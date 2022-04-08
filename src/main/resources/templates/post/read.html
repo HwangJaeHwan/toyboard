@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en" th:replace="~{layout/base :: layout(~{::content})}" xmlns:th="http://www.thymeleaf.org">
+
+
+<div class="flex-box justify-content-center" th:fragment="content">
+
+    <div class="flex-c w80">
+
+        <h3>[[${post.title}]]</h3>
+        <br>
+
+        <div class="flex-box justify-content-end">
+            <span th:text="${post.nickname}" ></span>
+        </div>
+
+        <div class="flex-box justify-content-end">
+            <span th:text="${post.getCreateTime()}"></span>
+            조회수 : <span th:text="${post.hits}"></span>
+            추천 :<span th:text="${post.recommendedNumber}"></span>
+        </div>
+
+
+        <div class="form-group">
+
+            <textarea class="col-md-12" th:text="${post.content}" readonly>
+
+            </textarea>
+
+        </div>
+
+
+    </div>
+
+
+
+</div>
+
+
+
+
+
+
+
+
+</html>
