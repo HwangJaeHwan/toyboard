@@ -32,7 +32,7 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public String registerEnd(@Valid @ModelAttribute(name = "user") RegisterDTO registerDTO, BindingResult bindingResult, HttpServletRequest request){
+    public String registerEnd(@Valid @ModelAttribute(name = "user") RegisterDTO registerDTO, BindingResult bindingResult){
 
         log.info("loginId={}",registerDTO.getLoginId());
 
@@ -61,13 +61,10 @@ public class UserController {
 
         Long registerId = userService.save(registerDTO);
 
-        HttpSession session = request.getSession();
 
-        session.setAttribute("loginUser", registerId);
-
-
-        return "/";
+        return "redirect:/login";
     }
+
     @GetMapping("/login")
     public String loginStart(User loginUser) {
 
@@ -92,9 +89,9 @@ public class UserController {
 
         HttpSession session = request.getSession();
 
-        session.setAttribute("loginUser", loginUser.getId());
+        session.setAttribute("loginUser", loginUser.getNickname());
 
 
-        return "/";
+        return "redirect:/post";
     }
 }
