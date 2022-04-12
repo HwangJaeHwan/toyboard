@@ -28,6 +28,10 @@ public class UserService {
 
     }
 
+    public User findByNickname(String nickname) {
+        return userRepository.findByNickname(nickname).orElse(null);
+    }
+
     @Transactional
     public Long save(RegisterDTO registerDTO) {
 
