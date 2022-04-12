@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 @Builder
 public class PostReadDTO {
 
+    private Long id;
 
     private String nickname;
 

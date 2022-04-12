@@ -50,6 +50,7 @@ public class Post {
     public PostReadDTO makeReadDTO(String nickname) {
 
         return PostReadDTO.builder()
+                .id(id)
                 .nickname(nickname)
                 .title(title)
                 .content(content)

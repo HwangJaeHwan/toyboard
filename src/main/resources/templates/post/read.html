@@ -27,18 +27,18 @@
             </textarea>
 
         </div>
+        <h2>댓글 [[${commentNums}]]개</h2>
 
-        <div>
-            <h2>댓글 0개</h2>
+        <div th:each="commentdto : ${comments}">
 
             <div class="flex-box justify-content-space-between">
-                <span>닉네임</span>
+                <span th:text="${commentdto.nickname}">닉네임</span>
                 <button>신고하기</button>
             </div>
 
 
             <div>
-                하하하하
+                <p th:text="${commentdto.content}"></p>
             </div>
 
 
@@ -49,15 +49,16 @@
 
         </div>
 
-        <div>
+        <form th:action="@{/comment/write/{id}(id = ${post.id})}" method="post" th:object="${commentWriteDTO}">
             <h3>댓글 작성</h3>
+
             <div class="flex-box">
-                <textarea class="col-md-11 h-100" placeholder="댓글을 입력해주세요."></textarea>
-                <button class="col-md-1 h-100">작성</button>
+                <textarea class="col-md-11 h-100" placeholder="댓글을 입력해주세요." th:field="*{comment}"></textarea>
+                <button class="col-md-1 h-100" type="submit">작성</button>
             </div>
 
 
-        </div>
+        </form>
 
 
     </div>
