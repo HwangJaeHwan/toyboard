@@ -12,8 +12,14 @@ import lombok.NoArgsConstructor;
 public class CommentReadDTO {
 
 
+    Long id;
+
     String nickname;
 
     String content;
+
+    int up;
+
+    int down;
 
 }

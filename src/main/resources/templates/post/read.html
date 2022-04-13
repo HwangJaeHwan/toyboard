@@ -43,8 +43,10 @@
 
 
             <div class="flex-box justify-content-end">
-                <button>up</button>
+                <button th:onclick="|commentUp(${commentdto.id})|">up</button>
+                <span th:id="|up${commentdto.id}|" th:text="${commentdto.up}"></span>
                 <button>down</button>
+                <span th:text="${commentdto.down}"></span>
             </div>
 
         </div>
@@ -64,10 +66,36 @@
     </div>
 
 
+    <script th:inline="javascript">
+
+        function commentUp(id){
+
+            $.ajax({
+                url: "/comment/upButton/" + id,
+                type: "GET",
+
+                success: function (data){
+                    console.log(data);
+
+                    document.getElementById("up" + id).innerHTML = "<span>" + data.upCount + "</span>";
+                }
+
+
+            })
+
+
+        }
+
+
+
+
+
+
+    </script>
+
+
 
 </div>
-
-
 
 
 

@@ -24,6 +24,12 @@ public class CommentService {
     private final UserRepository userRepository;
     private final PostRepository postRepository;
 
+
+    public Comment findById(Long id) {
+
+        return commentRepository.findById(id).orElse(null);
+    }
+
     public Long writeComment(CommentWriteDTO dto, String nickname, Long postId) {
 
         User loginUser = userRepository.findByNickname(nickname).orElse(null);
@@ -33,6 +39,8 @@ public class CommentService {
                 .user(loginUser)
                 .post(post)
                 .comment(dto.getComment())
+                .up(0)
+                .down(0)
                 .build();
 
         Comment save = commentRepository.save(comment);

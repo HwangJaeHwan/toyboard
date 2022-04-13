@@ -23,8 +23,12 @@ public class Comment {
     @Column(name = "comment_id")
     private Long id;
 
-
     private String comment;
+
+
+    private int up;
+
+    private int down;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
@@ -38,10 +42,22 @@ public class Comment {
     public CommentReadDTO makeReadDTO(String nickname) {
 
         return CommentReadDTO.builder()
+                .id(id)
                 .nickname(nickname)
                 .content(comment)
+                .up(up)
+                .down(down)
                 .build();
 
+    }
+
+
+    public void addUp() {
+        up += 1;
+    }
+
+    public void subUp(){
+        up -= 1;
     }
 
 
