@@ -32,9 +32,9 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public String registerEnd(@Valid @ModelAttribute(name = "user") RegisterDTO registerDTO, BindingResult bindingResult){
+    public String registerEnd(@Valid @ModelAttribute(name = "user") RegisterDTO registerDTO, BindingResult bindingResult) {
 
-        log.info("loginId={}",registerDTO.getLoginId());
+        log.info("loginId={}", registerDTO.getLoginId());
 
         if (bindingResult.hasErrors()) {
             return "user/register";
@@ -93,5 +93,20 @@ public class UserController {
 
 
         return "redirect:/post";
+    }
+
+
+    @GetMapping("/logout")
+    public String logout(HttpServletRequest request){
+
+        HttpSession session = request.getSession(false);
+
+
+        if (session != null) {
+            session.invalidate();
+        }
+
+
+        return "redirect:/user/login";
     }
 }

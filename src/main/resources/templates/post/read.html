@@ -45,8 +45,8 @@
             <div class="flex-box justify-content-end">
                 <button th:onclick="|commentUp(${commentdto.id})|">up</button>
                 <span th:id="|up${commentdto.id}|" th:text="${commentdto.up}"></span>
-                <button>down</button>
-                <span th:text="${commentdto.down}"></span>
+                <button th:onclick="|commentDown(${commentdto.id})|">down</button>
+                <span th:id="|down${commentdto.id}|" th:text="${commentdto.down}"></span>
             </div>
 
         </div>
@@ -76,8 +76,35 @@
 
                 success: function (data){
                     console.log(data);
+                    if (data.dup) {
+                        alert("중복이다새기야");
+                        return;
+                    }
 
                     document.getElementById("up" + id).innerHTML = "<span>" + data.upCount + "</span>";
+                }
+
+
+            })
+
+
+        }
+
+        function commentDown(id){
+
+            $.ajax({
+                url: "/comment/downButton/" + id,
+                type: "GET",
+
+                success: function (data){
+                    console.log(data);
+
+                    if (data.dup) {
+                        alert("중복이다새기야");
+                        return;
+                    }
+
+                    document.getElementById("down" + id).innerHTML = "<span>" + data.downCount + "</span>";
                 }
 
 

@@ -5,10 +5,7 @@ import com.example.board.toyboard.DTO.CommentWriteDTO;
 import com.example.board.toyboard.Entity.Comment;
 import com.example.board.toyboard.Entity.Post;
 import com.example.board.toyboard.Entity.User;
-import com.example.board.toyboard.Service.CommentService;
-import com.example.board.toyboard.Service.PostService;
-import com.example.board.toyboard.Service.UpService;
-import com.example.board.toyboard.Service.UserService;
+import com.example.board.toyboard.Service.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -27,6 +24,7 @@ public class CommentController {
     private final PostService postService;
     private final CommentService commentService;
     private final UpService upService;
+    private final DownService downService;
 
     @PostMapping("/write/{postId}")
     String write(@SessionAttribute("loginUser") String nickname, @PathVariable("postId") Long postId, @ModelAttribute(name = "comment") CommentWriteDTO dto) {
@@ -47,15 +45,43 @@ public class CommentController {
 
         log.info("tlqkf");
         HashMap<String, Integer> upCount = new HashMap<>();
+        HashMap<String, Boolean> check = new HashMap<>();
 
         User loginUser = userService.findByNickname(nickname);
         Comment comment = commentService.findById(id);
 
-        upService.upClick(loginUser, comment);
+        if (!upService.upClick(loginUser, comment)) {
+            check.put("dup", true);
+            return check;
+        }
 
         upCount.put("upCount", comment.getUp());
 
         return upCount;
 
     }
+
+    @GetMapping("/downButton/{id}")
+    @ResponseBody
+    Map downButton(@SessionAttribute("loginUser") String nickname, @PathVariable("id") Long id) {
+
+        log.info("tlqkf");
+        HashMap<String, Integer> downCount = new HashMap<>();
+        HashMap<String, Boolean> check = new HashMap<>();
+
+        User loginUser = userService.findByNickname(nickname);
+        Comment comment = commentService.findById(id);
+
+        if (!downService.downClick(loginUser, comment)) {
+            check.put("dup", true);
+            return check;
+        }
+
+        downCount.put("downCount", comment.getUp());
+
+        return downCount;
+
+    }
+
+
 }

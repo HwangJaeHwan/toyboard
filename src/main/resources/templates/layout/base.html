@@ -21,8 +21,8 @@
 
     <div th:if="${session.loginUser != null}" class="flex-box justify-content-center">
         <div class="flex-box justify-content-end w80">
-            <a class="text-right makeBlock margin-right-10" href="#" th:href="@{/user/mypage}" th:text="${session.loginUser}">닉네임</a>
-            <a class="text-right makeBlock" href="#" th:href="@{/user/logout}">로그아웃</a>
+            <a class="text-right makeBlock margin-right-10" href="#" th:href="@{/mypage}" th:text="${session.loginUser}">닉네임</a>
+            <a class="text-right makeBlock" href="#" th:href="@{/logout}">로그아웃</a>
         </div>
     </div>
 

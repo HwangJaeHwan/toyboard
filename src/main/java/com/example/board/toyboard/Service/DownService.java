@@ -1,13 +1,11 @@
 package com.example.board.toyboard.Service;
 
-
 import com.example.board.toyboard.Entity.Comment;
+import com.example.board.toyboard.Entity.Down;
 import com.example.board.toyboard.Entity.Up;
 import com.example.board.toyboard.Entity.User;
-import com.example.board.toyboard.Repository.CommentRepository;
 import com.example.board.toyboard.Repository.DownRepository;
 import com.example.board.toyboard.Repository.UpRepository;
-import com.example.board.toyboard.Repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -19,39 +17,39 @@ import java.util.Optional;
 @Slf4j
 @Transactional
 @RequiredArgsConstructor
-public class UpService {
+public class DownService {
 
-    private final UpRepository upRepository;
     private final DownRepository downRepository;
-    private final UserRepository userRepository;
-    private final CommentRepository commentRepository;
+    private final UpRepository upRepository;
 
 
-    public boolean upClick(User user, Comment comment) {
+    public boolean downClick(User user, Comment comment) {
 
-        Optional<Up> check = upRepository.findByUserAndComment(user, comment);
+        Optional<Down> check = downRepository.findByUserAndComment(user, comment);
 
-        if (downRepository.findByUserAndComment(user, comment).isPresent()) {
+        if (upRepository.findByUserAndComment(user, comment).isPresent()) {
             return false;
         }
 
         if (check.isPresent()) {
-            upRepository.delete(check.get());
+            downRepository.delete(check.get());
             comment.subUp();
         } else {
 
-            upRepository.save(
-                    Up.builder()
-                    .user(user)
-                    .comment(comment)
-                    .build()
+            downRepository.save(
+                    Down.builder()
+                            .user(user)
+                            .comment(comment)
+                            .build()
             );
             comment.addUp();
 
         }
 
         return true;
+
     }
+
 
 
 }
