@@ -37,11 +37,12 @@ public class CommentService {
 
         Comment comment = Comment.builder()
                 .user(loginUser)
-                .post(post)
                 .comment(dto.getComment())
                 .up(0)
                 .down(0)
                 .build();
+
+        comment.setPost(post);
 
         Comment save = commentRepository.save(comment);
 

@@ -42,8 +42,9 @@ public class PostService {
                 .createTime(LocalDateTime.now())
                 .hits(0)
                 .recommendedNumber(0)
-                .user(loginUser)
                 .build();
+
+        post.setUser(loginUser);
 
         Post save = postRepository.save(post);
 

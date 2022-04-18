@@ -30,6 +30,8 @@ public class Comment {
 
     private int down;
 
+    private int report;
+
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
@@ -37,6 +39,12 @@ public class Comment {
     @ManyToOne
     @JoinColumn(name = "post_id")
     private Post post;
+
+
+    public void setPost(Post post) {
+        this.post = post;
+        post.addComment(this);
+    }
 
 
     public CommentReadDTO makeReadDTO(String nickname) {
@@ -47,6 +55,7 @@ public class Comment {
                 .content(comment)
                 .up(up)
                 .down(down)
+                .report(20)
                 .build();
 
     }
@@ -58,6 +67,10 @@ public class Comment {
 
     public void subUp(){
         up -= 1;
+    }
+
+    public void commentReport() {
+        report++;
     }
 
 

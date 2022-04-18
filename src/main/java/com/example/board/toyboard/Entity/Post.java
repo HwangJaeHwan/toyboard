@@ -47,6 +47,17 @@ public class Post {
     private List<Comment> comments = new ArrayList<>();
 
 
+    public void setUser(User user) {
+        this.user = user;
+        user.addPost(this);
+    }
+
+
+    public void addComment(Comment comment) {
+        comments.add(comment);
+    }
+
+
     public PostReadDTO makeReadDTO(String nickname) {
 
         return PostReadDTO.builder()
