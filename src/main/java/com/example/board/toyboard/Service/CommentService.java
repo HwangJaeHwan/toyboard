@@ -40,6 +40,7 @@ public class CommentService {
                 .comment(dto.getComment())
                 .up(0)
                 .down(0)
+                .report(0)
                 .build();
 
         comment.setPost(post);
@@ -52,7 +53,9 @@ public class CommentService {
 
     public List<Comment> findCommentsByPost(Post post) {
 
-        return commentRepository.findCommentsByPost(post);
+        return post.getComments();
+
+//        return commentRepository.findCommentsByPost(post);
     }
 
 }

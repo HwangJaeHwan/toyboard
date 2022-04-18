@@ -22,4 +22,6 @@ public class CommentReadDTO {
 
     int down;
 
+    int report;
+
 }

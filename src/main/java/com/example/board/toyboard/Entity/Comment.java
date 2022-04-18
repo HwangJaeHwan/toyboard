@@ -55,7 +55,7 @@ public class Comment {
                 .content(comment)
                 .up(up)
                 .down(down)
-                .report(20)
+                .report(report)
                 .build();
 
     }
@@ -67,6 +67,14 @@ public class Comment {
 
     public void subUp(){
         up -= 1;
+    }
+
+    public void addDown() {
+        down += 1;
+    }
+
+    public void subDown(){
+        down -= 1;
     }
 
     public void commentReport() {

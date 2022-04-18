@@ -33,7 +33,7 @@ public class DownService {
 
         if (check.isPresent()) {
             downRepository.delete(check.get());
-            comment.subUp();
+            comment.subDown();
         } else {
 
             downRepository.save(
@@ -42,7 +42,7 @@ public class DownService {
                             .comment(comment)
                             .build()
             );
-            comment.addUp();
+            comment.addDown();
 
         }
 

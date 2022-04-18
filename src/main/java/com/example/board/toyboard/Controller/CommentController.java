@@ -22,6 +22,7 @@ public class CommentController {
 
     private final UserService userService;
     private final PostService postService;
+    private final ReportService reportService;
     private final CommentService commentService;
     private final UpService upService;
     private final DownService downService;
@@ -43,7 +44,6 @@ public class CommentController {
     @ResponseBody
     Map upButton(@SessionAttribute("loginUser") String nickname, @PathVariable("id") Long id) {
 
-        log.info("tlqkf");
         HashMap<String, Integer> upCount = new HashMap<>();
         HashMap<String, Boolean> check = new HashMap<>();
 
@@ -65,7 +65,6 @@ public class CommentController {
     @ResponseBody
     Map downButton(@SessionAttribute("loginUser") String nickname, @PathVariable("id") Long id) {
 
-        log.info("tlqkf");
         HashMap<String, Integer> downCount = new HashMap<>();
         HashMap<String, Boolean> check = new HashMap<>();
 
@@ -77,11 +76,31 @@ public class CommentController {
             return check;
         }
 
-        downCount.put("downCount", comment.getUp());
+        downCount.put("downCount", comment.getDown());
 
         return downCount;
 
     }
 
+    @GetMapping("/report/{id}")
+    @ResponseBody
+    String report(@SessionAttribute("loginUser") String nickname, @PathVariable("id") Long id) {
+
+
+        User loginUser = userService.findByNickname(nickname);
+        Comment comment = commentService.findById(id);
+
+        if (reportService.reportCheck(loginUser, comment)) {
+
+            reportService.commentReport(loginUser, comment);
+            comment.commentReport();
+
+            return "신고 완료";
+        }
+
+
+        return "이미 신고한 댓글입니다.";
+
+    }
 
 }
