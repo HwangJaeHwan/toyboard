@@ -9,11 +9,14 @@ import com.example.board.toyboard.Service.PostService;
 import com.example.board.toyboard.Service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.PostConstruct;
 import javax.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,11 +33,14 @@ public class PostController {
 
 
     @GetMapping
-    public String postList(Model model) {
+    public String postList(PageListDTO pageListDTO, Model model) {
 
-        List<PostListDTO> dtoList = postService.findAll().stream().map(post -> post.makeListDTO(post.getUser().getNickname())).collect(Collectors.toList());
+        Pageable pageable = pageListDTO.getPageable(Sort.by("createTime").descending());
 
-        model.addAttribute("posts",dtoList);
+
+//        List<PostListDTO> dtoList = postService.findAll().stream().map(post -> new PostListDTO(post, post.getUser().getNickname())).collect(Collectors.toList());
+
+        model.addAttribute("posts", postService.makePageResult(pageable));
 
         return "/post/list";
 
@@ -73,7 +79,7 @@ public class PostController {
 
         Post post = postService.findById(postId);
 
-        PostReadDTO readDTO = post.makeReadDTO(post.getUser().getNickname());
+        PostReadDTO readDTO = new PostReadDTO(post, post.getUser().getNickname());
 
         List<CommentReadDTO> commentDTOList = commentService.findCommentsByPost(post).stream().map(comment -> comment.makeReadDTO(comment.getUser().getNickname())).collect(Collectors.toList());
         model.addAttribute("commentWriteDTO", new CommentWriteDTO());
@@ -87,8 +93,6 @@ public class PostController {
 
 
     }
-
-
 
 
 

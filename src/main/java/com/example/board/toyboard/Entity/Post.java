@@ -58,32 +58,5 @@ public class Post {
     }
 
 
-    public PostReadDTO makeReadDTO(String nickname) {
-
-        return PostReadDTO.builder()
-                .id(id)
-                .nickname(nickname)
-                .title(title)
-                .content(content)
-                .createTime(createTime)
-                .hits(hits)
-                .recommendedNumber(recommendedNumber)
-                .build();
-
-
-    }
-
-    public PostListDTO makeListDTO(String nickname) {
-
-        return PostListDTO.builder()
-                .id(id)
-                .title(title)
-                .nickname(nickname)
-                .createTime(createTime)
-                .hits(hits)
-                .recommendedNumber(recommendedNumber)
-                .build();
-
-    }
 
 }

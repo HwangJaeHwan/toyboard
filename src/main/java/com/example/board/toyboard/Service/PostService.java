@@ -1,11 +1,14 @@
 package com.example.board.toyboard.Service;
 
+import com.example.board.toyboard.DTO.PageResultDTO;
 import com.example.board.toyboard.DTO.PostWriteDTO;
 import com.example.board.toyboard.Entity.Post;
 import com.example.board.toyboard.Entity.User;
 import com.example.board.toyboard.Repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +27,15 @@ public class PostService {
     @Transactional(readOnly = true)
     public List<Post> findAll() {
         return postRepository.findAll();
+    }
+
+    @Transactional(readOnly = true)
+    public PageResultDTO makePageResult(Pageable pageable) {
+
+        Page<Post> posts = postRepository.findAll(pageable);
+
+        return new PageResultDTO(posts);
+
     }
 
     @Transactional(readOnly = true)

@@ -2,7 +2,8 @@
 <html lang="en" th:replace="~{layout/base :: layout(~{::content})}" xmlns:th="http://www.thymeleaf.org">
 
 
-<div class="flex-box justify-content-center" th:fragment="content">
+<div class="flex-c align-items-center" th:fragment="content">
+
 
     <table class="table table-bordered w80">
         <thead>
@@ -17,7 +18,7 @@
 
         <tbody class="text-center">
 
-        <tr th:each="post : ${posts}">
+        <tr th:each="post : ${posts.getDtoList()}">
         <td class="text-left"><a th:href="@{/post/{id}(id=${post.id})}" th:text="${post.title}"></a></td>
         <td th:text="${post.nickname}">김갑인</td>
         <td th:text="${post.createTime}">2016-25-30</td>
@@ -28,6 +29,22 @@
         </tbody>
 
     </table>
+
+    <nav>
+        <ul class="pagination">
+            <li th:if="${posts.prev}">
+                <a th:href="@{/post(page=${posts.start - 1})}">이전</a>
+            </li>
+            <li th:class="${posts.now == num ? 'active':''}" th:each="num: ${posts.pageList}" >
+                <a th:href="@{/post(page=${num})}" th:text="${num}"></a>
+            </li>
+
+
+            <li th:if="${posts.next}">
+                <a th:href="@{/post(page=${posts.end + 1})}">다음</a>
+            </li>
+        </ul>
+    </nav>
 
 </div>
 
