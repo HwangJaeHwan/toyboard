@@ -1,6 +1,7 @@
 package com.example.board.toyboard.Service;
 
 import com.example.board.toyboard.DTO.PageResultDTO;
+import com.example.board.toyboard.DTO.PostUpdateDTO;
 import com.example.board.toyboard.DTO.PostWriteDTO;
 import com.example.board.toyboard.Entity.Post;
 import com.example.board.toyboard.Entity.User;
@@ -61,6 +62,15 @@ public class PostService {
         Post save = postRepository.save(post);
 
         return save.getId();
+
+    }
+
+    public void update(Long postId, PostUpdateDTO dto) {
+
+        Post post = findById(postId);
+
+        post.updateTitle(dto.getTitle());
+        post.updateContent(dto.getContent());
 
     }
 

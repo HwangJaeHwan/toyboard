@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en" th:replace="~{layout/base :: layout(~{::content})}" xmlns:th="http://www.thymeleaf.org">
+
+
+<div class="flex-box justify-content-center" th:fragment="content">
+
+    <form action th:object="${post}" method="post" class="flex-c w80 align-items-center">
+
+        <input type="text" class="form-control" placeholder="제목을 입력해주세요." th:field="*{title}">
+        <br>
+        <br>
+
+        <textarea class="col-md-12" placeholder="내용을 입력해주세요." th:field="*{content}">
+
+        </textarea>
+        <div>
+            <button href="#" class="w-300 btn btn-success" type="submit">수정</button>
+            <a th:href="@{/post/{postId}(postId = ${id})}" class="w-300 btn btn-danger">취소</a>
+        </div>
+
+    </form>
+
+
+
+</div>
+
+
+
+
+
+
+
+
+</html>

@@ -3,7 +3,6 @@ package com.example.board.toyboard.Controller;
 import com.example.board.toyboard.DTO.*;
 import com.example.board.toyboard.Entity.Post;
 import com.example.board.toyboard.Entity.User;
-import com.example.board.toyboard.Repository.PostRepository;
 import com.example.board.toyboard.Service.CommentService;
 import com.example.board.toyboard.Service.PostService;
 import com.example.board.toyboard.Service.UserService;
@@ -16,7 +15,6 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.PostConstruct;
 import javax.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -74,26 +72,58 @@ public class PostController {
 
 
     @GetMapping("/{postId}")
-    public String readPost(@PathVariable("postId") Long postId, Model model) {
+    public String readPost(@SessionAttribute("loginUser") String loginUser, @PathVariable("postId") Long postId, Model model) {
 
 
         Post post = postService.findById(postId);
 
-        PostReadDTO readDTO = new PostReadDTO(post, post.getUser().getNickname());
 
-        List<CommentReadDTO> commentDTOList = commentService.findCommentsByPost(post).stream().map(comment -> comment.makeReadDTO(comment.getUser().getNickname())).collect(Collectors.toList());
+        PostReadDTO readDTO = new PostReadDTO(post);
+
+        List<CommentReadDTO> commentDTOList = commentService.findComments(post).stream().map(comment -> comment.makeReadDTO(comment.getUser().getNickname())).collect(Collectors.toList());
         model.addAttribute("commentWriteDTO", new CommentWriteDTO());
         model.addAttribute("post", readDTO);
         model.addAttribute("comments", commentDTOList);
         model.addAttribute("commentNums", commentDTOList.size());
-
-
+        model.addAttribute("nickname", loginUser);
 
         return "/post/read";
 
 
     }
 
+    @GetMapping("/update/{postId}")
+    public String updateStart(@PathVariable("postId") Long postId, Model model) {
+
+        Post post = postService.findById(postId);
+
+        PostUpdateDTO dto = PostUpdateDTO.builder()
+                .title(post.getTitle())
+                .content(post.getContent())
+                .build();
+
+        model.addAttribute("id", postId);
+        model.addAttribute("post", dto);
+
+        return "/post/update";
+    }
 
 
+    @PostMapping("update/{postId}")
+    public String updateEnd(@PathVariable("postId") Long postId, @Valid @ModelAttribute(name = "post") PostUpdateDTO dto, BindingResult bindingResult, Model model) {
+
+        model.addAttribute("id", postId);
+
+        if (bindingResult.hasErrors()) {
+            return "/post/update";
+        }
+
+
+        postService.update(postId, dto);
+
+        log.info("dto ={}", dto);
+
+        return "redirect:/post/" + postId;
+
+    }
 }

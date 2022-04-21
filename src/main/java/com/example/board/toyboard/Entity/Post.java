@@ -47,6 +47,14 @@ public class Post {
     private List<Comment> comments = new ArrayList<>();
 
 
+    public void updateTitle(String title){
+        this.title = title;
+    }
+    public void updateContent(String content) {
+        this.content = content;
+    }
+
+
     public void setUser(User user) {
         this.user = user;
         user.addPost(this);

@@ -29,9 +29,9 @@ public class PostReadDTO {
 
     private int recommendedNumber;
 
-    public PostReadDTO(Post post, String nickname) {
+    public PostReadDTO(Post post) {
         this.id = post.getId();
-        this.nickname = nickname;
+        this.nickname = post.getUser().getNickname();
         this.title = post.getTitle();
         this.content = post.getContent();
         this.createTime = post.getCreateTime();

@@ -51,11 +51,10 @@ public class CommentService {
 
     }
 
-    public List<Comment> findCommentsByPost(Post post) {
+    public List<Comment> findComments(Post post) {
 
         return post.getComments();
 
-//        return commentRepository.findCommentsByPost(post);
     }
 
 }

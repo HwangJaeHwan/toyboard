@@ -18,6 +18,9 @@
             조회수 : <span th:text="${post.hits}"></span>
             추천 :<span th:text="${post.recommendedNumber}"></span>
         </div>
+        <div class="flex-box justify-content-end" th:if="${session.loginUser.equals(nickname)}">
+            <a th:href="@{/post/update/{id}(id = ${post.id})}" class="btn btn-primary">수정</a>
+        </div>
 
 
         <div class="form-group">
@@ -33,9 +36,11 @@
 
             <div class="flex-box justify-content-space-between">
                 <span th:text="${commentdto.nickname}">닉네임</span>
+                <div>
                 <button th:onclick="|clickReport(${commentdto.id})|">신고하기</button>
+                <button th:if="${session.loginUser.equals(nickname)}">수정하기</button>
+                </div>
             </div>
-
 
             <div>
                 <p th:if="${commentdto.report >= 10}">블라인드 처리된 댓글입니다.</p>
