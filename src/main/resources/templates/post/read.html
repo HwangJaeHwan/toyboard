@@ -18,7 +18,7 @@
             조회수 : <span th:text="${post.hits}"></span>
             추천 :<span th:text="${post.recommendedNumber}"></span>
         </div>
-        <div class="flex-box justify-content-end" th:if="${session.loginUser.equals(nickname)}">
+        <div class="flex-box justify-content-end" th:if="${session.loginUser.equals(post.nickname)}">
             <a th:href="@{/post/update/{id}(id = ${post.id})}" class="btn btn-primary">수정</a>
         </div>
 
@@ -30,25 +30,26 @@
             </textarea>
 
         </div>
-        <h2>댓글 [[${commentNums}]]개</h2>
+        <h2 id="commentNums" >댓글 [[${commentNums}]]개</h2>
 
-        <div th:each="commentdto : ${comments}">
+        <div th:id="|comment${commentdto.id}|" th:class="flex-c" th:each="commentdto : ${comments}">
 
             <div class="flex-box justify-content-space-between">
                 <span th:text="${commentdto.nickname}">닉네임</span>
-                <div>
-                <button th:onclick="|clickReport(${commentdto.id})|">신고하기</button>
-                <button th:if="${session.loginUser.equals(nickname)}">수정하기</button>
+                <div th:if="${commentdto.report < 10}">
+                <button th:if="${session.loginUser.equals(commentdto.nickname)}"th:onclick="|clickDelete(${commentdto.id},${commentNums})|" >삭제하기</button>
+                <button th:unless="${session.loginUser.equals(commentdto.nickname)}" th:onclick="|clickReport(${commentdto.id})|">신고하기</button>
+
                 </div>
             </div>
 
             <div>
                 <p th:if="${commentdto.report >= 10}">블라인드 처리된 댓글입니다.</p>
-                <p th:if="${commentdto.report < 10}" th:text="${commentdto.content}"></p>
+                <textarea class="col-md-12 h-100" th:id="|comment${commentdto.id}|" th:if="${commentdto.report < 10}" th:text="${commentdto.content}" readonly></textarea>
             </div>
 
 
-            <div class="flex-box justify-content-end">
+            <div class="flex-box justify-content-end margin-bottom-30">
                 <button th:onclick="|commentUp(${commentdto.id})|">up</button>
                 <span th:id="|up${commentdto.id}|" th:text="${commentdto.up}"></span>
                 <button th:onclick="|commentDown(${commentdto.id})|">down</button>
@@ -85,13 +86,42 @@
 
             $.ajax({
                 url: "/comment/report/" + id,
-                type: "GET",
+                type: "PATCH",
 
 
                 success: function (data){
                     alert(data);
                 }
             })
+
+
+        }
+
+        function clickDelete(id,commentNums) {
+
+            if (!confirm("해당 댓글을 삭제하시겠습니까?")) {
+                return;
+            }
+
+            let count = commentNums - 1;
+
+
+            console.log(id);
+            console.log(count);
+
+            $.ajax({
+                url: "/comment/" + id,
+                type: "DELETE",
+
+
+                success: function (data){
+                    alert(data);
+                    $("#comment" + id).remove();
+                    $("#commentNums").html("댓글 " + count + "개");
+
+                }
+            })
+
 
 
         }

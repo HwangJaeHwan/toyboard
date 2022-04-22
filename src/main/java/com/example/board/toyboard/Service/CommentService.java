@@ -51,6 +51,10 @@ public class CommentService {
 
     }
 
+    public void delete(Long id) {
+        commentRepository.findById(id).ifPresent(commentRepository::delete);
+    }
+
     public List<Comment> findComments(Post post) {
 
         return post.getComments();

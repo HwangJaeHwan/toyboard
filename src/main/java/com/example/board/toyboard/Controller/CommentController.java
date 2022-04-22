@@ -82,7 +82,16 @@ public class CommentController {
 
     }
 
-    @GetMapping("/report/{id}")
+    @DeleteMapping("/{id}")
+    @ResponseBody
+    String delete(@PathVariable("id") Long id) {
+
+        commentService.delete(id);
+
+        return "삭제 완료";
+    }
+
+    @PatchMapping("/report/{id}")
     @ResponseBody
     String report(@SessionAttribute("loginUser") String nickname, @PathVariable("id") Long id) {
 

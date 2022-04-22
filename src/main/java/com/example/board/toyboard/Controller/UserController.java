@@ -107,6 +107,6 @@ public class UserController {
         }
 
 
-        return "redirect:/user/login";
+        return "redirect:/login";
     }
 }
