@@ -118,6 +118,7 @@
                     alert(data);
                     $("#comment" + id).remove();
                     $("#commentNums").html("댓글 " + count + "개");
+                    location.href = "/post/" + [[${post.id}]];
 
                 }
             })

@@ -65,6 +65,10 @@ public class Post {
         comments.add(comment);
     }
 
+    public void addHits() {
+        hits++;
+    }
+
 
 
 }

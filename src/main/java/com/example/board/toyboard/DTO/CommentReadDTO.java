@@ -1,5 +1,6 @@
 package com.example.board.toyboard.DTO;
 
+import com.example.board.toyboard.Entity.Comment;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -24,4 +25,12 @@ public class CommentReadDTO {
 
     int report;
 
+    public CommentReadDTO(Comment comment) {
+        this.id = comment.getId();
+        this.nickname = comment.getUser().getNickname();
+        this.content = comment.getComment();
+        this.up = comment.getUp();
+        this.down = comment.getDown();
+        this.report = comment.getReport();
+    }
 }

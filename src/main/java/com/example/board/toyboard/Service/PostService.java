@@ -46,6 +46,12 @@ public class PostService {
 
     }
 
+    public void upHit(Long postId) {
+
+        postRepository.findById(postId).ifPresent(Post::addHits);
+
+    }
+
 
     public Long write(PostWriteDTO dto, User loginUser) {
 
