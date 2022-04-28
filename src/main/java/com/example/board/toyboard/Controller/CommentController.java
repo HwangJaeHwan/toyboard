@@ -1,6 +1,7 @@
 package com.example.board.toyboard.Controller;
 
 
+import com.example.board.toyboard.DTO.CommentReadDTO;
 import com.example.board.toyboard.DTO.CommentWriteDTO;
 import com.example.board.toyboard.Entity.Comment;
 import com.example.board.toyboard.Entity.Post;
@@ -12,7 +13,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Controller
 @Slf4j
@@ -26,6 +29,18 @@ public class CommentController {
     private final CommentService commentService;
     private final UpService upService;
     private final DownService downService;
+
+
+    @GetMapping("/{postId}")
+    @ResponseBody
+    List<CommentReadDTO> findAll(@PathVariable("postId") Long postId) {
+
+        Post post = postService.findById(postId);
+
+        log.info("post = {}", post);
+
+        return post.getComments().stream().map(CommentReadDTO::new).collect(Collectors.toList());
+    }
 
     @PostMapping("/write/{postId}")
     String write(@SessionAttribute("loginUser") String nickname, @PathVariable("postId") Long postId, @ModelAttribute(name = "comment") CommentWriteDTO dto) {
