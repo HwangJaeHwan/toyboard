@@ -93,20 +93,19 @@
                     console.log(data)
                     data.forEach(function (commentDTO) {
 
-                        document.getElementById("test").append('<div id="comment' + commentDTO.id + '"class="flex-c">\n' +
-                            '<div  class="flex-box justify-content-space-between">\n' +
-                            '<span>' + commentDTO.nickname + '</span>');
+                        document.getElementById("test").innerHTML += '<div id="comment' + commentDTO.id + '"class="flex-c">\n' +
+                            '<div  id="commentHead'+commentDTO.id+'" class="flex-box justify-content-space-between">\n' +
+                            '<span>' + commentDTO.nickname + '</span>';
 
 
                             if (commentDTO.report < 10) {
 
                                 if (session === commentDTO.nickname) {
-                                    document.getElementById("test").innerHTML += '<div> <button onclick="clickDelete(' + commentDTO.id + ')">삭제하기</button> </div>';
+                                    document.getElementById("commentHead"+commentDTO.id).innerHTML += '<div> <button onclick="clickDelete(' + commentDTO.id + ')">삭제하기</button> </div>';
                                 } else {
-                                    document.getElementById("test").innerHTML += '<div> <button onclick="clickReport(' + commentDTO.id + ')">신고하기</button> </div>';
+                                    document.getElementById("commentHead"+commentDTO.id).innerHTML += '<div> <button onclick="clickReport(' + commentDTO.id + ')">신고하기</button> </div>';
                                 }
 
-                                document.getElementById("test").innerHTML += '</div>';
                             }
 
 
@@ -114,21 +113,20 @@
 
                             // document.getElementById("test").innerHTML += '<div>';
                             if (commentDTO.report >= 10) {
-                                document.getElementById("test").innerHTML += '<p>블라인드 처리된 댓글입니다.</p>';
+                                document.getElementById("comment"+commentDTO.id).innerHTML += '<p>블라인드 처리된 댓글입니다.</p>';
                             } else {
-                                document.getElementById("test").innerHTML += '<textarea class="col-md-12 h-100" id="commentContent' + commentDTO.id + '" readonly>' + commentDTO.content + '</textarea>'
+                                document.getElementById("comment"+commentDTO.id).innerHTML += '<div><textarea class="col-md-12 h-100" id="commentContent' + commentDTO.id + '" readonly>' + commentDTO.content + '</textarea> </div>'
                             }
                             // document.getElementById("test").innerHTML += '</div>';
 
 
-                            document.getElementById("test").innerHTML += ' <div class="flex-box justify-content-end margin-bottom-30">\n' +
+                            document.getElementById("comment"+commentDTO.id).innerHTML += ' <div class="flex-box justify-content-end margin-bottom-30">\n' +
                                 '                <button onclick="commentUp(' + commentDTO.id + ')">up</button>\n' +
-                                '                <span id="up' + commentDTO.id + '" th:text="${commentdto.up}"></span>\n' +
+                                '                <span id="up' + commentDTO.id + '">commentDTO.up</span>\n' +
                                 '                <button onclick="commentDown(' + commentDTO.id + ')">down</button>\n' +
-                                '                <span id="down' + commentDTO.id + '" th:text="${commentdto.down}"></span>\n' +
+                                '                <span id="down' + commentDTO.id + '">commentDTO.down</span>\n' +
                                 '            </div>';
 
-                        document.getElementById("test").innerHTML += '</div>';
 
 
                         }
