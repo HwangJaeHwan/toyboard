@@ -9,17 +9,19 @@ import com.example.board.toyboard.Entity.User;
 import com.example.board.toyboard.Service.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.http.HttpResponse;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-@Controller
 @Slf4j
 @RequiredArgsConstructor
+@RestController
 @RequestMapping("/comment")
 public class CommentController {
 
@@ -32,31 +34,27 @@ public class CommentController {
 
 
     @GetMapping("/{postId}")
-    @ResponseBody
     List<CommentReadDTO> findAll(@PathVariable("postId") Long postId) {
 
         Post post = postService.findById(postId);
 
-        log.info("post = {}", post);
+        log.info("시발2 = {}", post);
 
         return post.getComments().stream().map(CommentReadDTO::new).collect(Collectors.toList());
     }
 
-    @PostMapping("/write/{postId}")
-    String write(@SessionAttribute("loginUser") String nickname, @PathVariable("postId") Long postId, @ModelAttribute(name = "comment") CommentWriteDTO dto) {
+    @PostMapping("/{postId}")
+    String write(@SessionAttribute("loginUser") String nickname, @PathVariable("postId") Long postId, @RequestBody CommentWriteDTO dto) {
 
-        log.info("dto = {}", dto.getComment());
+        log.info("시발 = {}", dto.getContent());
 
         commentService.writeComment(dto, nickname, postId);
 
-
-        return "redirect:/post/" + postId;
-
+        return "Ok";
 
     }
 
     @GetMapping("/upButton/{id}")
-    @ResponseBody
     Map upButton(@SessionAttribute("loginUser") String nickname, @PathVariable("id") Long id) {
 
         HashMap<String, Integer> upCount = new HashMap<>();
@@ -77,7 +75,6 @@ public class CommentController {
     }
 
     @GetMapping("/downButton/{id}")
-    @ResponseBody
     Map downButton(@SessionAttribute("loginUser") String nickname, @PathVariable("id") Long id) {
 
         HashMap<String, Integer> downCount = new HashMap<>();
@@ -98,7 +95,6 @@ public class CommentController {
     }
 
     @DeleteMapping("/{id}")
-    @ResponseBody
     String delete(@PathVariable("id") Long id) {
 
         commentService.delete(id);
@@ -107,7 +103,6 @@ public class CommentController {
     }
 
     @PatchMapping("/report/{id}")
-    @ResponseBody
     String report(@SessionAttribute("loginUser") String nickname, @PathVariable("id") Long id) {
 
 

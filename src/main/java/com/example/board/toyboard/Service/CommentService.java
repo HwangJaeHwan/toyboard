@@ -37,7 +37,7 @@ public class CommentService {
 
         Comment comment = Comment.builder()
                 .user(loginUser)
-                .comment(dto.getComment())
+                .comment(dto.getContent())
                 .up(0)
                 .down(0)
                 .report(0)

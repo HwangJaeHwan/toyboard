@@ -9,11 +9,8 @@ import lombok.NoArgsConstructor;
 public class CommentWriteDTO {
 
 
-    Long userId;
+    String content;
 
-    Long postId;
-
-    String comment;
 
 
 }
