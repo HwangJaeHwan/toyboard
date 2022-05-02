@@ -6,12 +6,14 @@ import com.example.board.toyboard.Entity.User;
 import com.example.board.toyboard.Service.CommentService;
 import com.example.board.toyboard.Service.PostService;
 import com.example.board.toyboard.Service.UserService;
+import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,14 +33,13 @@ public class PostController {
 
 
     @GetMapping
-    public String postList(PageListDTO pageListDTO, Model model) {
+    public String postList(PageListDTO pageListDTO, SearchDTO searchDTO, Model model) {
 
         Pageable pageable = pageListDTO.getPageable(Sort.by("createTime").descending());
 
+        model.addAttribute("posts", postService.makePageResult(pageable,searchDTO));
 
-//        List<PostListDTO> dtoList = postService.findAll().stream().map(post -> new PostListDTO(post, post.getUser().getNickname())).collect(Collectors.toList());
 
-        model.addAttribute("posts", postService.makePageResult(pageable));
 
         return "/post/list";
 

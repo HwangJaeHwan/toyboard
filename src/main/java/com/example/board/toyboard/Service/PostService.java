@@ -3,6 +3,7 @@ package com.example.board.toyboard.Service;
 import com.example.board.toyboard.DTO.PageResultDTO;
 import com.example.board.toyboard.DTO.PostUpdateDTO;
 import com.example.board.toyboard.DTO.PostWriteDTO;
+import com.example.board.toyboard.DTO.SearchDTO;
 import com.example.board.toyboard.Entity.Post;
 import com.example.board.toyboard.Entity.User;
 import com.example.board.toyboard.Repository.PostRepository;
@@ -31,9 +32,9 @@ public class PostService {
     }
 
     @Transactional(readOnly = true)
-    public PageResultDTO makePageResult(Pageable pageable) {
+    public PageResultDTO makePageResult(Pageable pageable, SearchDTO searchDTO) {
 
-        Page<Post> posts = postRepository.findAll(pageable);
+        Page<Post> posts = postRepository.search(searchDTO, pageable);
 
         return new PageResultDTO(posts);
 
