@@ -37,6 +37,8 @@ public class PostController {
 
         Pageable pageable = pageListDTO.getPageable(Sort.by("createTime").descending());
 
+        log.info("searchDTO = {}", searchDTO);
+
         model.addAttribute("posts", postService.makePageResult(pageable,searchDTO));
 
 

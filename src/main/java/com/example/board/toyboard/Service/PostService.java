@@ -35,6 +35,7 @@ public class PostService {
     public PageResultDTO makePageResult(Pageable pageable, SearchDTO searchDTO) {
 
         Page<Post> posts = postRepository.search(searchDTO, pageable);
+        log.info("posts = {}", posts);
 
         return new PageResultDTO(posts);
 

@@ -5,6 +5,27 @@
 <div class="flex-c align-items-center" th:fragment="content">
 
 
+
+    <form class="flex-box justify-content-end w80" action method="get">
+
+        <div style="vertical-align: bottom" class="text-center">
+            <label class="radio-inline">
+                <input type="radio" name="type" value="t" checked> 제목
+            </label>
+
+            <label class="radio-inline">
+                <input type="radio" name="type" value="w"> 작성자
+            </label>
+        </div>
+
+        <input type="text" class="w20 form-control" name="content" th:value="${searchDTO.content}" placeholder="Text input">
+
+        <button class="col-md-1 btn btn-primary" type="submit">검색</button>
+
+
+    </form>
+
+
     <table class="table table-bordered w80">
         <thead>
         <tr>
@@ -21,7 +42,7 @@
         <tr th:each="post : ${posts.getDtoList()}">
         <td class="text-left"><a th:href="@{/post/{id}(id=${post.id})}" th:text="${post.title}"></a></td>
         <td th:text="${post.nickname}">김갑인</td>
-        <td th:text="${post.createTime}">2016-25-30</td>
+        <td th:text="${#temporals.format(post.createTime, 'yyyy/MM/dd HH:mm')}">2016-25-30</td>
         <td th:text="${post.hits}" >1</td>
         <td th:text="${post.recommendedNumber}">0</td>
 
@@ -30,18 +51,27 @@
 
     </table>
 
+    <div class="flex-box justify-content-end w80">
+        <a class="btn btn-default" th:href="@{/post/write}">글쓰기</a>
+    </div>
+
+
     <nav>
         <ul class="pagination">
             <li th:if="${posts.prev}">
-                <a th:href="@{/post(page=${posts.start - 1})}">이전</a>
+                <a th:if="${#strings.isEmpty(searchDTO.content)}" th:href="@{/post(page=${posts.start - 1})}" th:text="${num}"></a>
+                <a th:unless="${#strings.isEmpty(searchDTO.content)}" th:href="@{/post(page=${posts.start - 1},type=${searchDTO.type},content=${searchDTO.content})}" th:text="${num}"></a>
             </li>
             <li th:class="${posts.now == num ? 'active':''}" th:each="num: ${posts.pageList}" >
-                <a th:href="@{/post(page=${num})}" th:text="${num}"></a>
+
+                <a th:if="${#strings.isEmpty(searchDTO.content)}" th:href="@{/post(page=${num})}" th:text="${num}"></a>
+                <a th:unless="${#strings.isEmpty(searchDTO.content)}" th:href="@{/post(page=${num},type=${searchDTO.type},content=${searchDTO.content})}" th:text="${num}"></a>
             </li>
 
 
             <li th:if="${posts.next}">
-                <a th:href="@{/post(page=${posts.end + 1})}">다음</a>
+                <a th:if="${#strings.isEmpty(searchDTO.content)}" th:href="@{/post(page=${posts.end + 1})}" th:text="${num}"></a>
+                <a th:unless="${#strings.isEmpty(searchDTO.content)}" th:href="@{/post(page=${posts.end + 1},type=${searchDTO.type},content=${searchDTO.content})}" th:text="${num}"></a>
             </li>
         </ul>
     </nav>

@@ -7,6 +7,7 @@ import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
@@ -16,7 +17,7 @@ import javax.persistence.EntityManager;
 import java.util.List;
 
 import static com.example.board.toyboard.Entity.QPost.*;
-
+@Slf4j
 public class PostRepositoryImpl implements PostRepositoryCustom{
 
 
@@ -33,10 +34,10 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
         BooleanBuilder builder = new BooleanBuilder();
 
         if (StringUtils.hasText(searchDTO.getType())&&StringUtils.hasText(searchDTO.getContent())) {
-            if (searchDTO.getType() == "t") {
+            if (searchDTO.getType().equals("t")) {
                 builder.and(post.title.contains(searchDTO.getContent()));
             } else {
-                builder.and(post.user.nickname.eq(searchDTO.getContent()));
+                builder.and(post.user.nickname.contains(searchDTO.getContent()));
             }
         }
 
@@ -46,6 +47,8 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
+
+
 
         JPAQuery<Long> countQuery = queryFactory
                 .select(post.count())
