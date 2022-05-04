@@ -6,6 +6,7 @@ import com.example.board.toyboard.Entity.User;
 import com.example.board.toyboard.Service.CommentService;
 import com.example.board.toyboard.Service.PostService;
 import com.example.board.toyboard.Service.UserService;
+import com.example.board.toyboard.session.SessionConst;
 import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -57,7 +58,7 @@ public class PostController {
 
 
     @PostMapping("/write")
-    public String writeEnd(@SessionAttribute("loginUser") String nickname, @Valid @ModelAttribute(name = "post") PostWriteDTO dto, BindingResult bindingResult) {
+    public String writeEnd(@SessionAttribute(name = SessionConst.LOGIN_USER) String nickname, @Valid @ModelAttribute(name = "post") PostWriteDTO dto, BindingResult bindingResult) {
 
         if (bindingResult.hasErrors()) {
             return "/post/write";
@@ -75,7 +76,7 @@ public class PostController {
 
 
     @GetMapping("/{postId}")
-    public String readPost(@SessionAttribute("loginUser") String loginUser, @PathVariable("postId") Long postId, Model model, @RequestParam(required = false) boolean check) {
+    public String readPost(@SessionAttribute(name = SessionConst.LOGIN_USER) String loginUser, @PathVariable("postId") Long postId, Model model, @RequestParam(required = false) boolean check) {
 
 
         Post post = postService.findById(postId);

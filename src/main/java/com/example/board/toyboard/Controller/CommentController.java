@@ -7,6 +7,7 @@ import com.example.board.toyboard.Entity.Comment;
 import com.example.board.toyboard.Entity.Post;
 import com.example.board.toyboard.Entity.User;
 import com.example.board.toyboard.Service.*;
+import com.example.board.toyboard.session.SessionConst;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -44,7 +45,7 @@ public class CommentController {
     }
 
     @PostMapping("/{postId}")
-    String write(@SessionAttribute("loginUser") String nickname, @PathVariable("postId") Long postId, @RequestBody CommentWriteDTO dto) {
+    String write(@SessionAttribute(name = SessionConst.LOGIN_USER) String nickname, @PathVariable("postId") Long postId, @RequestBody CommentWriteDTO dto) {
 
         log.info("시발 = {}", dto.getContent());
 
@@ -55,7 +56,7 @@ public class CommentController {
     }
 
     @GetMapping("/upButton/{id}")
-    Map upButton(@SessionAttribute("loginUser") String nickname, @PathVariable("id") Long id) {
+    Map upButton(@SessionAttribute(name = SessionConst.LOGIN_USER) String nickname, @PathVariable("id") Long id) {
 
         HashMap<String, Integer> upCount = new HashMap<>();
         HashMap<String, Boolean> check = new HashMap<>();
@@ -75,7 +76,7 @@ public class CommentController {
     }
 
     @GetMapping("/downButton/{id}")
-    Map downButton(@SessionAttribute("loginUser") String nickname, @PathVariable("id") Long id) {
+    Map downButton(@SessionAttribute(name = SessionConst.LOGIN_USER) String nickname, @PathVariable("id") Long id) {
 
         HashMap<String, Integer> downCount = new HashMap<>();
         HashMap<String, Boolean> check = new HashMap<>();
@@ -103,7 +104,7 @@ public class CommentController {
     }
 
     @PatchMapping("/report/{id}")
-    String report(@SessionAttribute("loginUser") String nickname, @PathVariable("id") Long id) {
+    String report(@SessionAttribute(name = SessionConst.LOGIN_USER) String nickname, @PathVariable("id") Long id) {
 
 
         User loginUser = userService.findByNickname(nickname);

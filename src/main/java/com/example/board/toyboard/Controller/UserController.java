@@ -4,6 +4,7 @@ import com.example.board.toyboard.DTO.RegisterDTO;
 import com.example.board.toyboard.Entity.User;
 import com.example.board.toyboard.Repository.UserRepository;
 import com.example.board.toyboard.Service.UserService;
+import com.example.board.toyboard.session.SessionConst;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -11,6 +12,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -73,7 +75,8 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public String loginEnd(@Valid @ModelAttribute(name = "user") LoginDTO loginDTO, BindingResult bindingResult, HttpServletRequest request) {
+    public String loginEnd(@Valid @ModelAttribute(name = "user") LoginDTO loginDTO, BindingResult bindingResult,
+                           HttpServletRequest request,@RequestParam(defaultValue = "/post") String redirectURI) {
 
         if (bindingResult.hasErrors()) {
             return "user/login";
@@ -89,10 +92,10 @@ public class UserController {
 
         HttpSession session = request.getSession();
 
-        session.setAttribute("loginUser", loginUser.getNickname());
+        session.setAttribute(SessionConst.LOGIN_USER, loginUser.getNickname());
 
 
-        return "redirect:/post";
+        return "redirect:" + redirectURI;
     }
 
 
