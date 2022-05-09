@@ -10,7 +10,7 @@
         <br>
         <br>
 
-        <textarea class="col-md-12" placeholder="내용을 입력해주세요." th:field="*{content}">
+        <textarea class="summernote" placeholder="내용을 입력해주세요." th:field="*{content}">
 
         </textarea>
         <div>
@@ -23,12 +23,15 @@
     </form>
 
 
+    <script>
+        $('.summernote').summernote({
+            weight: 800,
+            height: 450,
+            lang: "ko-KR"
+        });
+    </script>
 
 </div>
-
-
-
-
 
 
 
