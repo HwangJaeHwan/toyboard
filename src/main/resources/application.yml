@@ -13,9 +13,13 @@
 #         show_sql: true
           format_sql: true
 
+    servlet:
+      multipart:
+        max-file-size: 5MB
+
   logging.level:
     org.hibernate.SQL: debug
 #   org.hibernate.type: trace
 
   file:
-    dir: /Users/Hwang/upload/
+    dir: C:/Users/Hwang/upload/

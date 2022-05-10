@@ -6,19 +6,23 @@ import com.example.board.toyboard.Entity.User;
 import com.example.board.toyboard.Service.CommentService;
 import com.example.board.toyboard.Service.PostService;
 import com.example.board.toyboard.Service.UserService;
+import com.example.board.toyboard.file.FileStore;
+import com.example.board.toyboard.file.UploadFile;
 import com.example.board.toyboard.session.SessionConst;
-import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
+import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,6 +35,7 @@ public class PostController {
     private final PostService postService;
     private final UserService userService;
     private final CommentService commentService;
+    private final FileStore fileStore;
 
 
     @GetMapping
@@ -40,8 +45,7 @@ public class PostController {
 
         log.info("searchDTO = {}", searchDTO);
 
-        model.addAttribute("posts", postService.makePageResult(pageable,searchDTO));
-
+        model.addAttribute("posts", postService.makePageResult(pageable, searchDTO));
 
 
         return "/post/list";
@@ -134,4 +138,24 @@ public class PostController {
         return "redirect:/post/" + postId;
 
     }
+
+    @PostMapping("/image")
+    @ResponseBody
+    public String uploadImage(@RequestParam MultipartFile file) throws IOException {
+
+        UploadFile uploadFile = fileStore.storeFile(file);
+
+        String imagePath = "/post/image/" + uploadFile.getStoreFileName();
+
+        return imagePath;
+
+    }
+
+    @ResponseBody
+    @GetMapping("/image/{filename}")
+    public UrlResource downloadImage(@PathVariable String filename) throws
+            MalformedURLException {
+        return new UrlResource("file:" + fileStore.getFullPath(filename));
+    }
+
 }
