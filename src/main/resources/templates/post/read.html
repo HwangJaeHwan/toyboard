@@ -4,17 +4,21 @@
 
 <div class="flex-box justify-content-center" th:fragment="content">
 
-    <div class="flex-c w80">
+    <div style="background: white" class="flex-c w80">
 
-        <h3>[[${post.title}]]</h3>
-        <br>
+
+        <h2>[[${post.title}]]</h2>
+        <hr>
 
         <div class="flex-box justify-content-end">
-            <span th:text="${post.nickname}" ></span>
+            <h3 th:text="${post.nickname}" ></h3>
         </div>
 
         <div class="flex-box justify-content-end">
-            <span th:text="${post.getCreateTime()}"></span>
+            <span th:text="${#temporals.format(post.createTime, 'yyyy/MM/dd HH:mm')}"></span>
+        </div>
+
+        <div class="flex-box justify-content-end">
             조회수 : <span th:text="${post.hits}"></span>
             추천 :<span th:text="${post.recommendedNumber}"></span>
         </div>
@@ -22,7 +26,7 @@
             <a th:href="@{/post/update/{id}(id = ${post.id})}" class="btn btn-primary">수정</a>
         </div>
 
-
+        <hr>
         <div class="form-group">
 
             <div class="col-md-12" th:utext="${post.content}">
@@ -63,7 +67,6 @@
     </div>
 
         <div>
-            <h3>댓글 작성</h3>
 
             <div class="flex-box">
                 <textarea id="newComment" class="col-md-11 h-100" placeholder="댓글을 입력해주세요."></textarea>
