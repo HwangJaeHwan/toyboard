@@ -1,6 +1,6 @@
 package com.example.board.toyboard.DTO;
 
-import com.example.board.toyboard.Entity.Post;
+import com.example.board.toyboard.Entity.Post.Post;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

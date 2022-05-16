@@ -4,7 +4,7 @@ import com.example.board.toyboard.DTO.PageResultDTO;
 import com.example.board.toyboard.DTO.PostUpdateDTO;
 import com.example.board.toyboard.DTO.PostWriteDTO;
 import com.example.board.toyboard.DTO.SearchDTO;
-import com.example.board.toyboard.Entity.Post;
+import com.example.board.toyboard.Entity.Post.Post;
 import com.example.board.toyboard.Entity.User;
 import com.example.board.toyboard.Repository.PostRepository;
 import lombok.RequiredArgsConstructor;
@@ -62,6 +62,7 @@ public class PostService {
                 .content(dto.getContent())
                 .createTime(LocalDateTime.now())
                 .hits(0)
+                .postType(dto.getPostType())
                 .recommendedNumber(0)
                 .build();
 
@@ -79,6 +80,7 @@ public class PostService {
 
         post.updateTitle(dto.getTitle());
         post.updateContent(dto.getContent());
+        post.updatePostType(dto.getPostType());
 
     }
 

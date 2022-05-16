@@ -1,7 +1,8 @@
 package com.example.board.toyboard.Controller;
 
 import com.example.board.toyboard.DTO.*;
-import com.example.board.toyboard.Entity.Post;
+import com.example.board.toyboard.Entity.Post.Post;
+import com.example.board.toyboard.Entity.Post.PostCode;
 import com.example.board.toyboard.Entity.User;
 import com.example.board.toyboard.Service.CommentService;
 import com.example.board.toyboard.Service.PostService;
@@ -23,6 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -54,15 +56,19 @@ public class PostController {
 
 
     @GetMapping("/write")
-    public String writeStart(@ModelAttribute(name = "post") PostWriteDTO dto) {
+    public String writeStart(@ModelAttribute(name = "post") PostWriteDTO dto, Model model) {
+
+        model.addAttribute("postCodes", makePostCodes());
 
 
         return "/post/write";
     }
 
 
+
     @PostMapping("/write")
     public String writeEnd(@SessionAttribute(name = SessionConst.LOGIN_USER) String nickname, @Valid @ModelAttribute(name = "post") PostWriteDTO dto, BindingResult bindingResult) {
+
 
         if (bindingResult.hasErrors()) {
             return "/post/write";
@@ -112,10 +118,13 @@ public class PostController {
         PostUpdateDTO dto = PostUpdateDTO.builder()
                 .title(post.getTitle())
                 .content(post.getContent())
+                .postType(post.getPostType())
                 .build();
 
         model.addAttribute("id", postId);
         model.addAttribute("post", dto);
+        model.addAttribute("postCodes", makePostCodes());
+
 
         return "/post/update";
     }
@@ -156,6 +165,17 @@ public class PostController {
     public UrlResource downloadImage(@PathVariable String filename) throws
             MalformedURLException {
         return new UrlResource("file:" + fileStore.getFullPath(filename));
+    }
+
+
+    private List<PostCode> makePostCodes() {
+        List<PostCode> postCodes = new ArrayList<>();
+
+        postCodes.add(new PostCode("FREE", "자유"));
+        postCodes.add(new PostCode("INFO", "정보"));
+        postCodes.add(new PostCode("QNA", "Q&A"));
+
+        return postCodes;
     }
 
 }

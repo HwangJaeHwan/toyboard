@@ -14,6 +14,8 @@ import javax.validation.constraints.NotNull;
 @Builder
 public class PostUpdateDTO {
 
+    @NotEmpty
+    private String postType;
 
     @NotEmpty(message = "제목을 입력해주세요.")
     private String title;

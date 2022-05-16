@@ -8,6 +8,10 @@ import javax.validation.constraints.NotEmpty;
 public class PostWriteDTO {
 
 
+    @NotEmpty
+    private String postType;
+
+
     @NotEmpty(message = "제목을 입력해주세요.")
     private String title;
 

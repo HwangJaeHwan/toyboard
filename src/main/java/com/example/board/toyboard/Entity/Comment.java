@@ -2,7 +2,7 @@ package com.example.board.toyboard.Entity;
 
 
 import com.example.board.toyboard.DTO.CommentReadDTO;
-import com.example.board.toyboard.DTO.CommentWriteDTO;
+import com.example.board.toyboard.Entity.Post.Post;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

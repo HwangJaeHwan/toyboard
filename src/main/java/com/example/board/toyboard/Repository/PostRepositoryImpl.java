@@ -1,12 +1,10 @@
 package com.example.board.toyboard.Repository;
 
 import com.example.board.toyboard.DTO.SearchDTO;
-import com.example.board.toyboard.Entity.Post;
-import com.example.board.toyboard.Entity.QPost;
+import com.example.board.toyboard.Entity.Post.Post;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

@@ -1,6 +1,6 @@
 package com.example.board.toyboard.DTO;
 
-import com.example.board.toyboard.Entity.Post;
+import com.example.board.toyboard.Entity.Post.Post;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;

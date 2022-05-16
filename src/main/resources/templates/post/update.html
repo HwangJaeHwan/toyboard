@@ -6,8 +6,12 @@
 
     <form action th:object="${post}" method="post" class="flex-c w80 align-items-center">
 
-        <input type="text" class="form-control" placeholder="제목을 입력해주세요." th:field="*{title}">
+        <select th:field="*{postType}" class="form-control">
+            <option th:each="postCode: ${postCodes}" th:value="${postCode.postType}"th:text="${postCode.displayName}" ></option>
+        </select>
         <br>
+
+        <input type="text" class="form-control" placeholder="제목을 입력해주세요." th:field="*{title}">
         <br>
 
         <textarea id="summernote" placeholder="내용을 입력해주세요." th:field="*{content}">

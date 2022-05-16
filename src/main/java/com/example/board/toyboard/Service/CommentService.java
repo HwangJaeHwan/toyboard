@@ -2,7 +2,7 @@ package com.example.board.toyboard.Service;
 
 import com.example.board.toyboard.DTO.CommentWriteDTO;
 import com.example.board.toyboard.Entity.Comment;
-import com.example.board.toyboard.Entity.Post;
+import com.example.board.toyboard.Entity.Post.Post;
 import com.example.board.toyboard.Entity.User;
 import com.example.board.toyboard.Repository.CommentRepository;
 import com.example.board.toyboard.Repository.PostRepository;

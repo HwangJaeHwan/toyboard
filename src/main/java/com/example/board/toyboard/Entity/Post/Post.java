@@ -1,8 +1,8 @@
-package com.example.board.toyboard.Entity;
+package com.example.board.toyboard.Entity.Post;
 
 
-import com.example.board.toyboard.DTO.PostListDTO;
-import com.example.board.toyboard.DTO.PostReadDTO;
+import com.example.board.toyboard.Entity.Comment;
+import com.example.board.toyboard.Entity.User;
 import lombok.*;
 
 import javax.persistence.*;
@@ -32,6 +32,9 @@ public class Post {
 
     private LocalDateTime createTime;
 
+
+    private String postType;
+
     private int hits;
 
     private int recommendedNumber;
@@ -50,6 +53,10 @@ public class Post {
     }
     public void updateContent(String content) {
         this.content = content;
+    }
+
+    public void updatePostType(String postType){
+        this.postType = postType;
     }
 
 
