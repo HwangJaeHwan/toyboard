@@ -4,7 +4,7 @@
 
 <div class="flex-c align-items-center" th:fragment="content">
 
-
+<h1>[[${postType}]]</h1>
 
     <form class="flex-box justify-content-end w80" action method="get">
 
@@ -19,7 +19,7 @@
         </div>
 
         <input type="text" class="w20 form-control" name="content" th:value="${searchDTO.content}" placeholder="Text input">
-
+        <input type="hidden"  name="postType" th:value="${postType}"}>
         <button class="col-md-1 btn btn-primary" type="submit">검색</button>
 
 
@@ -59,19 +59,19 @@
     <nav>
         <ul class="pagination">
             <li th:if="${posts.prev}">
-                <a th:if="${#strings.isEmpty(searchDTO.content)}" th:href="@{/post(page=${posts.start - 1})}" th:text="${num}"></a>
-                <a th:unless="${#strings.isEmpty(searchDTO.content)}" th:href="@{/post(page=${posts.start - 1},type=${searchDTO.type},content=${searchDTO.content})}" th:text="${num}"></a>
+                <a th:if="${#strings.isEmpty(searchDTO.content)}" th:href="@{/post(page=${posts.start - 1},postType=${postType}))}" th:text="${num}"></a>
+                <a th:unless="${#strings.isEmpty(searchDTO.content)}" th:href="@{/post(page=${posts.start - 1},type=${searchDTO.type},content=${searchDTO.content},postType=${postType})}" th:text="${num}"></a>
             </li>
             <li th:class="${posts.now == num ? 'active':''}" th:each="num: ${posts.pageList}" >
 
-                <a th:if="${#strings.isEmpty(searchDTO.content)}" th:href="@{/post(page=${num})}" th:text="${num}"></a>
-                <a th:unless="${#strings.isEmpty(searchDTO.content)}" th:href="@{/post(page=${num},type=${searchDTO.type},content=${searchDTO.content})}" th:text="${num}"></a>
+                <a th:if="${#strings.isEmpty(searchDTO.content)}" th:href="@{/post(page=${num},postType=${postType})}" th:text="${num}"></a>
+                <a th:unless="${#strings.isEmpty(searchDTO.content)}" th:href="@{/post(page=${num},type=${searchDTO.type},content=${searchDTO.content},postType=${postType})}" th:text="${num}"></a>
             </li>
 
 
             <li th:if="${posts.next}">
-                <a th:if="${#strings.isEmpty(searchDTO.content)}" th:href="@{/post(page=${posts.end + 1})}" th:text="${num}"></a>
-                <a th:unless="${#strings.isEmpty(searchDTO.content)}" th:href="@{/post(page=${posts.end + 1},type=${searchDTO.type},content=${searchDTO.content})}" th:text="${num}"></a>
+                <a th:if="${#strings.isEmpty(searchDTO.content)}" th:href="@{/post(page=${posts.end + 1},postType=${postType}))}" th:text="${num}"></a>
+                <a th:unless="${#strings.isEmpty(searchDTO.content)}" th:href="@{/post(page=${posts.end + 1},type=${searchDTO.type},content=${searchDTO.content},postType=${postType})}" th:text="${num}"></a>
             </li>
         </ul>
     </nav>

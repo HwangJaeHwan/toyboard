@@ -17,6 +17,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -41,18 +42,21 @@ public class PostController {
 
 
     @GetMapping
-    public String postList(PageListDTO pageListDTO, SearchDTO searchDTO, Model model) {
+    public String posts(PageListDTO pageListDTO, SearchDTO searchDTO
+            , @RequestParam(defaultValue = "createTime") String sort ,@RequestParam(defaultValue = "free") String postType, Model model) {
 
-        Pageable pageable = pageListDTO.getPageable(Sort.by("createTime").descending());
+        Pageable pageable = pageListDTO.getPageable(Sort.by(sort).descending());
 
         log.info("searchDTO = {}", searchDTO);
 
-        model.addAttribute("posts", postService.makePageResult(pageable, searchDTO));
 
+        model.addAttribute("posts", postService.makePageResult(pageable, searchDTO, postType.toUpperCase()));
+        model.addAttribute("postType", postType);
 
         return "/post/list";
 
     }
+
 
 
     @GetMapping("/write")

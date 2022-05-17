@@ -2,6 +2,7 @@ package com.example.board.toyboard.Repository;
 
 import com.example.board.toyboard.DTO.SearchDTO;
 import com.example.board.toyboard.Entity.Post.Post;
+import com.example.board.toyboard.Entity.Post.QPost;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -14,7 +15,8 @@ import org.springframework.util.StringUtils;
 import javax.persistence.EntityManager;
 import java.util.List;
 
-import static com.example.board.toyboard.Entity.QPost.*;
+import static com.example.board.toyboard.Entity.Post.QPost.post;
+
 @Slf4j
 public class PostRepositoryImpl implements PostRepositoryCustom{
 
@@ -27,7 +29,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
 
 
     @Override
-    public Page<Post> search(SearchDTO searchDTO, Pageable pageable) {
+    public Page<Post> search(SearchDTO searchDTO, Pageable pageable, String postType) {
 
         BooleanBuilder builder = new BooleanBuilder();
 
@@ -38,6 +40,8 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
                 builder.and(post.user.nickname.contains(searchDTO.getContent()));
             }
         }
+
+        builder.and(post.postType.eq(postType));
 
         List<Post> content = queryFactory
                 .selectFrom(post)

@@ -8,6 +8,6 @@ import org.springframework.data.domain.Pageable;
 public interface PostRepositoryCustom {
 
 
-    Page<Post> search(SearchDTO searchDTO, Pageable pageable);
+    Page<Post> search(SearchDTO searchDTO, Pageable pageable,String postType);
 
 }

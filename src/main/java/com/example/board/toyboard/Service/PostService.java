@@ -32,9 +32,9 @@ public class PostService {
     }
 
     @Transactional(readOnly = true)
-    public PageResultDTO makePageResult(Pageable pageable, SearchDTO searchDTO) {
+    public PageResultDTO makePageResult(Pageable pageable, SearchDTO searchDTO, String postType) {
 
-        Page<Post> posts = postRepository.search(searchDTO, pageable);
+        Page<Post> posts = postRepository.search(searchDTO, pageable, postType);
         log.info("posts = {}", posts);
 
         return new PageResultDTO(posts);
