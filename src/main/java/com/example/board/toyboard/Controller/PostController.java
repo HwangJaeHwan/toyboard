@@ -45,13 +45,15 @@ public class PostController {
     public String posts(PageListDTO pageListDTO, SearchDTO searchDTO
             , @RequestParam(defaultValue = "createTime") String sort ,@RequestParam(defaultValue = "free") String postType, Model model) {
 
-        Pageable pageable = pageListDTO.getPageable(Sort.by(sort).descending());
+        Pageable pageable = pageListDTO.getPageable(Sort.by(Sort.Direction.DESC, sort));
 
         log.info("searchDTO = {}", searchDTO);
+        log.info("sort={}", sort);
 
 
         model.addAttribute("posts", postService.makePageResult(pageable, searchDTO, postType.toUpperCase()));
         model.addAttribute("postType", postType);
+        model.addAttribute("sort", sort);
 
         return "/post/list";
 

@@ -4,11 +4,14 @@ import com.example.board.toyboard.DTO.SearchDTO;
 import com.example.board.toyboard.Entity.Post.Post;
 import com.example.board.toyboard.Entity.Post.QPost;
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.Order;
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.util.StringUtils;
 
@@ -48,6 +51,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
                 .where(builder)
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
+                .orderBy(postSort(pageable))
                 .fetch();
 
 
@@ -59,6 +63,27 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
 
         return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
 
+    }
+
+    private OrderSpecifier<?> postSort(Pageable page) {
+
+        if (!page.getSort().isEmpty()) {
+
+            for (Sort.Order order : page.getSort()) {
+
+                Order direction = order.getDirection().isAscending() ? Order.ASC : Order.DESC;
+
+                switch (order.getProperty()){
+                    case "createTime":
+                        return new OrderSpecifier(direction, post.createTime);
+                    case "hits":
+                        return new OrderSpecifier(direction, post.hits);
+                    case "recommendedNumber":
+                        return new OrderSpecifier(direction, post.recommendedNumber);
+                }
+            }
+        }
+        return null;
     }
 
 }
