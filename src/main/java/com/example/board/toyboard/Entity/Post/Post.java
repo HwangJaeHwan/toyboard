@@ -1,6 +1,7 @@
 package com.example.board.toyboard.Entity.Post;
 
 
+import com.example.board.toyboard.Entity.BaseEntity;
 import com.example.board.toyboard.Entity.Comment;
 import com.example.board.toyboard.Entity.User;
 import lombok.*;
@@ -16,7 +17,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class Post {
+public class Post extends BaseEntity {
 
 
     @Id

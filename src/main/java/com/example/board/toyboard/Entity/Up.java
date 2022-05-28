@@ -14,7 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Up {
+public class Up extends BaseEntity{
 
 
     @Id
