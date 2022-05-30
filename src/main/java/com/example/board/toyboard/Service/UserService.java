@@ -3,6 +3,7 @@ package com.example.board.toyboard.Service;
 import com.example.board.toyboard.DTO.LoginDTO;
 import com.example.board.toyboard.DTO.RegisterDTO;
 import com.example.board.toyboard.Entity.User;
+import com.example.board.toyboard.Exception.UserNotFoundException;
 import com.example.board.toyboard.Repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +24,7 @@ public class UserService {
 
     public User findById(Long userId) {
 
-        return userRepository.findById(userId).orElse(null);
+        return userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
 
 
     }

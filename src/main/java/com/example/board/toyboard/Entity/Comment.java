@@ -10,6 +10,8 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
+import static javax.persistence.FetchType.LAZY;
+
 @Entity
 @Getter
 @NoArgsConstructor
@@ -32,11 +34,11 @@ public class Comment extends BaseEntity{
 
     private int report;
 
-    @ManyToOne
+    @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
-    @ManyToOne
+    @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "post_id")
     private Post post;
 
@@ -47,18 +49,6 @@ public class Comment extends BaseEntity{
     }
 
 
-    public CommentReadDTO makeReadDTO(String nickname) {
-
-        return CommentReadDTO.builder()
-                .id(id)
-                .nickname(nickname)
-                .content(comment)
-                .up(up)
-                .down(down)
-                .report(report)
-                .build();
-
-    }
 
 
     public void addUp() {

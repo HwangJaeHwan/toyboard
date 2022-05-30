@@ -83,7 +83,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
                 }
             }
         }
-        return null;
+        return new OrderSpecifier(Order.ASC, post.createTime);
     }
 
 }

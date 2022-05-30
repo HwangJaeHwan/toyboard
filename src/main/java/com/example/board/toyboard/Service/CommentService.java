@@ -4,6 +4,9 @@ import com.example.board.toyboard.DTO.CommentWriteDTO;
 import com.example.board.toyboard.Entity.Comment;
 import com.example.board.toyboard.Entity.Post.Post;
 import com.example.board.toyboard.Entity.User;
+import com.example.board.toyboard.Exception.CommentNotFoundException;
+import com.example.board.toyboard.Exception.PostNotFoundException;
+import com.example.board.toyboard.Exception.UserNotFoundException;
 import com.example.board.toyboard.Repository.CommentRepository;
 import com.example.board.toyboard.Repository.PostRepository;
 import com.example.board.toyboard.Repository.UserRepository;
@@ -27,13 +30,13 @@ public class CommentService {
 
     public Comment findById(Long id) {
 
-        return commentRepository.findById(id).orElse(null);
+        return commentRepository.findById(id).orElseThrow(CommentNotFoundException::new);
     }
 
     public Long writeComment(CommentWriteDTO dto, String nickname, Long postId) {
 
-        User loginUser = userRepository.findByNickname(nickname).orElse(null);
-        Post post = postRepository.findById(postId).orElse(null);
+        User loginUser = userRepository.findByNickname(nickname).orElseThrow(UserNotFoundException::new);
+        Post post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
 
         Comment comment = Comment.builder()
                 .user(loginUser)
@@ -51,7 +54,8 @@ public class CommentService {
 
     }
 
-    public void delete(Long id) {
+    public void delete(Long id, User loginUser) {
+
         commentRepository.findById(id).ifPresent(commentRepository::delete);
     }
 

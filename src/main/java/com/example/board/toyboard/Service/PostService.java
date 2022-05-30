@@ -6,6 +6,7 @@ import com.example.board.toyboard.DTO.PostWriteDTO;
 import com.example.board.toyboard.DTO.SearchDTO;
 import com.example.board.toyboard.Entity.Post.Post;
 import com.example.board.toyboard.Entity.User;
+import com.example.board.toyboard.Exception.PostNotFoundException;
 import com.example.board.toyboard.Repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -44,7 +45,7 @@ public class PostService {
     @Transactional(readOnly = true)
     public Post findById(Long postId) {
 
-        return postRepository.findById(postId).orElse(null);
+        return postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
 
     }
 
@@ -66,7 +67,7 @@ public class PostService {
                 .recommendedNumber(0)
                 .build();
 
-        post.setUser(loginUser);
+        post.setWriter(loginUser);
 
         Post save = postRepository.save(post);
 

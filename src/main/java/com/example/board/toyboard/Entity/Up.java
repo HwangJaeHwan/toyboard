@@ -9,6 +9,8 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 import java.util.List;
 
+import static javax.persistence.FetchType.*;
+
 @Entity
 @Getter
 @NoArgsConstructor
@@ -22,11 +24,11 @@ public class Up extends BaseEntity{
     @Column(name = "up_id")
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
-    @ManyToOne
+    @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "comment_id")
     private Comment comment;
 

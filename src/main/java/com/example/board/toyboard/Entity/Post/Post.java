@@ -11,6 +11,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import static javax.persistence.FetchType.*;
+
 @Entity
 @Getter
 @Builder
@@ -41,7 +43,7 @@ public class Post extends BaseEntity {
     private int recommendedNumber;
 
 
-    @ManyToOne
+    @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
@@ -61,7 +63,7 @@ public class Post extends BaseEntity {
     }
 
 
-    public void setUser(User user) {
+    public void setWriter(User user) {
         this.user = user;
         user.addPost(this);
     }

@@ -93,9 +93,11 @@ public class CommentController {
     }
 
     @DeleteMapping("/{id}")
-    String delete(@PathVariable("id") Long id) {
+    String delete(@SessionAttribute(name = SessionConst.LOGIN_USER) String nickname, @PathVariable("id") Long id) {
 
-        commentService.delete(id);
+        User loginUser = userService.findByNickname(nickname);
+
+        commentService.delete(id,loginUser);
 
         return "삭제 완료";
     }
