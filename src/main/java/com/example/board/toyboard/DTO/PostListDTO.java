@@ -33,7 +33,7 @@ public class PostListDTO {
         this.id = post.getId();
         this.nickname = nickname;
         this.title = post.getTitle();
-        this.createTime = post.getCreateTime();
+        this.createTime = post.getCreatedTime();
         this.hits = post.getHits();
         this.recommendedNumber = post.getRecommendedNumber();
     }

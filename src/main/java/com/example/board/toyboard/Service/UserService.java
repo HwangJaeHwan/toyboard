@@ -30,7 +30,7 @@ public class UserService {
     }
 
     public User findByNickname(String nickname) {
-        return userRepository.findByNickname(nickname).orElse(null);
+        return userRepository.findByNickname(nickname).orElseThrow(UserNotFoundException::new);
     }
 
     @Transactional

@@ -34,6 +34,14 @@
             </div>
 
         </div>
+
+        <div class="flex-c align-items-center justify-content-center" >
+
+            <button class="btn-danger" th:onclick="|clickRecommend(${post.id})|">추천</button>
+            <p id="recommendedNumber" th:text="${post.recommendedNumber}">0</p>
+
+
+        </div>
         <h2 id="commentNums" >댓글 [[${commentNums}]]개</h2>
         <div id="test">
 
@@ -141,6 +149,25 @@
 
             });
 
+
+
+        }
+
+
+        function clickRecommend(id){
+
+
+
+
+            $.ajax({
+                url: "/post/recommend/" + id,
+                type: "GET",
+
+                success: function (data){
+                    console.log(data);
+                    $("#recommendedNumber").text(data);
+                }
+            })
 
 
         }

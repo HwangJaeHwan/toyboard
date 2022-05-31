@@ -5,9 +5,13 @@ import com.example.board.toyboard.DTO.PostUpdateDTO;
 import com.example.board.toyboard.DTO.PostWriteDTO;
 import com.example.board.toyboard.DTO.SearchDTO;
 import com.example.board.toyboard.Entity.Post.Post;
+import com.example.board.toyboard.Entity.Post.Recommendation;
 import com.example.board.toyboard.Entity.User;
 import com.example.board.toyboard.Exception.PostNotFoundException;
+import com.example.board.toyboard.Exception.UserNotFoundException;
 import com.example.board.toyboard.Repository.PostRepository;
+import com.example.board.toyboard.Repository.RecommendationRepository;
+import com.example.board.toyboard.Repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -17,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -25,6 +30,8 @@ import java.util.List;
 public class PostService {
 
     private final PostRepository postRepository;
+    private final UserRepository userRepository;
+    private final RecommendationRepository recommendationRepository;
 
 
     @Transactional(readOnly = true)
@@ -61,7 +68,6 @@ public class PostService {
         Post post = Post.builder()
                 .title(dto.getTitle())
                 .content(dto.getContent())
-                .createTime(LocalDateTime.now())
                 .hits(0)
                 .postType(dto.getPostType())
                 .recommendedNumber(0)
@@ -82,6 +88,42 @@ public class PostService {
         post.updateTitle(dto.getTitle());
         post.updateContent(dto.getContent());
         post.updatePostType(dto.getPostType());
+
+    }
+
+    public int recommend(Long postId, String nickname) {
+        Post post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
+        User user = userRepository.findByNickname(nickname).orElseThrow(UserNotFoundException::new);
+
+        log.info("number1 = {}", post.getRecommendedNumber());
+
+        Optional<Recommendation> check = recommendationRepository.findByUserAndPost(user, post);
+
+
+        if (check.isPresent()) {
+            recommendationRepository.delete(check.get());
+
+            post.subRecommendedNumber();
+
+        } else {
+
+            recommendationRepository.save(
+                    Recommendation.builder()
+                            .user(user)
+                            .post(post)
+                            .build()
+            );
+
+            post.addRecommendedNumber();
+
+        }
+
+        log.info("number2 = {}", post.getRecommendedNumber());
+
+        return post.getRecommendedNumber();
+
+
+
 
     }
 

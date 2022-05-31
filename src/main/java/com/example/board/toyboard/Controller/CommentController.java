@@ -97,6 +97,7 @@ public class CommentController {
 
         User loginUser = userService.findByNickname(nickname);
 
+
         commentService.delete(id,loginUser);
 
         return "삭제 완료";

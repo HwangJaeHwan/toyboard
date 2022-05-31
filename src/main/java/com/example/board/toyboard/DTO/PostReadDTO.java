@@ -33,7 +33,7 @@ public class PostReadDTO {
         this.nickname = post.getUser().getNickname();
         this.title = post.getTitle();
         this.content = post.getContent();
-        this.createTime = post.getCreateTime();
+        this.createTime = post.getCreatedTime();
         this.hits = post.getHits();
         this.recommendedNumber = post.getRecommendedNumber();
     }

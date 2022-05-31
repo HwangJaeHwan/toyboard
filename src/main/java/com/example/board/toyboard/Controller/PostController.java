@@ -43,7 +43,7 @@ public class PostController {
 
     @GetMapping
     public String posts(PageListDTO pageListDTO, SearchDTO searchDTO
-            , @RequestParam(defaultValue = "createTime") String sort ,@RequestParam(defaultValue = "free") String postType, Model model) {
+            , @RequestParam(defaultValue = "createdTime") String sort ,@RequestParam(defaultValue = "free") String postType, Model model) {
 
         Pageable pageable = pageListDTO.getPageable(Sort.by(Sort.Direction.DESC, sort));
 
@@ -136,7 +136,7 @@ public class PostController {
     }
 
 
-    @PostMapping("update/{postId}")
+    @PostMapping("/update/{postId}")
     public String updateEnd(@PathVariable("postId") Long postId, @Valid @ModelAttribute(name = "post") PostUpdateDTO dto, BindingResult bindingResult, Model model) {
 
         model.addAttribute("id", postId);
@@ -151,6 +151,14 @@ public class PostController {
         log.info("dto ={}", dto);
 
         return "redirect:/post/" + postId;
+
+    }
+
+    @GetMapping("/recommend/{postId}")
+    @ResponseBody
+    public int recommend(@SessionAttribute(SessionConst.LOGIN_USER) String nickname,  @PathVariable Long postId) {
+
+        return postService.recommend(postId, nickname);
 
     }
 

@@ -18,12 +18,13 @@ import static javax.persistence.FetchType.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
+@SequenceGenerator(name = "POST_SEQ_GENERATOR",
+        sequenceName = "POST_SEQ")
 public class Post extends BaseEntity {
 
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Column(name = "post_id")
     private Long id;
 
@@ -32,9 +33,6 @@ public class Post extends BaseEntity {
 
     @Column(length = 1000)
     private String content;
-
-    private LocalDateTime createTime;
-
 
     private String postType;
 
@@ -75,6 +73,14 @@ public class Post extends BaseEntity {
 
     public void addHits() {
         hits++;
+    }
+
+    public void addRecommendedNumber(){
+        recommendedNumber++;
+    }
+
+    public void subRecommendedNumber(){
+        recommendedNumber--;
     }
 
 

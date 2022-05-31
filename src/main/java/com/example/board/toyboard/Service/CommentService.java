@@ -56,7 +56,14 @@ public class CommentService {
 
     public void delete(Long id, User loginUser) {
 
-        commentRepository.findById(id).ifPresent(commentRepository::delete);
+        Comment comment = commentRepository.findById(id).orElseThrow(CommentNotFoundException::new);
+
+        if (comment.getUser() == loginUser) {
+            log.info("loginUser ={}, getUser ={}", loginUser, comment.getUser());
+            commentRepository.delete(comment);
+        } else {
+            throw new IllegalStateException();
+        }
     }
 
     public List<Comment> findComments(Post post) {
