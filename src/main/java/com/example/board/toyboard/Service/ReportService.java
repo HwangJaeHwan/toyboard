@@ -2,7 +2,8 @@ package com.example.board.toyboard.Service;
 
 
 import com.example.board.toyboard.Entity.Comment;
-import com.example.board.toyboard.Entity.Report;
+import com.example.board.toyboard.Entity.Report.CommentReport;
+import com.example.board.toyboard.Entity.Report.Report;
 import com.example.board.toyboard.Entity.User;
 import com.example.board.toyboard.Repository.ReportRepository;
 import lombok.RequiredArgsConstructor;
@@ -22,10 +23,8 @@ public class ReportService {
 
     public void commentReport(User user, Comment comment) {
 
-        Report report = Report.builder()
-                .user(user)
-                .comment(comment)
-                .build();
+
+        Report report = new CommentReport(user, comment);
 
         comment.commentReport();
 
