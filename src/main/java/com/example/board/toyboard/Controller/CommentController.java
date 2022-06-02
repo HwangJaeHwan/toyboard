@@ -110,10 +110,9 @@ public class CommentController {
         User loginUser = userService.findByNickname(nickname);
         Comment comment = commentService.findById(id);
 
-        if (reportService.reportCheck(loginUser, comment)) {
+        if (reportService.commentReportCheck(loginUser, comment)) {
 
             reportService.commentReport(loginUser, comment);
-            comment.commentReport();
 
             return "신고 완료";
         }

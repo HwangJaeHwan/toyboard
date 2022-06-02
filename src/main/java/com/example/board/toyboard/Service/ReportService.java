@@ -35,7 +35,7 @@ public class ReportService {
 
 
     @Transactional
-    public boolean reportCheck(User user, Comment comment){
+    public boolean commentReportCheck(User user, Comment comment){
 
         if (reportRepository.findByUserAndComment(user, comment).isPresent()) {
             return false;

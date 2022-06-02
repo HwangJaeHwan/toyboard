@@ -8,26 +8,19 @@
 
 
         <h2>[[${post.title}]]</h2>
-        <hr>
-
-        <div class="flex-box justify-content-end">
-            <h3 th:text="${post.nickname}" ></h3>
-        </div>
-
-        <div class="flex-box justify-content-end">
-            <span th:text="${#temporals.format(post.createTime, 'yyyy/MM/dd HH:mm')}"></span>
-        </div>
-
-        <div class="flex-box justify-content-end">
+        <div class="flex-box justify-content-start border-bottom">
+            <p class="margin-right-10" th:text="${post.nickname}" ></p>
+            <p class="margin-right-10" th:text="${#temporals.format(post.createTime, 'yyyy/MM/dd HH:mm')}   "></p>
             조회수 : <span th:text="${post.hits}"></span>
-            추천 :<span th:text="${post.recommendedNumber}"></span>
         </div>
+
+
         <div class="flex-box justify-content-end" th:if="${session.loginUser.equals(post.nickname)}">
             <a th:href="@{/post/update/{id}(id = ${post.id})}" class="btn btn-primary">수정</a>
         </div>
 
         <hr>
-        <div class="form-group">
+        <div class="form-group test">
 
             <div class="col-md-12" th:utext="${post.content}">
 
@@ -35,13 +28,15 @@
 
         </div>
 
-        <div class="flex-c align-items-center justify-content-center" >
+        <div class="flex-c align-items-center justify-content-center border-bottom-3px" >
 
             <button class="btn-danger" th:onclick="|clickRecommend(${post.id})|">추천</button>
             <p id="recommendedNumber" th:text="${post.recommendedNumber}">0</p>
 
 
         </div>
+
+
         <h2 id="commentNums" >댓글 [[${commentNums}]]개</h2>
         <div id="test">
 
