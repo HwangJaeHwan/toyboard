@@ -43,13 +43,6 @@ public class Comment extends BaseEntity{
     private Post post;
 
 
-    public void setPost(Post post) {
-        this.post = post;
-        post.addComment(this);
-    }
-
-
-
 
     public void addUp() {
         up += 1;
@@ -70,9 +63,6 @@ public class Comment extends BaseEntity{
     public void commentReport() {
         report++;
     }
-
-
-
 
 
 }

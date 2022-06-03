@@ -45,9 +45,6 @@ public class Post extends BaseEntity {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @OneToMany(mappedBy = "post")
-    private List<Comment> comments = new ArrayList<>();
-
 
     public void updateTitle(String title){
         this.title = title;
@@ -66,10 +63,6 @@ public class Post extends BaseEntity {
         user.addPost(this);
     }
 
-
-    public void addComment(Comment comment) {
-        comments.add(comment);
-    }
 
     public void addHits() {
         hits++;

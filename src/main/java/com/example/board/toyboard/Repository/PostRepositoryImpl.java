@@ -71,15 +71,14 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
 
             for (Sort.Order order : page.getSort()) {
 
-                Order direction = order.getDirection().isAscending() ? Order.ASC : Order.DESC;
 
                 switch (order.getProperty()){
                     case "createdTime":
-                        return new OrderSpecifier(direction, post.createdTime);
+                        return new OrderSpecifier(Order.ASC, post.createdTime);
                     case "hits":
-                        return new OrderSpecifier(direction, post.hits);
+                        return new OrderSpecifier(Order.DESC, post.hits);
                     case "recommendedNumber":
-                        return new OrderSpecifier(direction, post.recommendedNumber);
+                        return new OrderSpecifier(Order.DESC, post.recommendedNumber);
                 }
             }
         }

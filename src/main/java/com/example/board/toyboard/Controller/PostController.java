@@ -26,6 +26,7 @@ import javax.validation.Valid;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -105,16 +106,20 @@ public class PostController {
         PostReadDTO readDTO = new PostReadDTO(post);
 
         List<CommentReadDTO> commentDTOList = commentService.findComments(post).stream().map(comment -> new CommentReadDTO(comment)).collect(Collectors.toList());
-        model.addAttribute("commentWriteDTO", new CommentWriteDTO());
+        List<CommentReadDTO> bestCommentList = commentService.findBestComments(post).stream().map(comment -> new CommentReadDTO(comment)).collect(Collectors.toList());
+
+
         model.addAttribute("post", readDTO);
         model.addAttribute("comments", commentDTOList);
         model.addAttribute("commentNums", commentDTOList.size());
         model.addAttribute("nickname", loginUser);
+        model.addAttribute("bestComments", bestCommentList);
 
         return "/post/read";
 
 
     }
+
 
     @GetMapping("/update/{postId}")
     public String updateStart(@PathVariable("postId") Long postId, Model model) {

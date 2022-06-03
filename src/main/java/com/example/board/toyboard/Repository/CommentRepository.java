@@ -2,6 +2,7 @@ package com.example.board.toyboard.Repository;
 
 import com.example.board.toyboard.Entity.Comment;
 import com.example.board.toyboard.Entity.Post.Post;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -12,7 +13,8 @@ import java.util.List;
 @Repository
 public interface CommentRepository extends JpaRepository<Comment,Long> {
 
-    @Query("select c from Comment c join fetch c.post where c.post = :p")
-    List<Comment> findCommentsByPost(@Param("p") Post post);
+    List<Comment> findCommentsByPost(Post post);
+
+    List<Comment> findCommentsByPostAndUpGreaterThanEqual(Post post, int up, Pageable pageable);
 
 }

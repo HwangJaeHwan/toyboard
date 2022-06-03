@@ -12,6 +12,9 @@ import com.example.board.toyboard.Repository.PostRepository;
 import com.example.board.toyboard.Repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,12 +44,12 @@ public class CommentService {
         Comment comment = Comment.builder()
                 .user(loginUser)
                 .comment(dto.getContent())
+                .post(post)
                 .up(0)
                 .down(0)
                 .report(0)
                 .build();
 
-        comment.setPost(post);
 
         Comment save = commentRepository.save(comment);
 
@@ -68,8 +71,13 @@ public class CommentService {
 
     public List<Comment> findComments(Post post) {
 
-        return post.getComments();
+        return commentRepository.findCommentsByPost(post);
 
+    }
+
+    public List<Comment> findBestComments(Post post) {
+
+        return commentRepository.findCommentsByPostAndUpGreaterThanEqual(post, 10, PageRequest.of(0, 3, Sort.by(Sort.Direction.DESC, "up")));
     }
 
 }
