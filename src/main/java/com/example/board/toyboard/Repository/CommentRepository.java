@@ -9,12 +9,15 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface CommentRepository extends JpaRepository<Comment,Long> {
 
     List<Comment> findCommentsByPost(Post post);
 
-    List<Comment> findCommentsByPostAndUpGreaterThanEqual(Post post, int up, Pageable pageable);
+    @Query("select c from Comment c join fetch c.post where c.id = :id")
+    Optional<Comment> findCommentWithPost(@Param("id") Long id);
+
 
 }

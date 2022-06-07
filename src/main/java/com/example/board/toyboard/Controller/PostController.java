@@ -93,27 +93,21 @@ public class PostController {
 
 
     @GetMapping("/{postId}")
-    public String readPost(@SessionAttribute(name = SessionConst.LOGIN_USER) String loginUser, @PathVariable("postId") Long postId, Model model, @RequestParam(required = false) boolean check) {
+    public String readPost(@SessionAttribute(name = SessionConst.LOGIN_USER) String loginUser, @PathVariable("postId") Long postId, Model model) {
 
 
         Post post = postService.findById(postId);
-
-        if (!check) {
-            post.addHits();
-        }
 
 
         PostReadDTO readDTO = new PostReadDTO(post);
 
         List<CommentReadDTO> commentDTOList = commentService.findComments(post).stream().map(comment -> new CommentReadDTO(comment)).collect(Collectors.toList());
-        List<CommentReadDTO> bestCommentList = commentService.findBestComments(post).stream().map(comment -> new CommentReadDTO(comment)).collect(Collectors.toList());
 
 
         model.addAttribute("post", readDTO);
         model.addAttribute("comments", commentDTOList);
         model.addAttribute("commentNums", commentDTOList.size());
         model.addAttribute("nickname", loginUser);
-        model.addAttribute("bestComments", bestCommentList);
 
         return "/post/read";
 

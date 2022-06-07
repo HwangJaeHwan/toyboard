@@ -4,10 +4,8 @@ package com.example.board.toyboard.Service;
 import com.example.board.toyboard.Entity.Comment;
 import com.example.board.toyboard.Entity.Up;
 import com.example.board.toyboard.Entity.User;
-import com.example.board.toyboard.Repository.CommentRepository;
-import com.example.board.toyboard.Repository.DownRepository;
-import com.example.board.toyboard.Repository.UpRepository;
-import com.example.board.toyboard.Repository.UserRepository;
+import com.example.board.toyboard.Entity.log.CommentLog;
+import com.example.board.toyboard.Repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -25,6 +23,7 @@ public class UpService {
     private final DownRepository downRepository;
     private final UserRepository userRepository;
     private final CommentRepository commentRepository;
+    private final LogRepository logRepository;
 
 
     public boolean upClick(User user, Comment comment) {

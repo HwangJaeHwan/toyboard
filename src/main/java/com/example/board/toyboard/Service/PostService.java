@@ -6,12 +6,12 @@ import com.example.board.toyboard.DTO.PostWriteDTO;
 import com.example.board.toyboard.DTO.SearchDTO;
 import com.example.board.toyboard.Entity.Post.Post;
 import com.example.board.toyboard.Entity.Post.Recommendation;
+import com.example.board.toyboard.Entity.Report.Report;
 import com.example.board.toyboard.Entity.User;
+import com.example.board.toyboard.Entity.log.PostLog;
 import com.example.board.toyboard.Exception.PostNotFoundException;
 import com.example.board.toyboard.Exception.UserNotFoundException;
-import com.example.board.toyboard.Repository.PostRepository;
-import com.example.board.toyboard.Repository.RecommendationRepository;
-import com.example.board.toyboard.Repository.UserRepository;
+import com.example.board.toyboard.Repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -33,6 +33,9 @@ public class PostService {
     private final UserRepository userRepository;
     private final RecommendationRepository recommendationRepository;
 
+    private final ReportRepository reportRepository;
+
+    private final LogRepository logRepository;
 
     @Transactional(readOnly = true)
     public List<Post> findAll() {
@@ -41,6 +44,7 @@ public class PostService {
 
     @Transactional(readOnly = true)
     public PageResultDTO makePageResult(Pageable pageable, SearchDTO searchDTO, String postType) {
+
 
         Page<Post> posts = postRepository.search(searchDTO, pageable, postType);
         log.info("posts = {}", posts);
@@ -75,7 +79,10 @@ public class PostService {
 
         post.setWriter(loginUser);
 
+
         Post save = postRepository.save(post);
+
+        logRepository.save(new PostLog(loginUser, post, "게시물을 작성했습니다."));
 
         return save.getId();
 

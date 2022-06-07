@@ -38,7 +38,7 @@ public class CommentController {
 
         log.info("시발2 = {}", post);
 
-        return post.getComments().stream().map(CommentReadDTO::new).collect(Collectors.toList());
+        return commentService.findComments(post).stream().map(CommentReadDTO::new).collect(Collectors.toList());
     }
 
     @PostMapping("/{postId}")
@@ -59,7 +59,7 @@ public class CommentController {
         HashMap<String, Boolean> check = new HashMap<>();
 
         User loginUser = userService.findByNickname(nickname);
-        Comment comment = commentService.findById(id);
+        Comment comment = commentService.findWithPost(id);
 
         if (!upService.upClick(loginUser, comment)) {
             check.put("dup", true);

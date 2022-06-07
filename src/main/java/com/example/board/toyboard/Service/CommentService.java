@@ -36,6 +36,10 @@ public class CommentService {
         return commentRepository.findById(id).orElseThrow(CommentNotFoundException::new);
     }
 
+    public Comment findWithPost(Long id) {
+        return commentRepository.findCommentWithPost(id).orElseThrow(CommentNotFoundException::new);
+    }
+
     public Long writeComment(CommentWriteDTO dto, String nickname, Long postId) {
 
         User loginUser = userRepository.findByNickname(nickname).orElseThrow(UserNotFoundException::new);
@@ -75,9 +79,5 @@ public class CommentService {
 
     }
 
-    public List<Comment> findBestComments(Post post) {
-
-        return commentRepository.findCommentsByPostAndUpGreaterThanEqual(post, 10, PageRequest.of(0, 3, Sort.by(Sort.Direction.DESC, "up")));
-    }
 
 }
