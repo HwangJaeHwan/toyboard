@@ -20,16 +20,11 @@ import static javax.persistence.FetchType.LAZY;
 public class CommentLog extends Log {
 
 
-    public CommentLog(User user, Post post, String message, User commentUser, Comment comment) {
-        super(user, post, message);
-        this.user = commentUser;
+    public CommentLog(User user, Post post, LogType type, Comment comment) {
+        super(user, post, type);
         this.comment = comment;
     }
 
-    @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "user_id")
-    @Column(name = "comment_user")
-    private User user;
 
     @ManyToOne(fetch = LAZY)
     @JoinColumn

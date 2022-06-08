@@ -18,10 +18,10 @@ import static javax.persistence.FetchType.*;
 public class Log {
 
 
-    public Log(User user, Post post, String message) {
+    public Log(User user, Post post, LogType type) {
         this.user = user;
         this.post = post;
-        this.message = message;
+        this.logType = type;
     }
 
     @Id
@@ -37,6 +37,8 @@ public class Log {
     @JoinColumn(name = "post_id")
     private Post post;
 
-    String message;
+    @Enumerated(EnumType.STRING)
+    private LogType logType;
+
 
 }

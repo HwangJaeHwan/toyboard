@@ -17,6 +17,7 @@
 
         <div class="flex-box justify-content-end" th:if="${session.loginUser.equals(post.nickname)}">
             <a th:href="@{/post/update/{id}(id = ${post.id})}" class="btn btn-primary">수정</a>
+            <a th:href="@{/post/delete/{id}(id = ${post.id})}" class="btn btn-danger">삭제</a>
         </div>
 
         <hr>

@@ -14,10 +14,13 @@ import java.util.Optional;
 @Repository
 public interface CommentRepository extends JpaRepository<Comment,Long> {
 
-    List<Comment> findCommentsByPost(Post post);
+    @Query("select c from Comment c join fetch c.user where c.post = :post")
+    List<Comment> findCommentsByPost(@Param("post") Post post);
 
-    @Query("select c from Comment c join fetch c.post where c.id = :id")
-    Optional<Comment> findCommentWithPost(@Param("id") Long id);
+    @Query("select c from Comment c join fetch c.post join fetch c.user where c.id = :id")
+    Optional<Comment> findWithPostAndUser(@Param("id") Long id);
+
+    void deleteAllByPost(Post post);
 
 
 }

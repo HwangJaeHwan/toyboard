@@ -59,7 +59,7 @@ public class CommentController {
         HashMap<String, Boolean> check = new HashMap<>();
 
         User loginUser = userService.findByNickname(nickname);
-        Comment comment = commentService.findWithPost(id);
+        Comment comment = commentService.findWithPostAndUser(id);
 
         if (!upService.upClick(loginUser, comment)) {
             check.put("dup", true);

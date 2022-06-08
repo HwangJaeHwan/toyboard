@@ -13,7 +13,7 @@ import javax.persistence.Entity;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class PostLog extends Log {
 
-    public PostLog(User user, Post post, String message) {
-        super(user, post, message);
+    public PostLog(User user, Post post, LogType type) {
+        super(user, post, type);
     }
 }

@@ -4,10 +4,13 @@ import com.example.board.toyboard.DTO.CommentWriteDTO;
 import com.example.board.toyboard.Entity.Comment;
 import com.example.board.toyboard.Entity.Post.Post;
 import com.example.board.toyboard.Entity.User;
+import com.example.board.toyboard.Entity.log.CommentLog;
+import com.example.board.toyboard.Entity.log.LogType;
 import com.example.board.toyboard.Exception.CommentNotFoundException;
 import com.example.board.toyboard.Exception.PostNotFoundException;
 import com.example.board.toyboard.Exception.UserNotFoundException;
 import com.example.board.toyboard.Repository.CommentRepository;
+import com.example.board.toyboard.Repository.LogRepository;
 import com.example.board.toyboard.Repository.PostRepository;
 import com.example.board.toyboard.Repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -30,14 +33,16 @@ public class CommentService {
     private final UserRepository userRepository;
     private final PostRepository postRepository;
 
+    private final LogRepository logRepository;
+
 
     public Comment findById(Long id) {
 
         return commentRepository.findById(id).orElseThrow(CommentNotFoundException::new);
     }
 
-    public Comment findWithPost(Long id) {
-        return commentRepository.findCommentWithPost(id).orElseThrow(CommentNotFoundException::new);
+    public Comment findWithPostAndUser(Long id) {
+        return commentRepository.findWithPostAndUser(id).orElseThrow(CommentNotFoundException::new);
     }
 
     public Long writeComment(CommentWriteDTO dto, String nickname, Long postId) {
@@ -54,6 +59,7 @@ public class CommentService {
                 .report(0)
                 .build();
 
+        logRepository.save(new CommentLog(loginUser, post, LogType.COMMENT, comment));
 
         Comment save = commentRepository.save(comment);
 
@@ -67,6 +73,9 @@ public class CommentService {
 
         if (comment.getUser() == loginUser) {
             log.info("loginUser ={}, getUser ={}", loginUser, comment.getUser());
+
+            logRepository.findLogByUserAndCommentAndLogType(loginUser, comment, LogType.COMMENT).ifPresent(log -> logRepository.delete(log));
+            log.info("퉤={}", comment.getId());
             commentRepository.delete(comment);
         } else {
             throw new IllegalStateException();

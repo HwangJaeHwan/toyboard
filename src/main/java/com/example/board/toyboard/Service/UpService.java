@@ -2,9 +2,11 @@ package com.example.board.toyboard.Service;
 
 
 import com.example.board.toyboard.Entity.Comment;
+import com.example.board.toyboard.Entity.Post.Post;
 import com.example.board.toyboard.Entity.Up;
 import com.example.board.toyboard.Entity.User;
 import com.example.board.toyboard.Entity.log.CommentLog;
+import com.example.board.toyboard.Entity.log.LogType;
 import com.example.board.toyboard.Repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,17 +37,26 @@ public class UpService {
         }
 
         if (check.isPresent()) {
-            upRepository.delete(check.get());
-            comment.subUp();
-        } else {
+            Up up = check.get();
+            comment.subUp(up);
+            upRepository.delete(up);
+            logRepository.findLogByUserAndCommentAndLogType(user, comment,LogType.UP).ifPresent(log -> logRepository.delete(log));
 
-            upRepository.save(
-                    Up.builder()
+
+
+        } else {
+            Post post = comment.getPost();
+
+            Up up = Up.builder()
                     .user(user)
                     .comment(comment)
-                    .build()
-            );
-            comment.addUp();
+                    .build();
+
+            upRepository.save(up);
+
+            comment.addUp(up);
+
+            logRepository.save(new CommentLog(user, post, LogType.UP, comment));
 
         }
 

@@ -2,9 +2,13 @@ package com.example.board.toyboard.Service;
 
 import com.example.board.toyboard.Entity.Comment;
 import com.example.board.toyboard.Entity.Down;
+import com.example.board.toyboard.Entity.Post.Post;
 import com.example.board.toyboard.Entity.Up;
 import com.example.board.toyboard.Entity.User;
+import com.example.board.toyboard.Entity.log.CommentLog;
+import com.example.board.toyboard.Entity.log.LogType;
 import com.example.board.toyboard.Repository.DownRepository;
+import com.example.board.toyboard.Repository.LogRepository;
 import com.example.board.toyboard.Repository.UpRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +25,7 @@ public class DownService {
 
     private final DownRepository downRepository;
     private final UpRepository upRepository;
+    private final LogRepository logRepository;
 
 
     public boolean downClick(User user, Comment comment) {
@@ -33,8 +38,10 @@ public class DownService {
 
         if (check.isPresent()) {
             downRepository.delete(check.get());
+            logRepository.findLogByUserAndCommentAndLogType(user, comment,LogType.DOWN).ifPresent(log -> logRepository.delete(log));
             comment.subDown();
         } else {
+            Post post = comment.getPost();
 
             downRepository.save(
                     Down.builder()
@@ -43,6 +50,7 @@ public class DownService {
                             .build()
             );
             comment.addDown();
+            logRepository.save(new CommentLog(user, post, LogType.DOWN, comment));
 
         }
 

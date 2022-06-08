@@ -8,6 +8,7 @@ import com.example.board.toyboard.Entity.Post.Post;
 import com.example.board.toyboard.Entity.Post.Recommendation;
 import com.example.board.toyboard.Entity.Report.Report;
 import com.example.board.toyboard.Entity.User;
+import com.example.board.toyboard.Entity.log.LogType;
 import com.example.board.toyboard.Entity.log.PostLog;
 import com.example.board.toyboard.Exception.PostNotFoundException;
 import com.example.board.toyboard.Exception.UserNotFoundException;
@@ -35,6 +36,8 @@ public class PostService {
 
     private final ReportRepository reportRepository;
 
+    private final CommentRepository commentRepository;
+
     private final LogRepository logRepository;
 
     @Transactional(readOnly = true)
@@ -60,11 +63,6 @@ public class PostService {
 
     }
 
-    public void upHit(Long postId) {
-
-        postRepository.findById(postId).ifPresent(Post::addHits);
-
-    }
 
 
     public Long write(PostWriteDTO dto, User loginUser) {
@@ -82,9 +80,23 @@ public class PostService {
 
         Post save = postRepository.save(post);
 
-        logRepository.save(new PostLog(loginUser, post, "게시물을 작성했습니다."));
+        logRepository.save(new PostLog(loginUser, post, LogType.POST));
 
         return save.getId();
+
+    }
+
+    public void delete(User loginUser, Long postId) {
+
+        Post post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
+
+        if (post.getUser() == loginUser) {
+            logRepository.deleteAllByPost(post);
+            commentRepository.deleteAllByPost(post);
+            postRepository.delete(post);
+        } else {
+            throw new IllegalStateException();
+        }
 
     }
 

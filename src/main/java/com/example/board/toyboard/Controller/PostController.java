@@ -120,14 +120,8 @@ public class PostController {
 
         Post post = postService.findById(postId);
 
-        PostUpdateDTO dto = PostUpdateDTO.builder()
-                .title(post.getTitle())
-                .content(post.getContent())
-                .postType(post.getPostType())
-                .build();
-
         model.addAttribute("id", postId);
-        model.addAttribute("post", dto);
+        model.addAttribute("post", new PostUpdateDTO(post));
         model.addAttribute("postCodes", makePostCodes());
 
 

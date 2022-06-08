@@ -1,18 +1,21 @@
 package com.example.board.toyboard.DTO;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.example.board.toyboard.Entity.Post.Post;
+import lombok.*;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
 public class PostUpdateDTO {
+
+    public PostUpdateDTO(Post post) {
+
+        this.postType = post.getPostType();
+        this.title = post.getTitle();
+        this.content = post.getContent();
+
+    }
 
     @NotEmpty
     private String postType;
@@ -23,7 +26,6 @@ public class PostUpdateDTO {
 
     @NotEmpty(message = "내용을 입력해주세요.")
     private String content;
-
 
 
 }
