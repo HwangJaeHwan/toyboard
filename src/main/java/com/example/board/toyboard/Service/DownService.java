@@ -37,20 +37,27 @@ public class DownService {
         }
 
         if (check.isPresent()) {
-            downRepository.delete(check.get());
-            logRepository.findLogByUserAndCommentAndLogType(user, comment,LogType.DOWN).ifPresent(log -> logRepository.delete(log));
-            comment.subDown();
+            Down down = check.get();
+            downRepository.delete(down);
+            logRepository.findLogByUserAndCommentAndLogType(user, comment,LogType.DOWN).ifPresent(log -> {
+                comment.removeLog(log);
+                logRepository.delete(log);
+            });
+            comment.subDown(down);
         } else {
             Post post = comment.getPost();
 
-            downRepository.save(
-                    Down.builder()
-                            .user(user)
-                            .comment(comment)
-                            .build()
-            );
-            comment.addDown();
-            logRepository.save(new CommentLog(user, post, LogType.DOWN, comment));
+            Down down = Down.builder()
+                    .user(user)
+                    .comment(comment)
+                    .build();
+
+            comment.addDown(down);
+            downRepository.save(down);
+
+            CommentLog commentLog = new CommentLog(user, post, LogType.DOWN, comment);
+            comment.addLog(commentLog);
+            logRepository.save(commentLog);
 
         }
 

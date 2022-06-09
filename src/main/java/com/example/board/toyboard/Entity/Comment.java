@@ -3,10 +3,8 @@ package com.example.board.toyboard.Entity;
 
 import com.example.board.toyboard.DTO.CommentReadDTO;
 import com.example.board.toyboard.Entity.Post.Post;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import com.example.board.toyboard.Entity.log.CommentLog;
+import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.persistence.*;
@@ -22,6 +20,7 @@ import static javax.persistence.FetchType.LAZY;
 @AllArgsConstructor
 @Builder
 @Slf4j
+@ToString
 public class Comment extends BaseEntity{
 
 
@@ -48,35 +47,37 @@ public class Comment extends BaseEntity{
     private Post post;
 
     @OneToMany(mappedBy = "comment", cascade = CascadeType.REMOVE)
+    @Builder.Default
     private List<Up> ups = new ArrayList<>();
 
     @OneToMany(mappedBy = "comment", cascade = CascadeType.REMOVE)
+    @Builder.Default
     private List<Down> downs = new ArrayList<>();
+
+    @OneToMany(mappedBy = "comment", cascade = CascadeType.REMOVE)
+    @Builder.Default
+    private List<CommentLog> commentLogs = new ArrayList<>();
 
 
     public void addUp(Up up) {
         ups.add(up);
+
         this.up += 1;
     }
 
     public void subUp(Up up) {
-
-        for (Up up1 : ups) {
-            log.info("up1 = {}", up1);
-        }
         ups.remove(up);
-        for (Up up1 : ups) {
-            log.info("up2 = {}", up1);
-        }
         this.up -= 1;
     }
 
-    public void addDown() {
-        down += 1;
+    public void addDown(Down down) {
+        downs.add(down);
+        this.down += 1;
     }
 
-    public void subDown(){
-        down -= 1;
+    public void subDown(Down down){
+        downs.remove(down);
+        this.down -= 1;
     }
 
     public void commentReport() {
@@ -84,4 +85,11 @@ public class Comment extends BaseEntity{
     }
 
 
+    public void addLog(CommentLog commentLog) {
+        commentLogs.add(commentLog);
+    }
+
+    public void removeLog(CommentLog commentLog) {
+        commentLogs.remove(commentLog);
+    }
 }

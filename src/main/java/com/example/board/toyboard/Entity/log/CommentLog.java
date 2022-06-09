@@ -27,6 +27,6 @@ public class CommentLog extends Log {
 
 
     @ManyToOne(fetch = LAZY)
-    @JoinColumn
+    @JoinColumn(name = "comment_id")
     private Comment comment;
 }

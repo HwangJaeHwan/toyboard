@@ -21,6 +21,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -59,11 +60,17 @@ public class CommentService {
                 .report(0)
                 .build();
 
-        logRepository.save(new CommentLog(loginUser, post, LogType.COMMENT, comment));
 
-        Comment save = commentRepository.save(comment);
+        commentRepository.save(comment);
 
-        return save.getId();
+        log.info("흐미={}", comment);
+
+        CommentLog commentLog = new CommentLog(loginUser, post, LogType.COMMENT, comment);
+
+        comment.addLog(commentLog);
+        logRepository.save(commentLog);
+
+        return comment.getId();
 
     }
 
@@ -74,8 +81,6 @@ public class CommentService {
         if (comment.getUser() == loginUser) {
             log.info("loginUser ={}, getUser ={}", loginUser, comment.getUser());
 
-            logRepository.findLogByUserAndCommentAndLogType(loginUser, comment, LogType.COMMENT).ifPresent(log -> logRepository.delete(log));
-            log.info("퉤={}", comment.getId());
             commentRepository.delete(comment);
         } else {
             throw new IllegalStateException();

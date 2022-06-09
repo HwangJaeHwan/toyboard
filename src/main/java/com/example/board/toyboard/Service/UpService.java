@@ -40,7 +40,11 @@ public class UpService {
             Up up = check.get();
             comment.subUp(up);
             upRepository.delete(up);
-            logRepository.findLogByUserAndCommentAndLogType(user, comment,LogType.UP).ifPresent(log -> logRepository.delete(log));
+
+            logRepository.findLogByUserAndCommentAndLogType(user, comment,LogType.UP).ifPresent(log -> {
+                comment.removeLog(log);
+                logRepository.delete(log);
+            });
 
 
 
@@ -52,11 +56,16 @@ public class UpService {
                     .comment(comment)
                     .build();
 
-            upRepository.save(up);
 
             comment.addUp(up);
+            upRepository.save(up);
 
-            logRepository.save(new CommentLog(user, post, LogType.UP, comment));
+
+
+            CommentLog commentLog = new CommentLog(user, post, LogType.UP, comment);
+            log.info("장난={}", comment);
+            comment.addLog(commentLog);
+            logRepository.save(commentLog);
 
         }
 

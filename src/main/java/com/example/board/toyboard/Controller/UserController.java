@@ -89,6 +89,8 @@ public class UserController {
             return "user/login";
         }
 
+        log.info("유저2={}", loginUser);
+
 
         HttpSession session = request.getSession();
 

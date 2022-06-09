@@ -97,6 +97,7 @@ public class PostController {
 
 
         Post post = postService.findById(postId);
+        post.addHits();
 
 
         PostReadDTO readDTO = new PostReadDTO(post);
