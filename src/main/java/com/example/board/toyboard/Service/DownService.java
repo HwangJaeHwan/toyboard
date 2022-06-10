@@ -3,9 +3,8 @@ package com.example.board.toyboard.Service;
 import com.example.board.toyboard.Entity.Comment;
 import com.example.board.toyboard.Entity.Down;
 import com.example.board.toyboard.Entity.Post.Post;
-import com.example.board.toyboard.Entity.Up;
 import com.example.board.toyboard.Entity.User;
-import com.example.board.toyboard.Entity.log.CommentLog;
+import com.example.board.toyboard.Entity.log.Log;
 import com.example.board.toyboard.Entity.log.LogType;
 import com.example.board.toyboard.Repository.DownRepository;
 import com.example.board.toyboard.Repository.LogRepository;
@@ -55,7 +54,7 @@ public class DownService {
             comment.addDown(down);
             downRepository.save(down);
 
-            CommentLog commentLog = new CommentLog(user, post, LogType.DOWN, comment);
+            Log commentLog = new Log(user, post, LogType.DOWN, comment);
             comment.addLog(commentLog);
             logRepository.save(commentLog);
 

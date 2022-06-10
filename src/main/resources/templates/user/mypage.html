@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en" th:replace="~{layout/base :: layout(~{::content})}" xmlns:th="http://www.thymeleaf.org">
+
+
+<body>
+
+<div class="flex-box justify-content-center" th:fragment="content">
+
+
+
+
+
+    <table class="table table-bordered w80">
+
+        <tbody class="text-center">
+
+        <tr th:each="log : ${logs}">
+            <td>
+
+                <div th:if="${log.commentCheck}">
+
+                    <a th:href="@{/mypage/{id}(id=${log.commentWriterId})}" th:text="${log.commentWriter}"></a>
+                    <span th:text="${log.getMessage()}"></span>
+                    <span th:text="${#temporals.format(log.createTime, 'yyyy/MM/dd HH:mm')}"></span>
+
+                </div>
+                <div th:unless="${log.commentCheck}">
+
+                    <span th:text="${log.getMessage()}"></span>
+                    <span th:text="${#temporals.format(log.createTime, 'yyyy/MM/dd HH:mm')}"></span>
+
+                </div>
+
+
+                <a th:href="@{/post/{id}(id=${log.postId})}" th:text="${log.getPostTitle}"></a>
+            </td>
+
+
+        </tr>
+        </tbody>
+
+
+
+    </table>
+
+</div>
+
+
+</body>
+</html>

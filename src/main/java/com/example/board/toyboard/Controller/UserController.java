@@ -1,22 +1,24 @@
 package com.example.board.toyboard.Controller;
+import com.example.board.toyboard.DTO.LogDto;
 import com.example.board.toyboard.DTO.LoginDTO;
 import com.example.board.toyboard.DTO.RegisterDTO;
 import com.example.board.toyboard.Entity.User;
+import com.example.board.toyboard.Entity.log.Log;
 import com.example.board.toyboard.Repository.UserRepository;
 import com.example.board.toyboard.Service.UserService;
 import com.example.board.toyboard.session.SessionConst;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Controller
@@ -113,5 +115,39 @@ public class UserController {
 
 
         return "redirect:/login";
+    }
+
+    @GetMapping("/mypage/{id}")
+    public String myPage(@PathVariable Long id, Model model) {
+
+        User user = userService.findById(id);
+
+        List<Log> logs = userService.findLogsByUser(user);
+        List<LogDto> result = new ArrayList<>();
+
+        for (Log log : logs) {
+
+            switch (log.getLogType()) {
+
+                case UP:
+                case DOWN:
+                    result.add(LogDto.createCommentDTO(log));
+                    break;
+
+                case POST:
+                case COMMENT:
+                case RECOMMEND:
+                    result.add(LogDto.createPostDTO(log));
+                    break;
+            }
+
+        }
+
+        for (LogDto dto : result) {
+            log.info("dto = {}", dto);
+        }
+        model.addAttribute("logs", result);
+
+        return "user/mypage";
     }
 }

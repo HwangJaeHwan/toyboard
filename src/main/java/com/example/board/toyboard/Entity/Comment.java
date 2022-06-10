@@ -1,9 +1,8 @@
 package com.example.board.toyboard.Entity;
 
 
-import com.example.board.toyboard.DTO.CommentReadDTO;
 import com.example.board.toyboard.Entity.Post.Post;
-import com.example.board.toyboard.Entity.log.CommentLog;
+import com.example.board.toyboard.Entity.log.Log;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
@@ -56,7 +55,7 @@ public class Comment extends BaseEntity{
 
     @OneToMany(mappedBy = "comment", cascade = CascadeType.REMOVE)
     @Builder.Default
-    private List<CommentLog> commentLogs = new ArrayList<>();
+    private List<Log> commentLogs = new ArrayList<>();
 
 
     public void addUp(Up up) {
@@ -85,11 +84,11 @@ public class Comment extends BaseEntity{
     }
 
 
-    public void addLog(CommentLog commentLog) {
+    public void addLog(Log commentLog) {
         commentLogs.add(commentLog);
     }
 
-    public void removeLog(CommentLog commentLog) {
+    public void removeLog(Log commentLog) {
         commentLogs.remove(commentLog);
     }
 }

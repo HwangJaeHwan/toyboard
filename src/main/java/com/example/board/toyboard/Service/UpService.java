@@ -5,7 +5,7 @@ import com.example.board.toyboard.Entity.Comment;
 import com.example.board.toyboard.Entity.Post.Post;
 import com.example.board.toyboard.Entity.Up;
 import com.example.board.toyboard.Entity.User;
-import com.example.board.toyboard.Entity.log.CommentLog;
+import com.example.board.toyboard.Entity.log.Log;
 import com.example.board.toyboard.Entity.log.LogType;
 import com.example.board.toyboard.Repository.*;
 import lombok.RequiredArgsConstructor;
@@ -62,7 +62,7 @@ public class UpService {
 
 
 
-            CommentLog commentLog = new CommentLog(user, post, LogType.UP, comment);
+            Log commentLog = new Log(user, post, LogType.UP, comment);
             log.info("장난={}", comment);
             comment.addLog(commentLog);
             logRepository.save(commentLog);

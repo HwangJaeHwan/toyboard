@@ -6,10 +6,9 @@ import com.example.board.toyboard.DTO.PostWriteDTO;
 import com.example.board.toyboard.DTO.SearchDTO;
 import com.example.board.toyboard.Entity.Post.Post;
 import com.example.board.toyboard.Entity.Post.Recommendation;
-import com.example.board.toyboard.Entity.Report.Report;
 import com.example.board.toyboard.Entity.User;
+import com.example.board.toyboard.Entity.log.Log;
 import com.example.board.toyboard.Entity.log.LogType;
-import com.example.board.toyboard.Entity.log.PostLog;
 import com.example.board.toyboard.Exception.PostNotFoundException;
 import com.example.board.toyboard.Exception.UserNotFoundException;
 import com.example.board.toyboard.Repository.*;
@@ -20,7 +19,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -80,7 +78,7 @@ public class PostService {
 
         Post save = postRepository.save(post);
 
-        logRepository.save(new PostLog(loginUser, post, LogType.POST));
+        logRepository.save(new Log(loginUser, post, LogType.POST));
 
         return save.getId();
 
@@ -123,6 +121,7 @@ public class PostService {
             recommendationRepository.delete(check.get());
 
             post.subRecommendedNumber();
+            logRepository.findLogByUserAndLogType(user, LogType.RECOMMEND);
 
         } else {
 
@@ -134,7 +133,7 @@ public class PostService {
             );
 
             post.addRecommendedNumber();
-
+            logRepository.save(new Log(user, post, LogType.RECOMMEND));
         }
 
         log.info("number2 = {}", post.getRecommendedNumber());

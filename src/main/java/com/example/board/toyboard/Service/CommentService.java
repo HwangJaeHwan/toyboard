@@ -4,7 +4,7 @@ import com.example.board.toyboard.DTO.CommentWriteDTO;
 import com.example.board.toyboard.Entity.Comment;
 import com.example.board.toyboard.Entity.Post.Post;
 import com.example.board.toyboard.Entity.User;
-import com.example.board.toyboard.Entity.log.CommentLog;
+import com.example.board.toyboard.Entity.log.Log;
 import com.example.board.toyboard.Entity.log.LogType;
 import com.example.board.toyboard.Exception.CommentNotFoundException;
 import com.example.board.toyboard.Exception.PostNotFoundException;
@@ -15,13 +15,9 @@ import com.example.board.toyboard.Repository.PostRepository;
 import com.example.board.toyboard.Repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -65,7 +61,7 @@ public class CommentService {
 
         log.info("흐미={}", comment);
 
-        CommentLog commentLog = new CommentLog(loginUser, post, LogType.COMMENT, comment);
+        Log commentLog = new Log(loginUser, post, LogType.COMMENT, comment);
 
         comment.addLog(commentLog);
         logRepository.save(commentLog);
@@ -76,10 +72,17 @@ public class CommentService {
 
     public void delete(Long id, User loginUser) {
 
-        Comment comment = commentRepository.findById(id).orElseThrow(CommentNotFoundException::new);
+        Comment comment = commentRepository.findWithPostAndUser(id).orElseThrow(CommentNotFoundException::new);
 
         if (comment.getUser() == loginUser) {
             log.info("loginUser ={}, getUser ={}", loginUser, comment.getUser());
+
+            logRepository.findLogByUserAndCommentAndLogType(loginUser, comment, LogType.COMMENT).ifPresent(
+                    log -> {
+                        comment.removeLog(log);
+                        logRepository.delete(log);
+                    }
+            );
 
             commentRepository.delete(comment);
         } else {
