@@ -1,9 +1,6 @@
 package com.example.board.toyboard.Service;
 
-import com.example.board.toyboard.DTO.PageResultDTO;
-import com.example.board.toyboard.DTO.PostUpdateDTO;
-import com.example.board.toyboard.DTO.PostWriteDTO;
-import com.example.board.toyboard.DTO.SearchDTO;
+import com.example.board.toyboard.DTO.*;
 import com.example.board.toyboard.Entity.Post.Post;
 import com.example.board.toyboard.Entity.Post.Recommendation;
 import com.example.board.toyboard.Entity.User;
@@ -21,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 
 @Service
 @Slf4j
@@ -44,13 +42,15 @@ public class PostService {
     }
 
     @Transactional(readOnly = true)
-    public PageResultDTO makePageResult(Pageable pageable, SearchDTO searchDTO, String postType) {
-
+    public PageResultDTO<PostListDTO, Post> makePageResult(Pageable pageable, SearchDTO searchDTO, String postType) {
 
         Page<Post> posts = postRepository.search(searchDTO, pageable, postType);
         log.info("posts = {}", posts);
 
-        return new PageResultDTO(posts);
+        Function<Post, PostListDTO> fn = post -> new PostListDTO(post);
+
+
+        return new PageResultDTO<>(posts, fn);
 
     }
 

@@ -1,19 +1,24 @@
 package com.example.board.toyboard.Service;
 
+import com.example.board.toyboard.DTO.LogDTO;
 import com.example.board.toyboard.DTO.LoginDTO;
+import com.example.board.toyboard.DTO.PageResultDTO;
 import com.example.board.toyboard.DTO.RegisterDTO;
 import com.example.board.toyboard.Entity.User;
 import com.example.board.toyboard.Entity.log.Log;
+import com.example.board.toyboard.Entity.log.LogType;
 import com.example.board.toyboard.Exception.UserNotFoundException;
 import com.example.board.toyboard.Repository.LogRepository;
 import com.example.board.toyboard.Repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import java.util.function.Function;
 
 
 @Service
@@ -83,17 +88,23 @@ public class UserService {
 
     }
 
-    public List<Log> findLogsByUser(User user) {
+    public PageResultDTO<LogDTO, Log> findLogsByUser(User user, Pageable pageable) {
 
-        List<Log> logsByUser = logRepository.findLogsByUser(user);
+        Page<Log> logs = logRepository.findLogsByUser(user, pageable);
 
-        log.info("size = {}", logsByUser.size());
+        Function<Log, LogDTO> fn = (log -> new LogDTO(log));
 
-        for (Log log1 : logsByUser) {
-            log.info("Log = {}", log1.getId());
-        }
+        return new PageResultDTO<>(logs, fn);
 
-        return logsByUser;
+    }
+
+    public PageResultDTO<LogDTO, Log> findPostLogsByUser(User user, Pageable pageable) {
+
+        Page<Log> logs = logRepository.findPostLogsByUser(user, LogType.POST, pageable);
+
+        Function<Log, LogDTO> fn = (log -> new LogDTO(log));
+
+        return new PageResultDTO<>(logs, fn);
 
     }
 

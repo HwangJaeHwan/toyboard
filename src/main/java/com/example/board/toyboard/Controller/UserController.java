@@ -1,14 +1,12 @@
 package com.example.board.toyboard.Controller;
-import com.example.board.toyboard.DTO.LogDto;
-import com.example.board.toyboard.DTO.LoginDTO;
-import com.example.board.toyboard.DTO.RegisterDTO;
+import com.example.board.toyboard.DTO.*;
 import com.example.board.toyboard.Entity.User;
 import com.example.board.toyboard.Entity.log.Log;
-import com.example.board.toyboard.Repository.UserRepository;
 import com.example.board.toyboard.Service.UserService;
 import com.example.board.toyboard.session.SessionConst;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -17,8 +15,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
-import java.util.ArrayList;
-import java.util.List;
 
 
 @Controller
@@ -27,6 +23,13 @@ import java.util.List;
 public class UserController {
 
     private final UserService userService;
+
+
+    @GetMapping("/")
+    public String toPosts(){
+
+        return "redirect:/post";
+    }
 
 
     @GetMapping("/register")
@@ -117,37 +120,50 @@ public class UserController {
         return "redirect:/login";
     }
 
-    @GetMapping("/mypage/{id}")
-    public String myPage(@PathVariable Long id, Model model) {
 
+    @GetMapping("/mypage")
+    public String myPage(@SessionAttribute(name = SessionConst.LOGIN_USER) String nickname) {
+
+        User user = userService.findByNickname(nickname);
+
+        return "redirect:/mypage/" + user.getId();
+    }
+
+
+    @GetMapping("/mypage/{id}")
+    public String myPageWithId(@PathVariable Long id, PageListDTO pageListDTO, Model model) {
+
+        Pageable pageable = pageListDTO.getPageable();
         User user = userService.findById(id);
 
-        List<Log> logs = userService.findLogsByUser(user);
-        List<LogDto> result = new ArrayList<>();
+        PageResultDTO<LogDTO, Log> result = userService.findLogsByUser(user, pageable);
 
-        for (Log log : logs) {
-
-            switch (log.getLogType()) {
-
-                case UP:
-                case DOWN:
-                    result.add(LogDto.createCommentDTO(log));
-                    break;
-
-                case POST:
-                case COMMENT:
-                case RECOMMEND:
-                    result.add(LogDto.createPostDTO(log));
-                    break;
-            }
-
-        }
-
-        for (LogDto dto : result) {
-            log.info("dto = {}", dto);
-        }
+        model.addAttribute("postNum", user.getPosts().size());
+        model.addAttribute("nickname", user.getNickname());
+        model.addAttribute("userId", user.getId());
         model.addAttribute("logs", result);
 
         return "user/mypage";
     }
+
+
+    @GetMapping("/mypage/{id}/posts")
+    public String myPagePosts(@PathVariable Long id, PageListDTO pageListDTO , Model model) {
+
+        Pageable pageable = pageListDTO.getPageable();
+        User user = userService.findById(id);
+
+        PageResultDTO<LogDTO, Log> result = userService.findPostLogsByUser(user, pageable);
+
+        model.addAttribute("postNum", user.getPosts().size());
+        model.addAttribute("nickname", user.getNickname());
+        model.addAttribute("userId", user.getId());
+        model.addAttribute("logs", result);
+
+        return "user/mypagePost";
+    }
+
+
+
+
 }

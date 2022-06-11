@@ -7,12 +7,15 @@
 <div class="flex-c align-items-center" th:fragment="content">
 
 
+
     <h1 class="margin-bottom-30" th:text="${nickname}"></h1>
 
     <div class="flex-c text-center margin-bottom-30">
         <h3>내가 쓴 게시물</h3>
         <a th:href="@{/mypage/{id}/posts(id = ${userId})}" th:text="${postNum}"></a>
     </div>
+
+
 
 
     <table class="table table-bordered w80">
@@ -51,16 +54,16 @@
     <nav>
         <ul class="pagination">
             <li th:if="${logs.prev}">
-                <a th:href="@{/mypage/{id}/(page=${logs.start - 1}, id =${userId})}"><</a>
+                <a th:href="@{/mypage/{id}/posts(page=${logs.start - 1}, id =${userId})}"><</a>
             </li>
             <li th:class="${logs.now == num ? 'active':''}" th:each="num: ${logs.pageList}" >
 
-                <a th:href="@{/mypage/{id}(page=${num}, id = ${userId})}" th:text="${num}"></a>
+                <a th:href="@{/mypage/{id}/posts(page=${num}, id = ${userId})}" th:text="${num}"></a>
             </li>
 
 
             <li th:if="${logs.next}">
-                <a th:href="@{/mypage/{id}(page=${logs.end + 1},id=${userId})}">></a>
+                <a th:href="@{/mypage/{id}/posts(page=${logs.end + 1},id=${userId})}">></a>
             </li>
         </ul>
     </nav>

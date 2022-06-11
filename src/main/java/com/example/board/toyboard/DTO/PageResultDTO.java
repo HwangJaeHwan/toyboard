@@ -1,21 +1,21 @@
 package com.example.board.toyboard.DTO;
 
-import com.example.board.toyboard.Entity.Post.Post;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-@Data
+
 @Slf4j
-public class PageResultDTO {
+@Data
+public class PageResultDTO<DTO, EN> {
 
-
-    List<PostListDTO> dtoList;
+    List<DTO> dtoList;
 
     private int totalPage;
 
@@ -28,17 +28,18 @@ public class PageResultDTO {
     private List<Integer> pageList;
 
 
-    public PageResultDTO(Page<Post> posts) {
+    public PageResultDTO(Page<EN> entity, Function<EN,DTO> fn) {
 
-        totalPage = posts.getTotalPages();
+        totalPage = entity.getTotalPages();
 
         log.info("totalPage={}", totalPage);
 
+        dtoList = entity.map(fn).getContent();
 
-        dtoList = posts.map(post -> new PostListDTO(post, post.getUser().getNickname())).getContent();
 
-        makePageList(posts.getPageable());
+        makePageList(entity.getPageable());
     }
+
 
 
     private void makePageList(Pageable pageable) {
@@ -68,6 +69,4 @@ public class PageResultDTO {
 
 
     }
-
-
 }

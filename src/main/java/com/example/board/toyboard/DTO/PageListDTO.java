@@ -15,6 +15,11 @@ public class PageListDTO {
     }
 
 
+    public Pageable getPageable() {
+
+        return PageRequest.of(page - 1, 10);
+    }
+
     public Pageable getPageable(Sort sort) {
 
         return PageRequest.of(page - 1, 10, sort);

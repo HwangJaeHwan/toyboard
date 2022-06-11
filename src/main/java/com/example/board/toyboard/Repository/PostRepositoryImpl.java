@@ -3,6 +3,7 @@ package com.example.board.toyboard.Repository;
 import com.example.board.toyboard.DTO.SearchDTO;
 import com.example.board.toyboard.Entity.Post.Post;
 import com.example.board.toyboard.Entity.Post.QPost;
+import com.example.board.toyboard.Entity.QUser;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
@@ -19,6 +20,7 @@ import javax.persistence.EntityManager;
 import java.util.List;
 
 import static com.example.board.toyboard.Entity.Post.QPost.post;
+import static com.example.board.toyboard.Entity.QUser.*;
 
 @Slf4j
 public class PostRepositoryImpl implements PostRepositoryCustom{
@@ -48,6 +50,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
 
         List<Post> content = queryFactory
                 .selectFrom(post)
+                .join(post.user,user).fetchJoin()
                 .where(builder)
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -74,7 +77,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
 
                 switch (order.getProperty()){
                     case "createdTime":
-                        return new OrderSpecifier(Order.ASC, post.createdTime);
+                        return new OrderSpecifier(Order.DESC, post.createdTime);
                     case "hits":
                         return new OrderSpecifier(Order.DESC, post.hits);
                     case "recommendedNumber":

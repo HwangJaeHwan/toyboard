@@ -29,9 +29,9 @@ public class PostListDTO {
 
 
 
-    public PostListDTO(Post post, String nickname) {
+    public PostListDTO(Post post) {
         this.id = post.getId();
-        this.nickname = nickname;
+        this.nickname = post.getUser().getNickname();
         this.title = post.getTitle();
         this.createTime = post.getCreatedTime();
         this.hits = post.getHits();
