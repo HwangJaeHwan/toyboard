@@ -1,6 +1,8 @@
 package com.example.board.toyboard.Entity;
 
 
+import com.example.board.toyboard.DTO.PasswordChangeDTO;
+import com.example.board.toyboard.DTO.UserEditDTO;
 import com.example.board.toyboard.Entity.Post.Post;
 import lombok.*;
 
@@ -40,5 +42,15 @@ public class User extends BaseEntity{
 
     public void addPost(Post post) {
         posts.add(post);
+    }
+
+    public void nicknameChange(UserEditDTO userEditDTO) {
+
+        this.nickname = userEditDTO.getNickname();
+
+    }
+
+    public void passwordChange(String newPassword) {
+        this.password = newPassword;
     }
 }

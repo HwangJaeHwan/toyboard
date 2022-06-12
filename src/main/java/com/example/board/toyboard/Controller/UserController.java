@@ -163,6 +163,80 @@ public class UserController {
         return "user/mypagePost";
     }
 
+    @GetMapping("/mypage/edit")
+    public String editStart(@SessionAttribute(name = SessionConst.LOGIN_USER) String nickname, Model model) {
+
+
+        model.addAttribute("user", new UserEditDTO(nickname));
+
+
+        return "user/edit";
+
+    }
+
+    @PostMapping("mypage/edit")
+    public String editEnd(@SessionAttribute(name = SessionConst.LOGIN_USER) String nickname, UserEditDTO userEditDTO,
+                          BindingResult bindingResult,HttpServletRequest request) {
+
+        if (bindingResult.hasErrors()) {
+            return "user/edit";
+        }
+
+        if (userService.nicknameDuplicationCheck(userEditDTO.getNickname())) {
+            bindingResult.rejectValue("nickname", "duplicateNickname", "닉네임이 중복됩니다.");
+            return "user/edit";
+        }
+
+
+        Long userId = userService.nicknameChange(nickname, userEditDTO);
+
+        HttpSession session = request.getSession(false);
+        session.setAttribute(SessionConst.LOGIN_USER, userEditDTO.getNickname());
+        return "redirect:/mypage/" + userId;
+
+
+    }
+
+
+    @GetMapping("/mypage/passwordChange")
+    public String passwordChangeStart(@ModelAttribute("password") PasswordChangeDTO dto) {
+
+
+        return "user/passwordChange";
+    }
+
+    @PostMapping("/mypage/passwordChange")
+    public String passwordChangeEnd(@SessionAttribute(name = SessionConst.LOGIN_USER) String nickname,@ModelAttribute("password") PasswordChangeDTO dto,
+                                    BindingResult bindingResult) {
+
+        if (bindingResult.hasErrors()) {
+            return "user/passwordChange";
+        }
+
+        User loginUser = userService.findByNickname(nickname);
+
+        if (!userService.isPassword(dto.getNowPassword(), loginUser.getPassword())) {
+            bindingResult.rejectValue("nowPassword", "difPassword", "현재 비밀번호가 틀립니다.");
+            return "user/passwordChange";
+        }
+
+        if (dto.getNowPassword().equals(dto.getNewPassword())) {
+            bindingResult.rejectValue("newPassword", "samePassword", "현재 비밀번호와 새 비밀번호가 동일합니다.");
+            return "user/passwordChange";
+        }
+
+        if (!dto.getNewPassword().equals(dto.getNewPasswordCheck())) {
+            bindingResult.rejectValue("newPassword", "samePassword", "비밀번호가 일치하지 않습니다.");
+            return "user/passwordChange";
+        }
+
+        userService.passwordChange(nickname, dto);
+
+        return "redirect:/mypage/"+loginUser.getId();
+
+
+    }
+
 
 
 

@@ -14,6 +14,11 @@
         <a th:href="@{/mypage/{id}/posts(id = ${userId})}" th:text="${postNum}"></a>
     </div>
 
+    <div class="flex-box justify-content-end w80" th:if="${session.loginUser.equals(nickname)}">
+        <a th:href="@{/mypage/edit}" class="btn btn-info">정보수정</a>
+        <a th:href="@{/mypage/passwordChange}" class="btn btn-success">비밀번호 변경</a>
+    </div>
+
 
     <table class="table table-bordered w80">
 

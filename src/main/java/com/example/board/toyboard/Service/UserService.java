@@ -1,9 +1,6 @@
 package com.example.board.toyboard.Service;
 
-import com.example.board.toyboard.DTO.LogDTO;
-import com.example.board.toyboard.DTO.LoginDTO;
-import com.example.board.toyboard.DTO.PageResultDTO;
-import com.example.board.toyboard.DTO.RegisterDTO;
+import com.example.board.toyboard.DTO.*;
 import com.example.board.toyboard.Entity.User;
 import com.example.board.toyboard.Entity.log.Log;
 import com.example.board.toyboard.Entity.log.LogType;
@@ -83,8 +80,23 @@ public class UserService {
     public User login(LoginDTO loginDTO) {
 
         return userRepository.findByLoginId(loginDTO.getLoginId())
-                .filter(m -> encoder.matches(loginDTO.getPassword(), m.getPassword()))
+                .filter(m -> isPassword(loginDTO.getPassword(), m.getPassword()))
                 .orElse(null);
+
+    }
+
+    public boolean isPassword(String input , String password) {
+        return encoder.matches(input, password);
+    }
+
+    @Transactional
+    public Long nicknameChange(String nickname, UserEditDTO userEditDTO) {
+
+        User loginUser = userRepository.findByNickname(nickname).orElseThrow(UserNotFoundException::new);
+
+        loginUser.nicknameChange(userEditDTO);
+
+        return loginUser.getId();
 
     }
 
@@ -108,7 +120,18 @@ public class UserService {
 
     }
 
+    @Transactional
+    public void passwordChange(String nickname, PasswordChangeDTO dto) {
+
+        log.info("dto = {}", dto.getNewPassword());
 
 
+        User loginUser = userRepository.findByNickname(nickname).orElseThrow(UserNotFoundException::new);
+        log.info("비번1 = {}", loginUser.getPassword());
+        String newPassword = encoder.encode(dto.getNewPassword());
 
+        loginUser.passwordChange(newPassword);
+
+        log.info("비번2 = {}", loginUser.getPassword());
+    }
 }
