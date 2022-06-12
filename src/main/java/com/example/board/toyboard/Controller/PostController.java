@@ -148,6 +148,18 @@ public class PostController {
 
     }
 
+    @GetMapping("/delete/{postId}")
+    public String deletePost(@SessionAttribute(SessionConst.LOGIN_USER) String nickname, @PathVariable Long postId) {
+        User loginUser = userService.findByNickname(nickname);
+
+        postService.delete(loginUser, postId);
+
+        return "redirect:/post";
+
+    }
+
+
+
     @GetMapping("/recommend/{postId}")
     @ResponseBody
     public int recommend(@SessionAttribute(SessionConst.LOGIN_USER) String nickname,  @PathVariable Long postId) {
@@ -155,6 +167,7 @@ public class PostController {
         return postService.recommend(postId, nickname);
 
     }
+
 
     @PostMapping("/image")
     @ResponseBody
