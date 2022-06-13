@@ -25,7 +25,7 @@ public interface LogRepository extends JpaRepository<Log, Long> {
 
     Optional<Log> findLogByUserAndCommentAndLogType(User user, Comment comment, LogType type);
 
-    Optional<Log> findLogByUserAndLogType(User user, LogType logType);
+    Optional<Log> findLogByUserAndPostAndLogType(User user, Post post,LogType logType);
 
     void deleteAllByPost(Post post);
 

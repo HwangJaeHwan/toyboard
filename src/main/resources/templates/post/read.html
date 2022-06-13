@@ -31,7 +31,7 @@
 
         <div class="flex-c align-items-center justify-content-center border-bottom-3px" >
 
-            <button class="btn-danger" th:onclick="|clickRecommend(${post.id})|">추천</button>
+            <button class="btn-link" th:onclick="|clickRecommend(${post.id})|"><img src="../../static/icon/icons8-volunteering-64.png" th:src="@{/icon/icons8-volunteering-64.png}"></button>
             <p id="recommendedNumber" th:text="${post.recommendedNumber}">0</p>
 
 
@@ -46,8 +46,8 @@
             <div  class="flex-box justify-content-space-between">
                 <span th:text="${commentDTO.nickname}">닉네임</span>
                 <div>
-                <button th:if="${session.loginUser.equals(commentDTO.nickname)}" th:onclick="|clickDelete(${commentDTO.id},${commentNums})|" >삭제하기</button>
-                <button th:unless="${session.loginUser.equals(commentDTO.nickname)}" th:onclick="|clickReport(${commentDTO.id})|">신고하기</button>
+                <button th:if="${session.loginUser.equals(commentDTO.nickname)}" th:onclick="|clickDelete(${commentDTO.id},${commentNums})|" >삭제</button>
+                <button th:unless="${session.loginUser.equals(commentDTO.nickname)}" th:onclick="|clickReport(${commentDTO.id})|">신고</button>
 
                 </div>
             </div>
@@ -59,10 +59,10 @@
 
 
             <div class="flex-box justify-content-end margin-bottom-30">
-                <button th:onclick="|commentUp(${commentDTO.id})|">up</button>
-                <span th:id="|up${commentDTO.id}|" th:text="${commentDTO.up}"></span>
-                <button th:onclick="|commentDown(${commentDTO.id})|">down</button>
-                <span th:id="|down${commentDTO.id}|" th:text="${commentDTO.down}"></span>
+                <button class="btn-link" th:onclick="|commentUp(${commentDTO.id})|"><img th:src="@{/icon/icons8-thumbs-up-24.png}"></button>
+                <span th:id="|up${commentDTO.id}|" th:text=" ${commentDTO.up}"></span>
+                <button class="btn-link" th:onclick="|commentDown(${commentDTO.id})|"><img th:src="@{/icon/icons8-thumbs-down-24.png}"></button>
+                <span th:id="|down${commentDTO.id}|" th:text=" ${commentDTO.down}"></span>
             </div>
 
         </div>
@@ -110,9 +110,9 @@
 
 
                                 if (session === commentDTO.nickname) {
-                                    document.getElementById("commentHead"+commentDTO.id).innerHTML += '<div> <button onclick="clickDelete(' + commentDTO.id + ')">삭제하기</button> </div>';
+                                    document.getElementById("commentHead"+commentDTO.id).innerHTML += '<div> <button onclick="clickDelete(' + commentDTO.id + ')">삭제</button> </div>';
                                 } else {
-                                    document.getElementById("commentHead"+commentDTO.id).innerHTML += '<div> <button onclick="clickReport(' + commentDTO.id + ')">신고하기</button> </div>';
+                                    document.getElementById("commentHead"+commentDTO.id).innerHTML += '<div> <button onclick="clickReport(' + commentDTO.id + ')">신고</button> </div>';
                                 }
 
 
@@ -127,9 +127,9 @@
 
 
                             document.getElementById("comment"+commentDTO.id).innerHTML += ' <div class="flex-box justify-content-end margin-bottom-30">\n' +
-                                '                <button onclick="commentUp(' + commentDTO.id + ')">up</button>\n' +
+                                '                <button class="btn-link"onclick="commentUp(' + commentDTO.id + ')"><img src="/icon/icons8-thumbs-up-24.png"></button>\n' +
                                 '                <span id="up' + commentDTO.id + '">'+commentDTO.up+'</span>\n' +
-                                '                <button onclick="commentDown(' + commentDTO.id + ')">down</button>\n' +
+                                '                <button class="btn-link" onclick="commentDown(' + commentDTO.id + ')"><img src="/icon/icons8-thumbs-down-24.png"></button>\n' +
                                 '                <span id="down' + commentDTO.id + '">'+commentDTO.down+'</span>\n' +
                                 '            </div>';
 

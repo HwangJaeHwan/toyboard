@@ -121,7 +121,7 @@ public class PostService {
             recommendationRepository.delete(check.get());
 
             post.subRecommendedNumber();
-            logRepository.findLogByUserAndLogType(user, LogType.RECOMMEND);
+            logRepository.findLogByUserAndPostAndLogType(user, post, LogType.RECOMMEND).ifPresent(log -> logRepository.delete(log));
 
         } else {
 

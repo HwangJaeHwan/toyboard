@@ -11,7 +11,7 @@
 
     <div class="flex-c text-center margin-bottom-30">
         <h3>내가 쓴 게시물</h3>
-        <a th:href="@{/mypage/{id}/posts(id = ${userId})}" th:text="${postNum}"></a>
+        <a class="text-size-40" th:href="@{/mypage/{id}/posts(id = ${userId})}" th:text="${postNum}"></a>
     </div>
 
     <div class="flex-box justify-content-end w80" th:if="${session.loginUser.equals(nickname)}">
@@ -27,17 +27,19 @@
         <tr th:each="log : ${logs.getDtoList()}">
             <td>
 
-                <div th:if="${log.commentCheck}">
+                <div class="flex-c" th:if="${log.commentCheck}">
 
-                    <a th:href="@{/mypage/{id}(id=${log.commentWriterId})}" th:text="${log.commentWriter}"></a>
-                    <span th:text="${log.getMessage()}"></span>
-                    <span th:text="${#temporals.format(log.createTime, 'yyyy/MM/dd HH:mm')}"></span>
+                    <div>
+                        <a th:href="@{/mypage/{id}(id=${log.commentWriterId})}" th:text="${log.commentWriter}"></a>
+                        <span th:text="${log.getMessage()}"></span>
+                    </div>
+                    <span class="text-size-5 color-grey" th:text="${#temporals.format(log.createTime, 'yyyy/MM/dd HH:mm')}"></span>
 
                 </div>
-                <div th:unless="${log.commentCheck}">
+                <div class="flex-c" th:unless="${log.commentCheck}">
 
                     <span th:text="${log.getMessage()}"></span>
-                    <span th:text="${#temporals.format(log.createTime, 'yyyy/MM/dd HH:mm')}"></span>
+                    <span class="text-size-5 color-grey" th:text="${#temporals.format(log.createTime, 'yyyy/MM/dd HH:mm')}"></span>
 
                 </div>
 

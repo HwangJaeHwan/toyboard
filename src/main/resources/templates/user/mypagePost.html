@@ -32,13 +32,13 @@
 
                     <a th:href="@{/mypage/{id}(id=${log.commentWriterId})}" th:text="${log.commentWriter}"></a>
                     <span th:text="${log.getMessage()}"></span>
-                    <span th:text="${#temporals.format(log.createTime, 'yyyy/MM/dd HH:mm')}"></span>
+                    <span class="text-size-5 color-grey" th:text="${#temporals.format(log.createTime, 'yyyy/MM/dd HH:mm')}"></span>
 
                 </div>
                 <div th:unless="${log.commentCheck}">
 
                     <span th:text="${log.getMessage()}"></span>
-                    <span th:text="${#temporals.format(log.createTime, 'yyyy/MM/dd HH:mm')}"></span>
+                    <span class="text-size-5 color-grey" th:text="${#temporals.format(log.createTime, 'yyyy/MM/dd HH:mm')}"></span>
 
                 </div>
 

@@ -130,9 +130,20 @@ body {
     height: 800px;
 }
 
-
 .makeBlock {
     display: block;
+}
+
+.text-size-40{
+    font-size: 40px;
+}
+
+.text-size-5{
+    font-size: 5px;
+}
+
+.color-grey{
+    color: gray;
 }
 
 .login-input{
