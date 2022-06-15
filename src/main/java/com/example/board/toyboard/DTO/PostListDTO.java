@@ -25,6 +25,8 @@ public class PostListDTO {
 
     private int hits;
 
+    private int commentNum;
+
     private int recommendedNumber;
 
 
@@ -35,6 +37,7 @@ public class PostListDTO {
         this.title = post.getTitle();
         this.createTime = post.getCreatedTime();
         this.hits = post.getHits();
+        this.commentNum = post.getCommentNum();
         this.recommendedNumber = post.getRecommendedNumber();
     }
 

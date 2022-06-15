@@ -40,6 +40,8 @@ public class Post extends BaseEntity {
 
     private int recommendedNumber;
 
+    private int commentNum;
+
 
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "user_id")
@@ -66,6 +68,14 @@ public class Post extends BaseEntity {
 
     public void addHits() {
         hits++;
+    }
+
+    public void addCommentNum(){
+        this.commentNum++;
+    }
+
+    public void subCommentNum(){
+        this.commentNum--;
     }
 
     public void addRecommendedNumber(){

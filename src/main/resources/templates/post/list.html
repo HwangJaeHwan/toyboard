@@ -50,9 +50,8 @@
         </thead>
 
         <tbody class="text-center">
-
         <tr th:each="post : ${posts.getDtoList()}">
-        <td class="text-left"><a th:href="@{/post/{id}(id=${post.id})}" th:text="${post.title}"></a></td>
+        <td class="text-left"><a th:href="@{/post/{id}(id=${post.id})}" th:text="${post.title}"></a> <span th:if="${post.commentNum} != 0" > [[${post.commentNum}]]</span></td>
         <td th:text="${post.nickname}">김갑인</td>
         <td th:text="${#temporals.format(post.createTime, 'yyyy/MM/dd HH:mm')}">2016-25-30</td>
         <td th:text="${post.hits}" >1</td>
