@@ -4,9 +4,9 @@ import com.example.board.toyboard.Entity.Post.Post;
 import com.example.board.toyboard.Entity.User;
 import lombok.*;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
-import static javax.persistence.FetchType.LAZY;
+import static jakarta.persistence.FetchType.LAZY;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)

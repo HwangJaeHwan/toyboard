@@ -6,9 +6,9 @@ import com.example.board.toyboard.Entity.Comment;
 import com.example.board.toyboard.Entity.User;
 import lombok.*;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
-import static javax.persistence.FetchType.LAZY;
+import static jakarta.persistence.FetchType.LAZY;
 
 @Entity
 @Getter

@@ -9,9 +9,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class TestController {
 
 
-    @GetMapping("/")
-    public String test() {
-
-        return "user/login";
-    }
+//    @GetMapping("/")
+//    public String test() {
+//
+//        return "user/login";
+//    }
 }

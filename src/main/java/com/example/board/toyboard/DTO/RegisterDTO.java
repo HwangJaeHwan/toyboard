@@ -2,7 +2,7 @@ package com.example.board.toyboard.DTO;
 
 import lombok.Data;
 
-import javax.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotEmpty;
 
 @Data
 public class RegisterDTO {

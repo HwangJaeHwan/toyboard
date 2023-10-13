@@ -6,7 +6,7 @@ import com.example.board.toyboard.DTO.UserEditDTO;
 import com.example.board.toyboard.Entity.Post.Post;
 import lombok.*;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
