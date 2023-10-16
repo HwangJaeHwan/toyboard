@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 
 @Data
+@NoArgsConstructor
 public class PostUpdateDTO {
 
     public PostUpdateDTO(Post post) {

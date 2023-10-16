@@ -133,6 +133,8 @@ public class PostController {
     @PostMapping("/update/{postId}")
     public String updateEnd(@PathVariable("postId") Long postId, @Valid @ModelAttribute(name = "post") PostUpdateDTO dto, BindingResult bindingResult, Model model) {
 
+        log.info("dto = {}", dto);
+
         model.addAttribute("id", postId);
 
         if (bindingResult.hasErrors()) {
