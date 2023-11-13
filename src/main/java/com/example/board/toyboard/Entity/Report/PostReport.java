@@ -10,11 +10,8 @@ import static jakarta.persistence.FetchType.LAZY;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
-@Builder
 @Getter
 public class PostReport extends Report{
-
 
     public PostReport(User user, Post post) {
         super(user);

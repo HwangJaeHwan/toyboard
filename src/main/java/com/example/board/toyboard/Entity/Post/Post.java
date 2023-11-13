@@ -15,12 +15,13 @@ import static jakarta.persistence.FetchType.LAZY;
 
 @Entity
 @Getter
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @SequenceGenerator(name = "POST_SEQ_GENERATOR",
         sequenceName = "POST_SEQ")
 public class Post extends BaseEntity {
+
+
+
 
 
     @Id
@@ -31,7 +32,7 @@ public class Post extends BaseEntity {
     private String title;
 
 
-    @Column(length = 1000)
+    @Lob
     private String content;
 
     private String postType;
@@ -47,6 +48,16 @@ public class Post extends BaseEntity {
     @JoinColumn(name = "user_id")
     private User user;
 
+    @Builder
+    public Post(String title, String content, String postType, int hits, int recommendedNumber, int commentNum, User user) {
+        this.title = title;
+        this.content = content;
+        this.postType = postType;
+        this.hits = hits;
+        this.recommendedNumber = recommendedNumber;
+        this.commentNum = commentNum;
+        this.user = user;
+    }
 
     public void updateTitle(String title){
         this.title = title;

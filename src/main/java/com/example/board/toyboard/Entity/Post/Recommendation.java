@@ -10,12 +10,10 @@ import static jakarta.persistence.FetchType.LAZY;;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
-@Builder
 public class Recommendation extends BaseEntity {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "recommendation_id")
     private Long id;
 
@@ -25,5 +23,8 @@ public class Recommendation extends BaseEntity {
     @ManyToOne(fetch = LAZY)
     private Post post;
 
-
+    public Recommendation(User user, Post post) {
+        this.user = user;
+        this.post = post;
+    }
 }

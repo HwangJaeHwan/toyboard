@@ -12,10 +12,7 @@ import java.util.List;
 
 @Entity
 @Getter
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-@ToString
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User extends BaseEntity{
 
 
@@ -35,10 +32,20 @@ public class User extends BaseEntity{
     @Column(unique = true)
     private String email;
 
-    @OneToMany(mappedBy = "user")
-    @Builder.Default
-    private List<Post> posts = new ArrayList<>();
+    @Enumerated(EnumType.STRING)
+    private UserType userType;
 
+    @OneToMany(mappedBy = "user")
+    private final List<Post> posts = new ArrayList<>();
+
+    @Builder
+    public User(String loginId, String password, String nickname, String email, UserType userType) {
+        this.loginId = loginId;
+        this.password = password;
+        this.nickname = nickname;
+        this.email = email;
+        this.userType = userType;
+    }
 
     public void addPost(Post post) {
         posts.add(post);

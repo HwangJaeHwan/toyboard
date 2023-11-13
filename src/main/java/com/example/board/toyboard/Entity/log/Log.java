@@ -17,7 +17,6 @@ import static jakarta.persistence.FetchType.LAZY;
 
 @Entity
 @Getter
-@ToString
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Log extends BaseEntity {
 

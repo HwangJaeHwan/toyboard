@@ -15,11 +15,8 @@ import static jakarta.persistence.FetchType.LAZY;
 
 @Entity
 @Getter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Slf4j
-@ToString
 public class Comment extends BaseEntity{
 
 
@@ -46,17 +43,24 @@ public class Comment extends BaseEntity{
     private Post post;
 
     @OneToMany(mappedBy = "comment", cascade = CascadeType.REMOVE)
-    @Builder.Default
-    private List<Up> ups = new ArrayList<>();
+    private final List<Up> ups = new ArrayList<>();
 
     @OneToMany(mappedBy = "comment", cascade = CascadeType.REMOVE)
-    @Builder.Default
-    private List<Down> downs = new ArrayList<>();
+    private final List<Down> downs = new ArrayList<>();
 
     @OneToMany(mappedBy = "comment", cascade = CascadeType.REMOVE)
-    @Builder.Default
-    private List<Log> commentLogs = new ArrayList<>();
+    private final List<Log> commentLogs = new ArrayList<>();
 
+
+    @Builder
+    public Comment(String comment, int up, int down, int report, User user, Post post) {
+        this.comment = comment;
+        this.up = up;
+        this.down = down;
+        this.report = report;
+        this.user = user;
+        this.post = post;
+    }
 
     public void addUp(Up up) {
         ups.add(up);

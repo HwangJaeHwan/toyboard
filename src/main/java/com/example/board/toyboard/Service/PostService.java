@@ -125,12 +125,7 @@ public class PostService {
 
         } else {
 
-            recommendationRepository.save(
-                    Recommendation.builder()
-                            .user(user)
-                            .post(post)
-                            .build()
-            );
+            recommendationRepository.save(new Recommendation(user, post));
 
             post.addRecommendedNumber();
             logRepository.save(new Log(user, post, LogType.RECOMMEND));

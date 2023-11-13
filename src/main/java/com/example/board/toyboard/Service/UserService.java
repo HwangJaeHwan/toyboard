@@ -2,6 +2,7 @@ package com.example.board.toyboard.Service;
 
 import com.example.board.toyboard.DTO.*;
 import com.example.board.toyboard.Entity.User;
+import com.example.board.toyboard.Entity.UserType;
 import com.example.board.toyboard.Entity.log.Log;
 import com.example.board.toyboard.Entity.log.LogType;
 import com.example.board.toyboard.Exception.UserNotFoundException;
@@ -51,6 +52,7 @@ public class UserService {
                 .password(encode)
                 .nickname(registerDTO.getNickname())
                 .email(registerDTO.getEmail())
+                .userType(UserType.USER)
                 .build();
 
         User savedUser = userRepository.save(user);
