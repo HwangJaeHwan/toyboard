@@ -56,7 +56,7 @@ public class PostController {
         model.addAttribute("postType", postType);
         model.addAttribute("sort", sort);
 
-        return "/post/list";
+        return "post/list";
 
     }
 
@@ -68,7 +68,7 @@ public class PostController {
         model.addAttribute("postCodes", makePostCodes());
 
 
-        return "/post/write";
+        return "post/write";
     }
 
 
@@ -78,7 +78,7 @@ public class PostController {
 
 
         if (bindingResult.hasErrors()) {
-            return "/post/write";
+            return "post/write";
         }
 
         User loginUser = userService.findByNickname(nickname);
@@ -110,7 +110,7 @@ public class PostController {
         model.addAttribute("commentNums", commentDTOList.size());
         model.addAttribute("nickname", loginUser);
 
-        return "/post/read";
+        return "post/read";
 
 
     }
@@ -126,7 +126,7 @@ public class PostController {
         model.addAttribute("postCodes", makePostCodes());
 
 
-        return "/post/update";
+        return "post/update";
     }
 
 
@@ -138,7 +138,7 @@ public class PostController {
         model.addAttribute("id", postId);
 
         if (bindingResult.hasErrors()) {
-            return "/post/update";
+            return "post/update";
         }
 
 
