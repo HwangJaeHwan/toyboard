@@ -4,6 +4,7 @@ import com.example.board.toyboard.DTO.*;
 import com.example.board.toyboard.Entity.Post.Post;
 import com.example.board.toyboard.Entity.Post.PostCode;
 import com.example.board.toyboard.Entity.User;
+import com.example.board.toyboard.Entity.UserType;
 import com.example.board.toyboard.Service.CommentService;
 import com.example.board.toyboard.Service.PostService;
 import com.example.board.toyboard.Service.UserService;
@@ -72,12 +73,15 @@ public class PostController {
     }
 
 
-
     @PostMapping("/write")
-    public String writeEnd(@SessionAttribute(name = SessionConst.LOGIN_USER) String nickname, @Valid @ModelAttribute(name = "post") PostWriteDTO dto, BindingResult bindingResult) {
+    public String writeEnd(@SessionAttribute(name = SessionConst.LOGIN_USER) String nickname,
+                           @Valid @ModelAttribute(name = "post") PostWriteDTO dto, BindingResult bindingResult,
+                           Model model) {
 
 
         if (bindingResult.hasErrors()) {
+
+            model.addAttribute("postCodes", makePostCodes());
             return "post/write";
         }
 
@@ -93,7 +97,8 @@ public class PostController {
 
 
     @GetMapping("/{postId}")
-    public String readPost(@SessionAttribute(name = SessionConst.LOGIN_USER) String loginUser, @PathVariable("postId") Long postId, Model model) {
+    public String readPost(@SessionAttribute(SessionConst.USER_TYPE) String userType,
+                           @PathVariable("postId") Long postId, Model model) {
 
 
         Post post = postService.findById(postId);
@@ -102,13 +107,19 @@ public class PostController {
 
         PostReadDTO readDTO = new PostReadDTO(post);
 
-        List<CommentReadDTO> commentDTOList = commentService.findComments(post).stream().map(comment -> new CommentReadDTO(comment)).collect(Collectors.toList());
+        List<CommentReadDTO> commentDTOList = commentService.findComments(post)
+                                                .stream()
+                                                .map(CommentReadDTO::new)
+                                                .collect(Collectors.toList());
 
+
+        log.info("유저타입 = {}", userType);
+        log.info("클래스 = {}", userType.getClass());
 
         model.addAttribute("post", readDTO);
         model.addAttribute("comments", commentDTOList);
         model.addAttribute("commentNums", commentDTOList.size());
-        model.addAttribute("nickname", loginUser);
+        model.addAttribute("userType", userType);
 
         return "post/read";
 

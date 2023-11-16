@@ -100,6 +100,7 @@ public class UserController {
         HttpSession session = request.getSession();
 
         session.setAttribute(SessionConst.LOGIN_USER, loginUser.getNickname());
+        session.setAttribute(SessionConst.USER_TYPE, loginUser.getUserType());
 
 
         return "redirect:" + redirectURI;

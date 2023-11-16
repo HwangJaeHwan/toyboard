@@ -12,12 +12,20 @@
             <p class="margin-right-10" th:text="${post.nickname}" ></p>
             <p class="margin-right-10" th:text="${#temporals.format(post.createTime, 'yyyy/MM/dd HH:mm')}   "></p>
             조회수 : <span th:text="${post.hits}"></span>
+            <p class="margin-right-10" th:text="${userType}">유저타입</p>
         </div>
 
 
-        <div class="flex-box justify-content-end" th:if="${session.loginUser.equals(post.nickname)}">
+        <div class="flex-box justify-content-end" th:if="${session.loginUser eq post.nickname and userType eq 'USER'}">
             <a th:href="@{/post/update/{id}(id = ${post.id})}" class="btn btn-primary">수정</a>
             <a th:href="@{/post/delete/{id}(id = ${post.id})}" class="btn btn-danger">삭제</a>
+        </div>
+
+
+        <div class="flex-box justify-content-end" th:if="${userType eq 'ADMIN'}">
+            <a th:href="@{/post/update/{id}(id = ${post.id})}" class="btn btn-primary">수정</a>
+            <a th:href="@{/post/delete/{id}(id = ${post.id})}" class="btn btn-danger">삭제</a>
+
         </div>
 
         <hr>
