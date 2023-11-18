@@ -47,7 +47,7 @@ public class PostService {
         Page<Post> posts = postRepository.search(searchDTO, pageable, postType);
         log.info("posts = {}", posts);
 
-        Function<Post, PostListDTO> fn = post -> new PostListDTO(post);
+        Function<Post, PostListDTO> fn = PostListDTO::new;
 
 
         return new PageResultDTO<>(posts, fn);

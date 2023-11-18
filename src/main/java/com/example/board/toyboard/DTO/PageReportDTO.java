@@ -13,7 +13,7 @@ import java.util.stream.IntStream;
 
 @Slf4j
 @Data
-public class PageResultDTO<DTO, EN> {
+public class PageReportDTO<DTO> {
 
     List<DTO> dtoList;
 
@@ -28,16 +28,16 @@ public class PageResultDTO<DTO, EN> {
     private List<Integer> pageList;
 
 
-    public PageResultDTO(Page<EN> entity, Function<EN,DTO> fn) {
+    public PageReportDTO(Page<DTO> dto) {
 
-        totalPage = entity.getTotalPages();
+        totalPage = dto.getTotalPages();
 
         log.info("totalPage={}", totalPage);
 
-        dtoList = entity.map(fn).getContent();
+        dtoList = dto.getContent();
 
 
-        makePageList(entity.getPageable());
+        makePageList(dto.getPageable());
     }
 
 

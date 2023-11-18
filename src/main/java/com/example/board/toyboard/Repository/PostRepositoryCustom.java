@@ -1,5 +1,7 @@
 package com.example.board.toyboard.Repository;
 
+import com.example.board.toyboard.DTO.PageListDTO;
+import com.example.board.toyboard.DTO.PostReportDTO;
 import com.example.board.toyboard.DTO.SearchDTO;
 import com.example.board.toyboard.Entity.Post.Post;
 import org.springframework.data.domain.Page;
@@ -9,5 +11,8 @@ public interface PostRepositoryCustom {
 
 
     Page<Post> search(SearchDTO searchDTO, Pageable pageable,String postType);
+
+    Page<PostReportDTO> reportedList(Pageable pageable);
+
 
 }

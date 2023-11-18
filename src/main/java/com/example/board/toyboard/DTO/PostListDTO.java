@@ -10,8 +10,6 @@ import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
-@Builder
 public class PostListDTO {
 
 
@@ -31,6 +29,7 @@ public class PostListDTO {
 
 
 
+    @Builder
     public PostListDTO(Post post) {
         this.id = post.getId();
         this.nickname = post.getUser().getNickname();

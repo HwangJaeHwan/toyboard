@@ -1,14 +1,21 @@
 package com.example.board.toyboard.Repository;
 
+import com.example.board.toyboard.DTO.PageListDTO;
+import com.example.board.toyboard.DTO.PostReportDTO;
 import com.example.board.toyboard.DTO.SearchDTO;
 import com.example.board.toyboard.Entity.Post.Post;
 import com.example.board.toyboard.Entity.Post.QPost;
 import com.example.board.toyboard.Entity.QUser;
+import com.example.board.toyboard.Entity.Report.PostReport;
+import com.example.board.toyboard.Entity.Report.QPostReport;
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,16 +28,15 @@ import java.util.List;
 
 import static com.example.board.toyboard.Entity.Post.QPost.post;
 import static com.example.board.toyboard.Entity.QUser.*;
+import static com.example.board.toyboard.Entity.Report.QPostReport.*;
 
 @Slf4j
+@RequiredArgsConstructor
 public class PostRepositoryImpl implements PostRepositoryCustom{
 
 
     private final JPAQueryFactory queryFactory;
 
-    public PostRepositoryImpl(EntityManager em) {
-        this.queryFactory = new JPAQueryFactory(em);
-    }
 
 
     @Override
@@ -68,6 +74,40 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
 
     }
 
+    @Override
+    public Page<PostReportDTO> reportedList(Pageable pageable) {
+
+
+        List<PostReportDTO> content = queryFactory
+                .select(
+                        Projections.constructor(PostReportDTO.class,
+                                post.id.as("id"),
+                                post.title.as("title"),
+                                post.user.nickname.as("nickname"),
+                                postReport.count().as("reposts")))
+                .from(post)
+                .join(postReport.post,post)
+                .groupBy(post.id)
+                .having(postReport.count().goe(10L))
+                .orderBy(postReport.count().desc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+
+        JPAQuery<Long> countQuery = queryFactory
+                .select(postReport.post.id.count())
+                .from(postReport)
+                .groupBy(postReport.post.id)
+                .having(postReport.post.id.count().goe(10L));
+
+        return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
+
+
+
+
+    }
+
     private OrderSpecifier<?> postSort(Pageable page) {
 
         if (!page.getSort().isEmpty()) {
@@ -77,15 +117,15 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
 
                 switch (order.getProperty()){
                     case "createdTime":
-                        return new OrderSpecifier(Order.DESC, post.createdTime);
+                        return new OrderSpecifier<>(Order.DESC, post.createdTime);
                     case "hits":
-                        return new OrderSpecifier(Order.DESC, post.hits);
+                        return new OrderSpecifier<>(Order.DESC, post.hits);
                     case "recommendedNumber":
-                        return new OrderSpecifier(Order.DESC, post.recommendedNumber);
+                        return new OrderSpecifier<>(Order.DESC, post.recommendedNumber);
                 }
             }
         }
-        return new OrderSpecifier(Order.ASC, post.createdTime);
+        return new OrderSpecifier<>(Order.ASC, post.createdTime);
     }
 
 }
