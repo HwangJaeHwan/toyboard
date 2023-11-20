@@ -86,7 +86,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
                                 post.user.nickname.as("nickname"),
                                 postReport.count().as("reposts")))
                 .from(post)
-                .join(postReport.post,post)
+                .leftJoin(postReport).on(post.id.eq(postReport.post.id))
                 .groupBy(post.id)
                 .having(postReport.count().goe(10L))
                 .orderBy(postReport.count().desc())
@@ -100,6 +100,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
                 .from(postReport)
                 .groupBy(postReport.post.id)
                 .having(postReport.post.id.count().goe(10L));
+
 
         return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
 

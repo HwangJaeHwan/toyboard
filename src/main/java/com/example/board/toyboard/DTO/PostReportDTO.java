@@ -14,9 +14,9 @@ public class PostReportDTO {
 
     private String nickname;
 
-    private int reposts;
+    private Long reposts;
 
-    public PostReportDTO(Long id, String title, String nickname, int reposts) {
+    public PostReportDTO(Long id, String title, String nickname, Long reposts) {
         this.id = id;
         this.title = title;
         this.nickname = nickname;

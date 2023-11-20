@@ -107,7 +107,7 @@ public class UserService {
 
         Page<Log> logs = logRepository.findLogsByUser(user, pageable);
 
-        Function<Log, LogDTO> fn = (log -> new LogDTO(log));
+        Function<Log, LogDTO> fn = (LogDTO::new);
 
         return new PageResultDTO<>(logs, fn);
 
@@ -117,7 +117,7 @@ public class UserService {
 
         Page<Log> logs = logRepository.findPostLogsByUser(user, LogType.POST, pageable);
 
-        Function<Log, LogDTO> fn = (log -> new LogDTO(log));
+        Function<Log, LogDTO> fn = (LogDTO::new);
 
         return new PageResultDTO<>(logs, fn);
 

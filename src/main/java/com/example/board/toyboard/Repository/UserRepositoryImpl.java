@@ -13,7 +13,6 @@ import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
-import java.util.function.LongSupplier;
 
 import static com.example.board.toyboard.Entity.QUser.user;
 
