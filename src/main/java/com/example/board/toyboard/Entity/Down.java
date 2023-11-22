@@ -12,8 +12,6 @@ import static jakarta.persistence.FetchType.LAZY;
 @Entity
 @Getter
 @NoArgsConstructor
-@AllArgsConstructor
-@Builder
 public class Down extends BaseEntity{
 
 
@@ -30,7 +28,9 @@ public class Down extends BaseEntity{
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "comment_id")
     private Comment comment;
-
-
-
+    @Builder
+    public Down(User user, Comment comment) {
+        this.user = user;
+        this.comment = comment;
+    }
 }

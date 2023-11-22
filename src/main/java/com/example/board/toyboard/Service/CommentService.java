@@ -1,5 +1,6 @@
 package com.example.board.toyboard.Service;
 
+import com.example.board.toyboard.DTO.CommentReadDTO;
 import com.example.board.toyboard.DTO.CommentWriteDTO;
 import com.example.board.toyboard.Entity.Comment;
 import com.example.board.toyboard.Entity.Post.Post;
@@ -51,9 +52,6 @@ public class CommentService {
                 .user(loginUser)
                 .comment(dto.getContent())
                 .post(post)
-                .up(0)
-                .down(0)
-                .report(0)
                 .build();
 
 
@@ -96,6 +94,10 @@ public class CommentService {
 
         return commentRepository.findCommentsByPost(post);
 
+    }
+
+    public List<CommentReadDTO> test(Post post) {
+        return commentRepository.commentInfo(post);
     }
 
 

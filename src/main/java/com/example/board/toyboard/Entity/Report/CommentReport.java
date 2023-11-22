@@ -4,7 +4,6 @@ import com.example.board.toyboard.Entity.Comment;
 import com.example.board.toyboard.Entity.User;
 import lombok.*;
 
-import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;

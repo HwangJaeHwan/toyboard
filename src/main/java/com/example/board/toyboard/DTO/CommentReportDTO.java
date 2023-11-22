@@ -1,16 +1,17 @@
 package com.example.board.toyboard.DTO;
 
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public class PostReportDTO {
+public class CommentReportDTO {
 
     private Long postId;
 
-    private String title;
+    private String postTitle;
+
+    private String comment;
 
     private Long userId;
 
@@ -18,9 +19,10 @@ public class PostReportDTO {
 
     private Long reposts;
 
-    public PostReportDTO(Long postId, String title, Long userId, String nickname, Long reposts) {
+    public CommentReportDTO(Long postId, String postTitle, String comment, Long userId, String nickname, Long reposts) {
         this.postId = postId;
-        this.title = title;
+        this.postTitle = postTitle;
+        this.comment = comment;
         this.userId = userId;
         this.nickname = nickname;
         this.reposts = reposts;

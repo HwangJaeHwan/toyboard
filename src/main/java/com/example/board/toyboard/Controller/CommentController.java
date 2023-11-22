@@ -66,7 +66,7 @@ public class CommentController {
             return check;
         }
 
-        upCount.put("upCount", comment.getUp());
+        upCount.put("upCount", comment.getUps().size());
 
         return upCount;
 
@@ -86,7 +86,7 @@ public class CommentController {
             return check;
         }
 
-        downCount.put("downCount", comment.getDown());
+        downCount.put("downCount", comment.getDowns().size());
 
         return downCount;
 

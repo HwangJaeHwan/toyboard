@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface CommentRepository extends JpaRepository<Comment,Long> {
+public interface CommentRepository extends JpaRepository<Comment,Long>,CommentRepositoryCustom {
 
     @Query("select c from Comment c join fetch c.user where c.post = :post")
     List<Comment> findCommentsByPost(@Param("post") Post post);

@@ -1,16 +1,19 @@
 package com.example.board.toyboard.Service;
 
+import com.example.board.toyboard.DTO.CommentReportDTO;
 import com.example.board.toyboard.DTO.PageListDTO;
 import com.example.board.toyboard.DTO.PageReportDTO;
 import com.example.board.toyboard.DTO.PostReportDTO;
+import com.example.board.toyboard.Entity.Comment;
 import com.example.board.toyboard.Entity.Post.Post;
+import com.example.board.toyboard.Entity.Report.CommentReport;
 import com.example.board.toyboard.Entity.Report.PostReport;
 import com.example.board.toyboard.Entity.User;
 import com.example.board.toyboard.Entity.UserType;
+import com.example.board.toyboard.Repository.CommentRepository;
 import com.example.board.toyboard.Repository.PostRepository;
 import com.example.board.toyboard.Repository.ReportRepository;
 import com.example.board.toyboard.Repository.UserRepository;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -36,6 +39,9 @@ class AdminServiceTest {
     PostRepository postRepository;
 
     @Autowired
+    CommentRepository commentRepository;
+
+    @Autowired
     ReportRepository reportRepository;
 
 
@@ -43,7 +49,7 @@ class AdminServiceTest {
 
 
     @Test
-    void reportList() {
+    void reportPostList() {
 
         User admin = User.builder()
                 .loginId("adminId")
@@ -119,6 +125,86 @@ class AdminServiceTest {
         assertFalse(dto.isNext());
         assertEquals(dto.getDtoList().size(), 10L);
         assertEquals(dto.getPageList().size(), 2L);
+
+    }
+
+    @Test
+    void reportCommentList() {
+
+        User admin = User.builder()
+                .loginId("adminId")
+                .nickname("admin")
+                .password("tmpPassword")
+                .email("admin@email.com")
+                .userType(UserType.ADMIN)
+                .build();
+
+        User writer = User.builder()
+                .loginId("writer")
+                .nickname("writer")
+                .password("tmpPassword")
+                .email("writer@email.com")
+                .userType(UserType.USER)
+                .build();
+
+
+        List<User> users = new ArrayList<>();
+
+
+        IntStream.range(0, 20)
+                .forEach(i -> users.add(User.builder()
+                        .loginId("user" + i)
+                        .nickname("user" + i)
+                        .password("tmpPassword")
+                        .email("user@email.com" + i)
+                        .userType(UserType.USER)
+                        .build()));
+
+
+
+        userRepository.save(admin);
+        userRepository.save(writer);
+        userRepository.saveAll(users);
+
+
+        Post post = Post.builder()
+                .title("title")
+                .content("content")
+                .recommendedNumber(0)
+                .postType("free")
+                .hits(0)
+                .commentNum(0)
+                .user(writer)
+                .build();
+
+        postRepository.save(post);
+
+        Comment comment = Comment.builder()
+                .comment("content")
+                .user(writer)
+                .post(post)
+                .build();
+
+        commentRepository.save(comment);
+
+
+
+
+        List<CommentReport> reports = new ArrayList<>();
+
+
+        IntStream.range(0, 20)
+                .forEach(i -> IntStream.range(i, 30)
+                        .forEach(
+                                j -> reports.add(new CommentReport(users.get(i), comment))
+                        ));
+
+        reportRepository.saveAll(reports);
+
+        PageReportDTO<CommentReportDTO> dto = adminService.makeReportCommentPage(new PageListDTO());
+
+        System.out.println(dto);
+
 
     }
 

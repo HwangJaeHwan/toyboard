@@ -26,15 +26,13 @@ public class ReportService {
 
         Report report = new CommentReport(user, comment);
 
-        comment.commentReport();
-
         reportRepository.save(report);
 
 
     }
 
 
-    @Transactional
+    @Transactional(readOnly = true)
     public boolean commentReportCheck(User user, Comment comment){
 
         if (reportRepository.findByUserAndComment(user, comment).isPresent()) {

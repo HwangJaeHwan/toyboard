@@ -28,11 +28,6 @@ public class Comment extends BaseEntity{
     private String comment;
 
 
-    private int up;
-
-    private int down;
-
-    private int report;
 
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "user_id")
@@ -53,39 +48,28 @@ public class Comment extends BaseEntity{
 
 
     @Builder
-    public Comment(String comment, int up, int down, int report, User user, Post post) {
+    public Comment(String comment, User user, Post post) {
         this.comment = comment;
-        this.up = up;
-        this.down = down;
-        this.report = report;
         this.user = user;
         this.post = post;
     }
 
     public void addUp(Up up) {
         ups.add(up);
-
-        this.up += 1;
     }
 
     public void subUp(Up up) {
         ups.remove(up);
-        this.up -= 1;
     }
 
     public void addDown(Down down) {
         downs.add(down);
-        this.down += 1;
     }
 
     public void subDown(Down down){
         downs.remove(down);
-        this.down -= 1;
     }
 
-    public void commentReport() {
-        report++;
-    }
 
 
     public void addLog(Log commentLog) {

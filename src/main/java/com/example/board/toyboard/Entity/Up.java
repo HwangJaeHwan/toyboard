@@ -14,8 +14,6 @@ import static jakarta.persistence.FetchType.LAZY;
 @Entity
 @Getter
 @NoArgsConstructor
-@AllArgsConstructor
-@Builder
 public class Up extends BaseEntity{
 
 
@@ -32,8 +30,9 @@ public class Up extends BaseEntity{
     @JoinColumn(name = "comment_id")
     private Comment comment;
 
-
-
-
-
+    @Builder
+    public Up(User user, Comment comment) {
+        this.user = user;
+        this.comment = comment;
+    }
 }

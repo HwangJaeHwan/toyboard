@@ -23,14 +23,14 @@ public class CommentReadDTO {
 
     int down;
 
-    int report;
+    Long report;
 
     public CommentReadDTO(Comment comment) {
         this.id = comment.getId();
         this.nickname = comment.getUser().getNickname();
         this.content = comment.getComment();
-        this.up = comment.getUp();
-        this.down = comment.getDown();
-        this.report = comment.getReport();
+        this.up = comment.getUps().size();
+        this.down = comment.getDowns().size();
+        this.report = 1L;
     }
 }

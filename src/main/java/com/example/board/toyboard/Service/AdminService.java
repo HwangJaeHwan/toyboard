@@ -1,8 +1,8 @@
 package com.example.board.toyboard.Service;
 
 import com.example.board.toyboard.DTO.*;
-import com.example.board.toyboard.Entity.Post.Post;
 import com.example.board.toyboard.Entity.User;
+import com.example.board.toyboard.Repository.CommentRepository;
 import com.example.board.toyboard.Repository.PostRepository;
 import com.example.board.toyboard.Repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +22,7 @@ public class AdminService {
 
     private final PostRepository postRepository;
     private final UserRepository userRepository;
+    private final CommentRepository commentRepository;
 
     public PageResultDTO<UserListDTO, User> makeUserPage(Pageable pageable, SearchDTO searchDTO) {
 
@@ -38,6 +39,12 @@ public class AdminService {
         return new PageReportDTO<>(postRepository.reportedList(pageListDTO.getPageable()));
 
     }
+
+    public PageReportDTO<CommentReportDTO> makeReportCommentPage(PageListDTO pageListDTO) {
+
+        return new PageReportDTO<>(commentRepository.commentReports(pageListDTO.getPageable()));
+    }
+
 
 
 

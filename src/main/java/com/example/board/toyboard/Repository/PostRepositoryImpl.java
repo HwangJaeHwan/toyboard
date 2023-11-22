@@ -81,8 +81,9 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
         List<PostReportDTO> content = queryFactory
                 .select(
                         Projections.constructor(PostReportDTO.class,
-                                post.id.as("id"),
+                                post.id.as("postId"),
                                 post.title.as("title"),
+                                post.user.id.as("userId"),
                                 post.user.nickname.as("nickname"),
                                 postReport.count().as("reposts")))
                 .from(post)
@@ -99,7 +100,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
                 .select(postReport.post.id.count())
                 .from(postReport)
                 .groupBy(postReport.post.id)
-                .having(postReport.post.id.count().goe(10L));
+                .having(postReport.post.id.count().goe(10));
 
 
         return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
