@@ -2,6 +2,7 @@ package com.example.board.toyboard.Entity;
 
 
 import com.example.board.toyboard.Entity.Post.Post;
+import com.example.board.toyboard.Entity.Report.CommentReport;
 import com.example.board.toyboard.Entity.log.Log;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
@@ -46,7 +47,8 @@ public class Comment extends BaseEntity{
     @OneToMany(mappedBy = "comment", cascade = CascadeType.REMOVE)
     private final List<Log> commentLogs = new ArrayList<>();
 
-
+    @OneToMany(mappedBy = "comment", cascade = CascadeType.REMOVE)
+    private final List<CommentReport> reports = new ArrayList<>();
     @Builder
     public Comment(String comment, User user, Post post) {
         this.comment = comment;

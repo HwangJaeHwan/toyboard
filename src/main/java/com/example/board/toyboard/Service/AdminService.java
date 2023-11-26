@@ -24,25 +24,25 @@ public class AdminService {
     private final UserRepository userRepository;
     private final CommentRepository commentRepository;
 
-    public PageResultDTO<UserListDTO, User> makeUserPage(Pageable pageable, SearchDTO searchDTO) {
+    public PageConvertDTO<UserListDTO, User> makeUserPage(Pageable pageable, SearchDTO searchDTO) {
 
         Page<User> search = userRepository.search(pageable, searchDTO);
 
         Function<User, UserListDTO> fn = UserListDTO::new;
 
-        return new PageResultDTO<>(search, fn);
+        return new PageConvertDTO<>(search, fn);
 
     }
 
-    public PageReportDTO<PostReportDTO> makeReportedPostPage(PageListDTO pageListDTO) {
+    public PageDTO<PostReportDTO> makeReportedPostPage(PageListDTO pageListDTO) {
 
-        return new PageReportDTO<>(postRepository.reportedList(pageListDTO.getPageable()));
+        return new PageDTO<>(postRepository.reportedList(pageListDTO.getPageable()));
 
     }
 
-    public PageReportDTO<CommentReportDTO> makeReportCommentPage(PageListDTO pageListDTO) {
+    public PageDTO<CommentReportDTO> makeReportCommentPage(PageListDTO pageListDTO) {
 
-        return new PageReportDTO<>(commentRepository.commentReports(pageListDTO.getPageable()));
+        return new PageDTO<>(commentRepository.commentReports(pageListDTO.getPageable()));
     }
 
 

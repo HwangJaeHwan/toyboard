@@ -2,7 +2,7 @@ package com.example.board.toyboard.Service;
 
 import com.example.board.toyboard.DTO.CommentReportDTO;
 import com.example.board.toyboard.DTO.PageListDTO;
-import com.example.board.toyboard.DTO.PageReportDTO;
+import com.example.board.toyboard.DTO.PageDTO;
 import com.example.board.toyboard.DTO.PostReportDTO;
 import com.example.board.toyboard.Entity.Comment;
 import com.example.board.toyboard.Entity.Post.Post;
@@ -95,10 +95,8 @@ class AdminServiceTest {
                         Post.builder()
                                 .title("title" + i)
                                 .content("content" + i)
-                                .recommendedNumber(0)
                                 .postType("free")
                                 .hits(0)
-                                .commentNum(0)
                                 .user(writer)
                                 .build()
                 )
@@ -116,15 +114,15 @@ class AdminServiceTest {
 
         reportRepository.saveAll(reports);
 
-        PageReportDTO<PostReportDTO> dto = adminService.makeReportedPostPage(new PageListDTO());
+        PageDTO<PostReportDTO> dto = adminService.makeReportedPostPage(new PageListDTO());
 
-        assertEquals(dto.getStart(), 1);
-        assertEquals(dto.getStart(), 1);
-        assertEquals(dto.getEnd(), 2);
-        assertFalse(dto.isPrev());
-        assertFalse(dto.isNext());
+        assertEquals(dto.getPageInfo().getStart(), 1);
+        assertEquals(dto.getPageInfo().getStart(), 1);
+        assertEquals(dto.getPageInfo().getEnd(), 2);
+        assertFalse(dto.getPageInfo().isPrev());
+        assertFalse(dto.getPageInfo().isNext());
         assertEquals(dto.getDtoList().size(), 10L);
-        assertEquals(dto.getPageList().size(), 2L);
+        assertEquals(dto.getPageInfo().getPageList().size(), 2L);
 
     }
 
@@ -170,10 +168,8 @@ class AdminServiceTest {
         Post post = Post.builder()
                 .title("title")
                 .content("content")
-                .recommendedNumber(0)
                 .postType("free")
                 .hits(0)
-                .commentNum(0)
                 .user(writer)
                 .build();
 
@@ -201,7 +197,7 @@ class AdminServiceTest {
 
         reportRepository.saveAll(reports);
 
-        PageReportDTO<CommentReportDTO> dto = adminService.makeReportCommentPage(new PageListDTO());
+        PageDTO<CommentReportDTO> dto = adminService.makeReportCommentPage(new PageListDTO());
 
         System.out.println(dto);
 

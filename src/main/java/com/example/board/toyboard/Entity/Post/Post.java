@@ -35,9 +35,6 @@ public class Post extends BaseEntity {
 
     private int hits;
 
-    private int recommendedNumber;
-
-    private int commentNum;
 
 
     @ManyToOne(fetch = LAZY)
@@ -45,13 +42,12 @@ public class Post extends BaseEntity {
     private User user;
 
     @Builder
-    public Post(String title, String content, String postType, int hits, int recommendedNumber, int commentNum, User user) {
+    public Post(String title, String content, String postType, int hits, User user) {
+
         this.title = title;
         this.content = content;
         this.postType = postType;
         this.hits = hits;
-        this.recommendedNumber = recommendedNumber;
-        this.commentNum = commentNum;
         this.user = user;
     }
 
@@ -77,21 +73,6 @@ public class Post extends BaseEntity {
         hits++;
     }
 
-    public void addCommentNum(){
-        this.commentNum++;
-    }
-
-    public void subCommentNum(){
-        this.commentNum--;
-    }
-
-    public void addRecommendedNumber(){
-        recommendedNumber++;
-    }
-
-    public void subRecommendedNumber(){
-        recommendedNumber--;
-    }
 
 
 

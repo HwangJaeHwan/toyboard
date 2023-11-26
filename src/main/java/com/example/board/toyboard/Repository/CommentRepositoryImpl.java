@@ -43,8 +43,12 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom{
                 .from(comment)
                 .join(comment.user)
                 .join(commentReport).on(comment.id.eq(commentReport.comment.id))
+                .groupBy(comment.id)
                 .where(comment.post.eq(post))
+                .orderBy(comment.createdTime.asc())
                 .fetch();
+
+
 
     }
 

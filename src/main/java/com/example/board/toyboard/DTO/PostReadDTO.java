@@ -35,6 +35,5 @@ public class PostReadDTO {
         this.content = post.getContent();
         this.createTime = post.getCreatedTime();
         this.hits = post.getHits();
-        this.recommendedNumber = post.getRecommendedNumber();
     }
 }

@@ -101,36 +101,67 @@ class CommentServiceTest {
         Post post = Post.builder()
                 .title("title")
                 .content("content")
-                .recommendedNumber(0)
                 .postType("free")
                 .hits(0)
-                .commentNum(0)
                 .user(writer)
                 .build();
 
         postRepository.save(post);
 
-        Comment comment = Comment.builder()
-                .comment("content")
+        Comment comment1 = Comment.builder()
+                .comment("content1")
                 .user(writer)
                 .post(post)
                 .build();
 
-        commentRepository.save(comment);
+        Comment comment2 = Comment.builder()
+                .comment("content2")
+                .user(writer)
+                .post(post)
+                .build();
 
-        upRepository.save(new Up(up1, comment));
-        upRepository.save(new Up(up2, comment));
-        upRepository.save(new Up(up3, comment));
+        commentRepository.save(comment1);
+        commentRepository.save(comment2);
 
-        downRepository.save(new Down(down1, comment));
-        downRepository.save(new Down(down2, comment));
+        upRepository.save(new Up(up1, comment1));
+        upRepository.save(new Up(up2, comment1));
+        upRepository.save(new Up(up3, comment1));
 
-        reportRepository.save(new CommentReport(down1, comment));
-        reportRepository.save(new CommentReport(down2, comment));
+        downRepository.save(new Down(down1, comment1));
+        downRepository.save(new Down(down2, comment1));
+
+        reportRepository.save(new CommentReport(down1, comment1));
+        reportRepository.save(new CommentReport(down2, comment1));
+
+        upRepository.save(new Up(up1, comment2));
+        upRepository.save(new Up(up2, comment2));
+        upRepository.save(new Up(up3, comment2));
+
+        downRepository.save(new Down(down1, comment2));
+
+        reportRepository.save(new CommentReport(up1, comment2));
+        reportRepository.save(new CommentReport(up2, comment2));
+        reportRepository.save(new CommentReport(up3, comment2));
+        reportRepository.save(new CommentReport(down1, comment2));
+        reportRepository.save(new CommentReport(down2, comment2));
 
         List<CommentReadDTO> dto = commentService.test(post);
 
-        System.out.println(dto);
+        assertEquals(2, dto.size());
+
+        assertEquals(comment1.getId(), dto.get(0).getId());
+        assertEquals(comment1.getUser().getNickname(), dto.get(0).getNickname());
+        assertEquals(comment1.getComment(), dto.get(0).getContent());
+        assertEquals(3, dto.get(0).getUp());
+        assertEquals(2, dto.get(0).getDown());
+        assertEquals(2, dto.get(0).getReport());
+
+        assertEquals(comment2.getId(), dto.get(1).getId());
+        assertEquals(comment2.getUser().getNickname(), dto.get(1).getNickname());
+        assertEquals(comment2.getComment(), dto.get(1).getContent());
+        assertEquals(3, dto.get(1).getUp());
+        assertEquals(1, dto.get(1).getDown());
+        assertEquals(5, dto.get(1).getReport());
 
 
     }

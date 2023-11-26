@@ -103,23 +103,23 @@ public class UserService {
 
     }
 
-    public PageResultDTO<LogDTO, Log> findLogsByUser(User user, Pageable pageable) {
+    public PageConvertDTO<LogDTO, Log> findLogsByUser(User user, Pageable pageable) {
 
         Page<Log> logs = logRepository.findLogsByUser(user, pageable);
 
         Function<Log, LogDTO> fn = (LogDTO::new);
 
-        return new PageResultDTO<>(logs, fn);
+        return new PageConvertDTO<>(logs, fn);
 
     }
 
-    public PageResultDTO<LogDTO, Log> findPostLogsByUser(User user, Pageable pageable) {
+    public PageConvertDTO<LogDTO, Log> findPostLogsByUser(User user, Pageable pageable) {
 
         Page<Log> logs = logRepository.findPostLogsByUser(user, LogType.POST, pageable);
 
         Function<Log, LogDTO> fn = (LogDTO::new);
 
-        return new PageResultDTO<>(logs, fn);
+        return new PageConvertDTO<>(logs, fn);
 
     }
 

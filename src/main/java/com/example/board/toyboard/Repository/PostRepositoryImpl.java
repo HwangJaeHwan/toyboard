@@ -1,10 +1,13 @@
 package com.example.board.toyboard.Repository;
 
 import com.example.board.toyboard.DTO.PageListDTO;
+import com.example.board.toyboard.DTO.PostListDTO;
 import com.example.board.toyboard.DTO.PostReportDTO;
 import com.example.board.toyboard.DTO.SearchDTO;
 import com.example.board.toyboard.Entity.Post.Post;
 import com.example.board.toyboard.Entity.Post.QPost;
+import com.example.board.toyboard.Entity.Post.QRecommendation;
+import com.example.board.toyboard.Entity.QComment;
 import com.example.board.toyboard.Entity.QUser;
 import com.example.board.toyboard.Entity.Report.PostReport;
 import com.example.board.toyboard.Entity.Report.QPostReport;
@@ -27,6 +30,7 @@ import jakarta.persistence.EntityManager;
 import java.util.List;
 
 import static com.example.board.toyboard.Entity.Post.QPost.post;
+import static com.example.board.toyboard.Entity.Post.QRecommendation.*;
 import static com.example.board.toyboard.Entity.QUser.*;
 import static com.example.board.toyboard.Entity.Report.QPostReport.*;
 
@@ -40,7 +44,9 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
 
 
     @Override
-    public Page<Post> search(SearchDTO searchDTO, Pageable pageable, String postType) {
+    public Page<PostListDTO> search(SearchDTO searchDTO, Pageable pageable, String postType) {
+
+        QComment comment = new QComment("comment");
 
         BooleanBuilder builder = new BooleanBuilder();
 
@@ -54,14 +60,36 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
 
         builder.and(post.postType.eq(postType));
 
-        List<Post> content = queryFactory
-                .selectFrom(post)
-                .join(post.user,user).fetchJoin()
+        log.info("ㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋ");
+
+        List<PostListDTO> content = queryFactory
+                .select(Projections.constructor(PostListDTO.class,
+                        post.id,
+                        post.title,
+                        post.user.nickname,
+                        post.createdTime,
+                        post.hits,
+                        recommendation.count(),
+                        comment.count()
+                ))
+                .from(post)
+                .join(post.user)
+                .leftJoin(recommendation).on(post.id.eq(recommendation.post.id))
+                .leftJoin(comment).on(post.id.eq(comment.post.id))
+                .groupBy(post.id, post.title, post.user.nickname, post.createdTime, post.hits)
                 .where(builder)
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .orderBy(postSort(pageable))
                 .fetch();
+
+        log.info("내용 = {}", content);
+
+        List<Post> list = queryFactory.selectFrom(post)
+                .where(builder)
+                .fetch();
+
+        log.info("시발 = {},사이즈 = {}", list, list.size());
 
 
 
@@ -123,7 +151,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
                     case "hits":
                         return new OrderSpecifier<>(Order.DESC, post.hits);
                     case "recommendedNumber":
-                        return new OrderSpecifier<>(Order.DESC, post.recommendedNumber);
+                        return new OrderSpecifier<>(Order.DESC, recommendation.count());
                 }
             }
         }

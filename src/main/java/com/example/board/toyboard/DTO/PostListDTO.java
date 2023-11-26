@@ -23,24 +23,18 @@ public class PostListDTO {
 
     private int hits;
 
-    private int commentNum;
+    private long commentNum;
 
-    private int recommendedNumber;
-
-
+    private long recommendedNumber;
 
     @Builder
-    public PostListDTO(Post post) {
-        this.id = post.getId();
-        this.nickname = post.getUser().getNickname();
-        this.title = post.getTitle();
-        this.createTime = post.getCreatedTime();
-        this.hits = post.getHits();
-        this.commentNum = post.getCommentNum();
-        this.recommendedNumber = post.getRecommendedNumber();
+    public PostListDTO(Long id, String title, String nickname, LocalDateTime createTime, int hits, long commentNum, long recommendedNumber) {
+        this.id = id;
+        this.title = title;
+        this.nickname = nickname;
+        this.createTime = createTime;
+        this.hits = hits;
+        this.commentNum = commentNum;
+        this.recommendedNumber = recommendedNumber;
     }
-
-
-
-
 }

@@ -61,7 +61,6 @@ public class CommentService {
 
         Log commentLog = new Log(loginUser, post, LogType.COMMENT, comment);
 
-        post.addCommentNum();
         comment.addLog(commentLog);
         logRepository.save(commentLog);
 
@@ -83,7 +82,6 @@ public class CommentService {
                     }
             );
 
-            comment.getPost().subCommentNum();
             commentRepository.delete(comment);
         } else {
             throw new IllegalStateException();

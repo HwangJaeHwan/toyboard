@@ -137,7 +137,7 @@ public class UserController {
         Pageable pageable = pageListDTO.getPageable();
         User user = userService.findById(id);
 
-        PageResultDTO<LogDTO, Log> result = userService.findLogsByUser(user, pageable);
+        PageConvertDTO<LogDTO, Log> result = userService.findLogsByUser(user, pageable);
 
         model.addAttribute("postNum", user.getPosts().size());
         model.addAttribute("nickname", user.getNickname());
@@ -154,7 +154,7 @@ public class UserController {
         Pageable pageable = pageListDTO.getPageable();
         User user = userService.findById(id);
 
-        PageResultDTO<LogDTO, Log> result = userService.findPostLogsByUser(user, pageable);
+        PageConvertDTO<LogDTO, Log> result = userService.findPostLogsByUser(user, pageable);
 
         model.addAttribute("postNum", user.getPosts().size());
         model.addAttribute("nickname", user.getNickname());

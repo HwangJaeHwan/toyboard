@@ -18,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Function;
 
 @Service
 @Slf4j
@@ -42,15 +41,9 @@ public class PostService {
     }
 
     @Transactional(readOnly = true)
-    public PageResultDTO<PostListDTO, Post> makePageResult(Pageable pageable, SearchDTO searchDTO, String postType) {
+    public PageDTO<PostListDTO> makePageResult(Pageable pageable, SearchDTO searchDTO, String postType) {
 
-        Page<Post> posts = postRepository.search(searchDTO, pageable, postType);
-        log.info("posts = {}", posts);
-
-        Function<Post, PostListDTO> fn = PostListDTO::new;
-
-
-        return new PageResultDTO<>(posts, fn);
+        return new PageDTO<>(postRepository.search(searchDTO, pageable, postType));
 
     }
 
@@ -70,7 +63,6 @@ public class PostService {
                 .content(dto.getContent())
                 .hits(0)
                 .postType(dto.getPostType())
-                .recommendedNumber(0)
                 .build();
 
         post.setWriter(loginUser);
@@ -112,7 +104,6 @@ public class PostService {
         Post post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
         User user = userRepository.findByNickname(nickname).orElseThrow(UserNotFoundException::new);
 
-        log.info("number1 = {}", post.getRecommendedNumber());
 
         Optional<Recommendation> check = recommendationRepository.findByUserAndPost(user, post);
 
@@ -120,21 +111,21 @@ public class PostService {
         if (check.isPresent()) {
             recommendationRepository.delete(check.get());
 
-            post.subRecommendedNumber();
-            logRepository.findLogByUserAndPostAndLogType(user, post, LogType.RECOMMEND).ifPresent(log -> logRepository.delete(log));
+            logRepository.findLogByUserAndPostAndLogType(user, post, LogType.RECOMMEND).ifPresent(logRepository::delete);
 
         } else {
 
             recommendationRepository.save(new Recommendation(user, post));
 
-            post.addRecommendedNumber();
             logRepository.save(new Log(user, post, LogType.RECOMMEND));
         }
 
-        log.info("number2 = {}", post.getRecommendedNumber());
+//        recommendationRepository
 
-        return post.getRecommendedNumber();
 
+//        return post.getRecommendedNumber();
+
+        return 0;
 
 
 
