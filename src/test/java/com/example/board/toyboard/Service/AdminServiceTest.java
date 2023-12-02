@@ -175,13 +175,24 @@ class AdminServiceTest {
 
         postRepository.save(post);
 
-        Comment comment = Comment.builder()
-                .comment("content")
-                .user(writer)
-                .post(post)
-                .build();
+        List<Comment> comments = new ArrayList<>();
 
-        commentRepository.save(comment);
+        IntStream.range(0,30).forEach(i->
+                comments.add(
+
+                        Comment.builder()
+                                .comment("content" + i)
+                                .user(writer)
+                                .post(post)
+                                .build()
+
+                )
+
+        );
+
+
+
+        commentRepository.saveAll(comments);
 
 
 
@@ -192,7 +203,7 @@ class AdminServiceTest {
         IntStream.range(0, 20)
                 .forEach(i -> IntStream.range(i, 30)
                         .forEach(
-                                j -> reports.add(new CommentReport(users.get(i), comment))
+                                j -> reports.add(new CommentReport(users.get(i), comments.get(j)))
                         ));
 
         reportRepository.saveAll(reports);

@@ -109,6 +109,17 @@ class PostServiceTest {
 
         PageDTO<PostListDTO> dto = postService.makePageResult(pageable, searchDTO, "free");
 
+        assertEquals(dto.getTotalPage(), 3);
+        assertEquals(dto.getPageInfo().getNow(), 1);
+        assertEquals(dto.getPageInfo().getStart(), 1);
+        assertEquals(dto.getPageInfo().getEnd(), 3);
+        assertFalse(dto.getPageInfo().isPrev());
+        assertFalse(dto.getPageInfo().isNext());
+        assertEquals(dto.getPageInfo().getPageList().size(), 3);
+        assertIterableEquals(IntStream.rangeClosed(1, 3).boxed().toList(), dto.getPageInfo().getPageList());
+
+        assertEquals(dto.getDtoList().size(), 10);
+
         System.out.println(dto);
 
 

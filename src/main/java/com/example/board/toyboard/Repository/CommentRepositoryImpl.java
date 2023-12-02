@@ -2,9 +2,12 @@ package com.example.board.toyboard.Repository;
 
 import com.example.board.toyboard.DTO.CommentReadDTO;
 import com.example.board.toyboard.DTO.CommentReportDTO;
+import com.example.board.toyboard.Entity.Comment;
 import com.example.board.toyboard.Entity.Post.Post;
 import com.example.board.toyboard.Entity.QComment;
+import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Projections;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -77,20 +80,20 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom{
                 .limit(pageable.getPageSize())
                 .fetch();
 
+        List<Long> ids = queryFactory
+                .select(comment.id)
+                .from(comment)
+                .join(commentReport).on(comment.id.eq(commentReport.comment.id))
+                .groupBy(comment.id)
+                .having(commentReport.count().goe(10L))
+                .fetch();
+
         JPAQuery<Long> countQuery = queryFactory
-                .select(commentReport.comment.id.count())
-                .from(commentReport)
-                .groupBy(commentReport.comment.id)
-                .having(commentReport.comment.id.goe(10L));
+                .select(comment.count())
+                .from(comment)
+                .where(comment.id.in(ids));
 
-        Long count = queryFactory
-                .select(commentReport.comment.id.count())
-                .from(commentReport)
-                .groupBy(commentReport.comment.id)
-                .having(commentReport.comment.id.goe(10))
-                .fetchOne();
-
-        log.info("카운터 = {}", count);
+        log.info("카운터 = {}", ids);
 
 
         return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);

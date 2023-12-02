@@ -69,8 +69,8 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
                         post.user.nickname,
                         post.createdTime,
                         post.hits,
-                        recommendation.count(),
-                        comment.count()
+                        comment.count().as("commentNum"),
+                        recommendation.count().as("recommendedNumber")
                 ))
                 .from(post)
                 .join(post.user)
@@ -84,13 +84,6 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
                 .fetch();
 
         log.info("내용 = {}", content);
-
-        List<Post> list = queryFactory.selectFrom(post)
-                .where(builder)
-                .fetch();
-
-        log.info("시발 = {},사이즈 = {}", list, list.size());
-
 
 
         JPAQuery<Long> countQuery = queryFactory
@@ -155,7 +148,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
                 }
             }
         }
-        return new OrderSpecifier<>(Order.ASC, post.createdTime);
+        return new OrderSpecifier<>(Order.DESC, post.createdTime);
     }
 
 }
