@@ -38,6 +38,10 @@ dependencies {
 //	 https://mvnrepository.com/artifact/com.mysql/mysql-connector-j
 	implementation 'com.mysql:mysql-connector-j'
 
+	// https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-s3
+	implementation group: 'com.amazonaws', name: 'aws-java-sdk-s3', version: '1.12.604'
+
+
 
 	implementation 'com.querydsl:querydsl-core:5.0.0'
 	implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'

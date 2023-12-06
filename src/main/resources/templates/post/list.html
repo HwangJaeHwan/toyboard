@@ -69,20 +69,20 @@
 
     <nav>
         <ul class="pagination">
-            <li th:if="${posts.prev}">
-                <a th:if="${#strings.isEmpty(searchDTO.content)}" th:href="@{/post(page=${posts.start - 1},postType=${postType},sort=${sort})}" th:text="${num}"></a>
-                <a th:unless="${#strings.isEmpty(searchDTO.content)}" th:href="@{/post(page=${posts.start - 1},type=${searchDTO.type},content=${searchDTO.content},postType=${postType},sort=${sort})}" th:text="${num}"></a>
+            <li th:if="${posts.pageInfo.prev}">
+                <a th:if="${#strings.isEmpty(searchDTO.content)}" th:href="@{/post(page=${posts.pageInfo.start - 1},postType=${postType},sort=${sort})}" th:text="${num}"></a>
+                <a th:unless="${#strings.isEmpty(searchDTO.content)}" th:href="@{/post(page=${posts.pageInfo.start - 1},type=${searchDTO.type},content=${searchDTO.content},postType=${postType},sort=${sort})}" th:text="${num}"></a>
             </li>
-            <li th:class="${posts.now == num ? 'active':''}" th:each="num: ${posts.pageList}" >
+            <li th:class="${posts.pageInfo.now == num ? 'active':''}" th:each="num: ${posts.pageInfo.pageList}" >
 
                 <a th:if="${#strings.isEmpty(searchDTO.content)}" th:href="@{/post(page=${num},postType=${postType},sort=${sort})}" th:text="${num}"></a>
                 <a th:unless="${#strings.isEmpty(searchDTO.content)}" th:href="@{/post(page=${num},type=${searchDTO.type},content=${searchDTO.content},postType=${postType},sort=${sort})}" th:text="${num}"></a>
             </li>
 
 
-            <li th:if="${posts.next}">
-                <a th:if="${#strings.isEmpty(searchDTO.content)}" th:href="@{/post(page=${posts.end + 1},postType=${postType},sort=${sort})}" th:text="${num}"></a>
-                <a th:unless="${#strings.isEmpty(searchDTO.content)}" th:href="@{/post(page=${posts.end + 1},type=${searchDTO.type},content=${searchDTO.content},postType=${postType},sort=${sort})}" th:text="${num}"></a>
+            <li th:if="${posts.pageInfo.next}">
+                <a th:if="${#strings.isEmpty(searchDTO.content)}" th:href="@{/post(page=${posts.pageInfo.end + 1},postType=${postType},sort=${sort})}" th:text="${num}"></a>
+                <a th:unless="${#strings.isEmpty(searchDTO.content)}" th:href="@{/post(page=${posts.pageInfo.end + 1},type=${searchDTO.type},content=${searchDTO.content},postType=${postType},sort=${sort})}" th:text="${num}"></a>
             </li>
         </ul>
     </nav>

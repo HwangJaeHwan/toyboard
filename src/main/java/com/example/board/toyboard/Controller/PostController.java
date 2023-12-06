@@ -1,5 +1,6 @@
 package com.example.board.toyboard.Controller;
 
+import com.amazonaws.services.s3.AmazonS3;
 import com.example.board.toyboard.DTO.*;
 import com.example.board.toyboard.Entity.Post.Post;
 import com.example.board.toyboard.Entity.Post.PostCode;
@@ -13,6 +14,7 @@ import com.example.board.toyboard.file.UploadFile;
 import com.example.board.toyboard.session.SessionConst;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -41,6 +43,10 @@ public class PostController {
     private final UserService userService;
     private final CommentService commentService;
     private final FileStore fileStore;
+    private final AmazonS3 amazonS3;
+
+    @Value("${aws.s3.bucket}")
+    private String bucket;
 
 
     @GetMapping
@@ -186,11 +192,10 @@ public class PostController {
     @ResponseBody
     public String uploadImage(@RequestParam MultipartFile file) throws IOException {
 
-        UploadFile uploadFile = fileStore.storeFile(file);
+//        UploadFile uploadFile = fileStore.storeFile(file);
+        UploadFile uploadFile = fileStore.saveFile(file);
 
-        String imagePath = "/post/image/" + uploadFile.getStoreFileName();
-
-        return imagePath;
+        return "/post/image/" + uploadFile.getStoreFileName();
 
     }
 
@@ -198,7 +203,8 @@ public class PostController {
     @GetMapping("/image/{filename}")
     public UrlResource downloadImage(@PathVariable String filename) throws
             MalformedURLException {
-        return new UrlResource("file:" + fileStore.getFullPath(filename));
+//        return new UrlResource("file:" + fileStore.getFullPath(filename));
+        return new UrlResource(amazonS3.getUrl(bucket, filename));
     }
 
 
