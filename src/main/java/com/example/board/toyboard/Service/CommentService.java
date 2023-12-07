@@ -88,9 +88,9 @@ public class CommentService {
         }
     }
 
-    public List<Comment> findComments(Post post) {
+    public List<Comment> findComments(Long postId) {
 
-        return commentRepository.findCommentsByPost(post);
+        return commentRepository.findCommentsByPost(postId);
 
     }
 

@@ -54,6 +54,11 @@ public class PostService {
 
     }
 
+    public PostReadDTO read(Long postId) {
+
+        return postRepository.postRead(postId);
+    }
+
 
 
     public Long write(PostWriteDTO dto, User loginUser) {
@@ -83,6 +88,7 @@ public class PostService {
         if (post.getUser() == loginUser) {
             logRepository.deleteAllByPost(post);
             commentRepository.deleteAllByPost(post);
+            recommendationRepository.deleteAllByPost(post);
             postRepository.delete(post);
         } else {
             throw new IllegalStateException();
@@ -125,7 +131,7 @@ public class PostService {
 
 //        return post.getRecommendedNumber();
 
-        return 0;
+        return recommendationRepository.countAllByPost(post);
 
 
 

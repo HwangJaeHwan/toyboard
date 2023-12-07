@@ -38,7 +38,7 @@ public class CommentController {
 
         log.info("시발2 = {}", post);
 
-        return commentService.findComments(post).stream().map(CommentReadDTO::new).collect(Collectors.toList());
+        return commentService.findComments(postId).stream().map(CommentReadDTO::new).collect(Collectors.toList());
     }
 
     @PostMapping("/{postId}")

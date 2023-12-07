@@ -1,9 +1,6 @@
 package com.example.board.toyboard.Repository;
 
-import com.example.board.toyboard.DTO.PageListDTO;
-import com.example.board.toyboard.DTO.PostListDTO;
-import com.example.board.toyboard.DTO.PostReportDTO;
-import com.example.board.toyboard.DTO.SearchDTO;
+import com.example.board.toyboard.DTO.*;
 import com.example.board.toyboard.Entity.Post.Post;
 import com.example.board.toyboard.Entity.Post.QPost;
 import com.example.board.toyboard.Entity.Post.QRecommendation;
@@ -13,9 +10,8 @@ import com.example.board.toyboard.Entity.Report.PostReport;
 import com.example.board.toyboard.Entity.Report.QPostReport;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.Tuple;
-import com.querydsl.core.types.Order;
-import com.querydsl.core.types.OrderSpecifier;
-import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.*;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +29,7 @@ import static com.example.board.toyboard.Entity.Post.QPost.post;
 import static com.example.board.toyboard.Entity.Post.QRecommendation.*;
 import static com.example.board.toyboard.Entity.QUser.*;
 import static com.example.board.toyboard.Entity.Report.QPostReport.*;
+import static com.querydsl.core.types.ExpressionUtils.count;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -128,6 +125,41 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
 
 
 
+
+    }
+
+    @Override
+    public PostReadDTO postRead(Long postId) {
+
+        PostReadDTO postReadDTO = queryFactory
+                .select(Projections.constructor(
+                        PostReadDTO.class,
+                        post.id.as("id"),
+                        post.user.nickname.as("nickname"),
+                        post.title.as("title"),
+                        post.content.as("content"),
+                        post.createdTime.as("createTime"),
+                        post.hits.as("hits"),
+                        ExpressionUtils.as(
+                                JPAExpressions.select(count(recommendation.id))
+                                        .from(recommendation)
+                                        .where(recommendation.post.id.eq(postId)),
+                                "recommendedNumber")
+                ))
+                .from(post)
+                .leftJoin(post.user)
+                .where(post.id.eq(postId))
+                .fetchOne();
+
+
+        if (postReadDTO != null) {
+            queryFactory.update(post)
+                    .set(post.hits, post.hits.add(1))
+                    .where(post.id.eq(postId))
+                    .execute();
+        }
+
+        return postReadDTO;
 
     }
 

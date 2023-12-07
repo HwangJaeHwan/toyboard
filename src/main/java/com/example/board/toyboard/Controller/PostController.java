@@ -107,13 +107,9 @@ public class PostController {
                            @PathVariable("postId") Long postId, Model model) {
 
 
-        Post post = postService.findById(postId);
-        post.addHits();
+        PostReadDTO readDTO = postService.read(postId);
 
-
-        PostReadDTO readDTO = new PostReadDTO(post);
-
-        List<CommentReadDTO> commentDTOList = commentService.findComments(post)
+        List<CommentReadDTO> commentDTOList = commentService.findComments(postId)
                                                 .stream()
                                                 .map(CommentReadDTO::new)
                                                 .collect(Collectors.toList());

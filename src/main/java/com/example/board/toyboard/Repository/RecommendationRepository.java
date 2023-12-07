@@ -13,4 +13,8 @@ public interface RecommendationRepository extends JpaRepository<Recommendation, 
 
     Optional<Recommendation> findByUserAndPost(User user, Post post);
 
+    void deleteAllByPost(Post post);
+
+    int countAllByPost(Post post);
+
 }

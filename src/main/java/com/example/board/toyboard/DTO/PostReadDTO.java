@@ -11,7 +11,6 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class PostReadDTO {
 
     private Long id;
@@ -26,14 +25,7 @@ public class PostReadDTO {
 
     private int hits;
 
-    private int recommendedNumber;
+    private long recommendedNumber;
 
-    public PostReadDTO(Post post) {
-        this.id = post.getId();
-        this.nickname = post.getUser().getNickname();
-        this.title = post.getTitle();
-        this.content = post.getContent();
-        this.createTime = post.getCreatedTime();
-        this.hits = post.getHits();
-    }
+
 }

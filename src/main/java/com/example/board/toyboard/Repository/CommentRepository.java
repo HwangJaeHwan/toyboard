@@ -14,8 +14,8 @@ import java.util.Optional;
 @Repository
 public interface CommentRepository extends JpaRepository<Comment,Long>,CommentRepositoryCustom {
 
-    @Query("select c from Comment c join fetch c.user where c.post = :post")
-    List<Comment> findCommentsByPost(@Param("post") Post post);
+    @Query("select c from Comment c join fetch c.user where c.post.id = :postId")
+    List<Comment> findCommentsByPost(@Param("postId") Long postId);
 
     @Query("select c from Comment c join fetch c.post join fetch c.user where c.id = :id")
     Optional<Comment> findWithPostAndUser(@Param("id") Long id);
