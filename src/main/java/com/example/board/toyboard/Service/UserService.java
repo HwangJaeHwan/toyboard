@@ -137,4 +137,13 @@ public class UserService {
 
         log.info("비번2 = {}", loginUser.getPassword());
     }
+
+    public PageConvertDTO<UserListDTO,User> makePageResult(Pageable pageable, SearchDTO searchDTO) {
+
+
+        Page<User> entity = userRepository.search(pageable, searchDTO);
+        Function<User, UserListDTO> fn = UserListDTO::new;
+        return new PageConvertDTO<>(entity, fn);
+
+    }
 }

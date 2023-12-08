@@ -40,7 +40,7 @@ public class UserRepositoryImpl implements UserRepositoryCustom{
                 .selectFrom(user)
                 .where(builder)
                 .offset(pageable.getOffset())
-                .limit(pageable.getOffset())
+                .limit(pageable.getPageSize())
                 .orderBy(user.id.desc())
                 .fetch();
 

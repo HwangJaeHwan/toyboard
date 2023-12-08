@@ -11,11 +11,12 @@ public class PageHelper {
     public static PageInfo makePageList(Pageable pageable, int totalPage) {
 
         PageInfo pageInfo = new PageInfo();
+        int now = pageable.getPageNumber() + 1;
 
-        pageInfo.setNow(pageable.getPageNumber() + 1);
+        pageInfo.setNow(now);
 
 
-        int tmpEnd = (int) (Math.ceil(pageable.getPageNumber() + 1 / 10.0) * 10);
+        int tmpEnd = (int) (Math.ceil(now / 10.0) * 10);
 
         pageInfo.setStart(tmpEnd - 9);
 
