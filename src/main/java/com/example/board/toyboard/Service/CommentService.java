@@ -1,7 +1,6 @@
 package com.example.board.toyboard.Service;
 
-import com.example.board.toyboard.DTO.CommentReadDTO;
-import com.example.board.toyboard.DTO.CommentWriteDTO;
+import com.example.board.toyboard.DTO.*;
 import com.example.board.toyboard.Entity.Comment;
 import com.example.board.toyboard.Entity.Post.Post;
 import com.example.board.toyboard.Entity.User;
@@ -92,6 +91,11 @@ public class CommentService {
 
         return commentRepository.findCommentsByPost(postId);
 
+    }
+
+    public PageDTO<CommentReportDTO> commentsWithReport(PageListDTO pageListDTO) {
+
+        return new PageDTO<>(commentRepository.commentReports(pageListDTO.getPageable()));
     }
 
     public List<CommentReadDTO> test(Post post) {

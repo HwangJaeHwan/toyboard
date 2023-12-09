@@ -99,9 +99,9 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
         List<PostReportDTO> content = queryFactory
                 .select(
                         Projections.constructor(PostReportDTO.class,
-                                post.id.as("postId"),
+                                post.id.as("id"),
                                 post.title.as("title"),
-                                post.user.id.as("userId"),
+                                post.user.loginId.as("userLoginId"),
                                 post.user.nickname.as("nickname"),
                                 postReport.count().as("reposts")))
                 .from(post)

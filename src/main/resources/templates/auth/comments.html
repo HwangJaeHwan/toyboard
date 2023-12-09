@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en" th:replace="~{layout/base :: layout(~{::content})}" xmlns:th="http://www.thymeleaf.org">
+
+
+<div class="flex-c align-items-center" th:fragment="content">
+
+
+
+    <table class="table table-bordered w80">
+        <thead>
+        <tr>
+            <th scope="col" class="col-md-1 text-center">ID</th>
+            <th scope="col" class="col-md-4 text-center">게시물 제목</th>
+            <th scope="col" class="col-md-3 text-center">댓글 내용</th>
+            <th scope="col" class="col-md-3 text-center">닉네임</th>
+            <th scope="col" class="col-md-1 text-center">신고수</th>
+        </tr>
+        </thead>
+
+        <tbody class="text-center">
+        <tr th:each="comment : ${data.getDtoList()}">
+            <td class="text-left" th:text="${comment.id}">1</td>
+            <td class="text-left"><a th:href="@{/posts/{id}(id=${comment.postId})}" th:text="${comment.postTitle}"></a> </td>
+            <td th:text="${comment.comment}">댓글</td>
+            <td th:text="${comment.nickname}">닉네임</td>
+            <td th:text="${comment.reposts}">신고수</td>
+        </tr>
+        </tbody>
+
+    </table>
+
+
+    <nav>
+        <ul class="pagination">
+            <li th:if="${data.pageInfo.prev}">
+                <a th:if="${#strings.isEmpty(searchDTO.content)}" th:href="@{/users(page=${data.pageInfo.start - 1})}" th:text="${num}"></a>
+                <a th:unless="${#strings.isEmpty(searchDTO.content)}" th:href="@{/users(page=${data.pageInfo.start - 1},type=${searchDTO.type},content=${searchDTO.content})}" th:text="${num}"></a>
+            </li>
+            <li th:class="${data.pageInfo.now == num ? 'active':''}" th:each="num: ${data.pageInfo.pageList}" >
+
+                <a th:if="${#strings.isEmpty(searchDTO.content)}" th:href="@{/users(page=${num})}" th:text="${num}"></a>
+                <a th:unless="${#strings.isEmpty(searchDTO.content)}" th:href="@{/users(page=${num},type=${searchDTO.type},content=${searchDTO.content})}" th:text="${num}"></a>
+            </li>
+
+
+            <li th:if="${data.pageInfo.next}">
+                <a th:if="${#strings.isEmpty(searchDTO.content)}" th:href="@{/users(page=${data.pageInfo.end + 1})}" th:text="${num}"></a>
+                <a th:unless="${#strings.isEmpty(searchDTO.content)}" th:href="@{/users(page=${data.pageInfo.end + 1},type=${searchDTO.type},content=${searchDTO.content})}" th:text="${num}"></a>
+            </li>
+        </ul>
+    </nav>
+
+</div>
+
+</html>

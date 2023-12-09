@@ -31,14 +31,16 @@
   <table class="table table-bordered w80">
     <thead>
     <tr>
-      <th scope="col" class="col-md-4 text-center">아이디</th>
-      <th scope="col" class="col-md-4 text-center">닉네임</th>
-      <th scope="col" class="col-md-4 text-center">이메일</th>
+      <th scope="col" class="col-md-3 text-center">ID</th>
+      <th scope="col" class="col-md-3 text-center">유저 ID</th>
+      <th scope="col" class="col-md-3 text-center">닉네임</th>
+      <th scope="col" class="col-md-3 text-center">이메일</th>
     </tr>
     </thead>
 
     <tbody class="text-center">
     <tr th:each="user : ${data.getDtoList()}">
+      <td class="text-left" th:text="${user.id}">1</td>
       <td class="text-left"><a th:href="@{/mypage/{id}(id=${user.id})}" th:text="${user.loginId}"></a> </td>
       <td th:text="${user.nickname}">김갑인</td>
       <td th:text="${user.email}">이메일</td>

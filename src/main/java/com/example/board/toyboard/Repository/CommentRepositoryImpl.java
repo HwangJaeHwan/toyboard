@@ -64,10 +64,10 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom{
         List<CommentReportDTO> content = queryFactory
                 .select(
                         Projections.constructor(CommentReportDTO.class,
+                                comment.id.as("id"),
                                 comment.post.id.as("postId"),
                                 comment.post.title.as("postTitle"),
                                 comment.comment.as("comment"),
-                                comment.user.id.as("userId"),
                                 comment.user.nickname.as("nickname"),
                                 commentReport.count().as("reports")
                         ))
