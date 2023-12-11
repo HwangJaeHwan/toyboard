@@ -55,6 +55,11 @@ public class PostService {
 
     }
 
+    @Transactional(readOnly = true)
+    public Post findByIdWithUser(Long postId) {
+        return postRepository.findByIdWithUser(postId).orElseThrow(PostNotFoundException::new);
+    }
+
     public PostReadDTO read(Long postId) {
 
         return postRepository.postRead(postId);
@@ -82,24 +87,18 @@ public class PostService {
 
     }
 
-    public void delete(User loginUser, Long postId) {
+    public void delete(Post post) {
 
-        Post post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
+        logRepository.deleteAllByPost(post);
+        commentRepository.deleteAllByPost(post);
+        recommendationRepository.deleteAllByPost(post);
+        postRepository.delete(post);
 
-        if (post.getUser() == loginUser) {
-            logRepository.deleteAllByPost(post);
-            commentRepository.deleteAllByPost(post);
-            recommendationRepository.deleteAllByPost(post);
-            postRepository.delete(post);
-        } else {
-            throw new IllegalStateException();
-        }
+
 
     }
 
-    public void update(Long postId, PostUpdateDTO dto) {
-
-        Post post = findById(postId);
+    public void update(Post post, PostUpdateDTO dto) {
 
         post.updateTitle(dto.getTitle());
         post.updateContent(dto.getContent());

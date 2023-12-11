@@ -20,7 +20,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -29,7 +28,6 @@ import jakarta.validation.Valid;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -103,7 +101,7 @@ public class PostController {
 
 
     @GetMapping("/{postId}")
-    public String readPost(@SessionAttribute(SessionConst.USER_TYPE) String userType,
+    public String readPost(@SessionAttribute(SessionConst.USER_TYPE) UserType userType,
                            @PathVariable("postId") Long postId, Model model) {
 
 
@@ -130,9 +128,15 @@ public class PostController {
 
 
     @GetMapping("/update/{postId}")
-    public String updateStart(@PathVariable("postId") Long postId, Model model) {
+    public String updateStart(@PathVariable("postId") Long postId,
+                              @SessionAttribute(SessionConst.USER_TYPE) UserType userType,
+                              @SessionAttribute(SessionConst.LOGIN_USER) String nickname,
+                              Model model) {
 
-        Post post = postService.findById(postId);
+        Post post = postService.findByIdWithUser(postId);
+
+        postCheck(userType, nickname, post);
+
 
         model.addAttribute("id", postId);
         model.addAttribute("post", new PostUpdateDTO(post));
@@ -143,10 +147,19 @@ public class PostController {
     }
 
 
+
     @PostMapping("/update/{postId}")
-    public String updateEnd(@PathVariable("postId") Long postId, @Valid @ModelAttribute(name = "post") PostUpdateDTO dto, BindingResult bindingResult, Model model) {
+    public String updateEnd(@PathVariable("postId") Long postId,
+                            @Valid @ModelAttribute(name = "post") PostUpdateDTO dto,
+                            @SessionAttribute(SessionConst.USER_TYPE) UserType userType,
+                            @SessionAttribute(SessionConst.LOGIN_USER) String nickname,
+                            BindingResult bindingResult, Model model) {
 
         log.info("dto = {}", dto);
+
+        Post post = postService.findByIdWithUser(postId);
+
+        postCheck(userType, nickname,post);
 
         model.addAttribute("id", postId);
 
@@ -155,7 +168,7 @@ public class PostController {
         }
 
 
-        postService.update(postId, dto);
+        postService.update(post, dto);
 
         log.info("dto ={}", dto);
 
@@ -164,10 +177,14 @@ public class PostController {
     }
 
     @GetMapping("/delete/{postId}")
-    public String deletePost(@SessionAttribute(SessionConst.LOGIN_USER) String nickname, @PathVariable Long postId) {
-        User loginUser = userService.findByNickname(nickname);
+    public String deletePost(@SessionAttribute(SessionConst.LOGIN_USER) String nickname,
+                             @SessionAttribute(SessionConst.USER_TYPE) UserType userType,
+                             @PathVariable Long postId) {
+        Post post = postService.findByIdWithUser(postId);
 
-        postService.delete(loginUser, postId);
+        postCheck(userType, nickname, post);
+
+        postService.delete(post);
 
         return "redirect:/post";
 
@@ -212,6 +229,12 @@ public class PostController {
         postCodes.add(new PostCode("QNA", "Q&A"));
 
         return postCodes;
+    }
+
+    private void postCheck(UserType userType, String nickname, Post post) {
+        if (!post.getUser().getNickname().equals(nickname) || userType.equals(UserType.ADMIN)) {
+            throw new RuntimeException();
+        }
     }
 
 }
