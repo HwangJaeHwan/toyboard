@@ -29,5 +29,7 @@ public interface LogRepository extends JpaRepository<Log, Long> {
 
     void deleteAllByPost(Post post);
 
+    void deleteAllByComment(Comment comment);
+
 
 }

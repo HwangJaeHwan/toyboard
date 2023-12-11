@@ -101,8 +101,9 @@ public class PostController {
 
 
     @GetMapping("/{postId}")
-    public String readPost(@SessionAttribute(SessionConst.USER_TYPE) UserType userType,
-                           @PathVariable("postId") Long postId, Model model) {
+    public String readPost(
+            @SessionAttribute(SessionConst.USER_TYPE) String userType,
+            @PathVariable("postId") Long postId, Model model) {
 
 
         PostReadDTO readDTO = postService.read(postId);
@@ -113,8 +114,7 @@ public class PostController {
                                                 .collect(Collectors.toList());
 
 
-        log.info("유저타입 = {}", userType);
-        log.info("클래스 = {}", userType.getClass());
+
 
         model.addAttribute("post", readDTO);
         model.addAttribute("comments", commentDTOList);
@@ -232,7 +232,7 @@ public class PostController {
     }
 
     private void postCheck(UserType userType, String nickname, Post post) {
-        if (!post.getUser().getNickname().equals(nickname) || userType.equals(UserType.ADMIN)) {
+        if (!post.getUser().getNickname().equals(nickname) && !(userType == UserType.ADMIN)) {
             throw new RuntimeException();
         }
     }

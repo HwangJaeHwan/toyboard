@@ -12,21 +12,17 @@
             <p class="margin-right-10" th:text="${post.nickname}" ></p>
             <p class="margin-right-10" th:text="${#temporals.format(post.createTime, 'yyyy/MM/dd HH:mm')}   "></p>
             조회수 : <span th:text="${post.hits}"></span>
-            <p class="margin-right-10" th:text="${userType}">유저타입</p>
+            <p class="margin-right-10" th:text="${userType eq 'ADMIN'}" ></p>
+
         </div>
 
 
-        <div class="flex-box justify-content-end" th:if="${session.loginUser eq post.nickname and userType eq 'USER'}">
+        <div class="flex-box justify-content-end" th:if="${session.loginUser eq post.nickname or userType eq 'ADMIN'}">
             <a th:href="@{/post/update/{id}(id = ${post.id})}" class="btn btn-primary">수정</a>
             <a th:href="@{/post/delete/{id}(id = ${post.id})}" class="btn btn-danger">삭제</a>
         </div>
 
 
-        <div class="flex-box justify-content-end" th:if="${userType eq 'ADMIN'}">
-            <a th:href="@{/post/update/{id}(id = ${post.id})}" class="btn btn-primary">수정</a>
-            <a th:href="@{/post/delete/{id}(id = ${post.id})}" class="btn btn-danger">삭제</a>
-
-        </div>
 
         <hr>
         <div class="form-group test">
@@ -54,8 +50,8 @@
             <div  class="flex-box justify-content-space-between">
                 <span th:text="${commentDTO.nickname}">닉네임</span>
                 <div>
-                <button th:if="${session.loginUser.equals(commentDTO.nickname)}" th:onclick="|clickDelete(${commentDTO.id},${commentNums})|" >삭제</button>
-                <button th:unless="${session.loginUser.equals(commentDTO.nickname)}" th:onclick="|clickReport(${commentDTO.id})|">신고</button>
+                <button th:if="${session.loginUser eq commentDTO.nickname or userType eq 'ADMIN'}" th:onclick="|clickDelete(${commentDTO.id},${commentNums})|" >삭제</button>
+                <button th:unless="${session.loginUser eq commentDTO.nickname or userType eq 'ADMIN'}" th:onclick="|clickReport(${commentDTO.id})|">신고</button>
 
                 </div>
             </div>
@@ -97,7 +93,8 @@
 
         function showComments(id){
 
-            const session = [[${session.loginUser}]];
+            const loginUser = [[${session.loginUser}]];
+            const userType = [[${session.userType}]];
             let commentNums;
 
             $.ajax({
@@ -112,12 +109,13 @@
                     console.log(data)
                     data.forEach(function (commentDTO) {
 
+
                         document.getElementById("comments").innerHTML += '<div id="comment' + commentDTO.id + '"class="flex-c">\n' +
                             '<div  id="commentHead'+commentDTO.id+'" class="flex-box justify-content-space-between">\n' +
                             '<span>' + commentDTO.nickname + '</span>';
 
 
-                                if (session === commentDTO.nickname) {
+                                if (loginUser === commentDTO.nickname || userType === "ADMIN") {
                                     document.getElementById("commentHead"+commentDTO.id).innerHTML += '<div> <button onclick="clickDelete(' + commentDTO.id + ')">삭제</button> </div>';
                                 } else {
                                     document.getElementById("commentHead"+commentDTO.id).innerHTML += '<div> <button onclick="clickReport(' + commentDTO.id + ')">신고</button> </div>';

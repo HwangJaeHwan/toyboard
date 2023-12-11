@@ -20,7 +20,7 @@
         <tbody class="text-center">
         <tr th:each="comment : ${data.getDtoList()}">
             <td class="text-left" th:text="${comment.id}">1</td>
-            <td class="text-left"><a th:href="@{/posts/{id}(id=${comment.postId})}" th:text="${comment.postTitle}"></a> </td>
+            <td class="text-left"><a th:href="@{/posts/#comment{id}(id=${comment.postId})}" th:text="${comment.postTitle}"></a> </td>
             <td th:text="${comment.comment}">댓글</td>
             <td th:text="${comment.nickname}">닉네임</td>
             <td th:text="${comment.reposts}">신고수</td>
@@ -33,19 +33,19 @@
     <nav>
         <ul class="pagination">
             <li th:if="${data.pageInfo.prev}">
-                <a th:if="${#strings.isEmpty(searchDTO.content)}" th:href="@{/users(page=${data.pageInfo.start - 1})}" th:text="${num}"></a>
-                <a th:unless="${#strings.isEmpty(searchDTO.content)}" th:href="@{/users(page=${data.pageInfo.start - 1},type=${searchDTO.type},content=${searchDTO.content})}" th:text="${num}"></a>
+                <a th:if="${#strings.isEmpty(searchDTO.content)}" th:href="@{/auth/comments(page=${data.pageInfo.start - 1})}" th:text="${num}"></a>
+                <a th:unless="${#strings.isEmpty(searchDTO.content)}" th:href="@{/auth/comments(page=${data.pageInfo.start - 1},type=${searchDTO.type},content=${searchDTO.content})}" th:text="${num}"></a>
             </li>
             <li th:class="${data.pageInfo.now == num ? 'active':''}" th:each="num: ${data.pageInfo.pageList}" >
 
-                <a th:if="${#strings.isEmpty(searchDTO.content)}" th:href="@{/users(page=${num})}" th:text="${num}"></a>
-                <a th:unless="${#strings.isEmpty(searchDTO.content)}" th:href="@{/users(page=${num},type=${searchDTO.type},content=${searchDTO.content})}" th:text="${num}"></a>
+                <a th:if="${#strings.isEmpty(searchDTO.content)}" th:href="@{/auth/comments(page=${num})}" th:text="${num}"></a>
+                <a th:unless="${#strings.isEmpty(searchDTO.content)}" th:href="@{/auth/comments(page=${num},type=${searchDTO.type},content=${searchDTO.content})}" th:text="${num}"></a>
             </li>
 
 
             <li th:if="${data.pageInfo.next}">
-                <a th:if="${#strings.isEmpty(searchDTO.content)}" th:href="@{/users(page=${data.pageInfo.end + 1})}" th:text="${num}"></a>
-                <a th:unless="${#strings.isEmpty(searchDTO.content)}" th:href="@{/users(page=${data.pageInfo.end + 1},type=${searchDTO.type},content=${searchDTO.content})}" th:text="${num}"></a>
+                <a th:if="${#strings.isEmpty(searchDTO.content)}" th:href="@{/auth/comments(page=${data.pageInfo.end + 1})}" th:text="${num}"></a>
+                <a th:unless="${#strings.isEmpty(searchDTO.content)}" th:href="@{/auth/comments(page=${data.pageInfo.end + 1},type=${searchDTO.type},content=${searchDTO.content})}" th:text="${num}"></a>
             </li>
         </ul>
     </nav>

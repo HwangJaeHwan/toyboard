@@ -6,6 +6,7 @@ import com.example.board.toyboard.DTO.CommentWriteDTO;
 import com.example.board.toyboard.Entity.Comment;
 import com.example.board.toyboard.Entity.Post.Post;
 import com.example.board.toyboard.Entity.User;
+import com.example.board.toyboard.Entity.UserType;
 import com.example.board.toyboard.Service.*;
 import com.example.board.toyboard.session.SessionConst;
 import lombok.RequiredArgsConstructor;
@@ -93,12 +94,19 @@ public class CommentController {
     }
 
     @DeleteMapping("/{id}")
-    String delete(@SessionAttribute(name = SessionConst.LOGIN_USER) String nickname, @PathVariable("id") Long id) {
+    String delete(@SessionAttribute(name = SessionConst.LOGIN_USER) String nickname,
+                  @SessionAttribute(SessionConst.USER_TYPE) UserType userType,
+                  @PathVariable("id") Long id) {
 
-        User loginUser = userService.findByNickname(nickname);
+        Comment comment = commentService.findByIdWithUser(id);
+        log.info("userType = {}", userType);
+        log.info("userType == admin : {}", userType == UserType.ADMIN);
 
+        if (!(userType == UserType.ADMIN) && !comment.getUser().getNickname().equals(nickname)) {
+            throw new RuntimeException();//수정
+        }
 
-        commentService.delete(id,loginUser);
+        commentService.delete(comment);
 
         return "삭제 완료";
     }

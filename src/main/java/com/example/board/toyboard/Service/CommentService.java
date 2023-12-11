@@ -38,6 +38,11 @@ public class CommentService {
         return commentRepository.findById(id).orElseThrow(CommentNotFoundException::new);
     }
 
+    public Comment findByIdWithUser(Long id) {
+
+        return commentRepository.findByIdWithUser(id).orElseThrow(CommentNotFoundException::new);
+    }
+
     public Comment findWithPostAndUser(Long id) {
         return commentRepository.findWithPostAndUser(id).orElseThrow(CommentNotFoundException::new);
     }
@@ -67,24 +72,11 @@ public class CommentService {
 
     }
 
-    public void delete(Long id, User loginUser) {
+    public void delete(Comment comment) {
 
-        Comment comment = commentRepository.findWithPostAndUser(id).orElseThrow(CommentNotFoundException::new);
-
-        if (comment.getUser() == loginUser) {
-            log.info("loginUser ={}, getUser ={}", loginUser, comment.getUser());
-
-            logRepository.findLogByUserAndCommentAndLogType(loginUser, comment, LogType.COMMENT).ifPresent(
-                    log -> {
-                        comment.removeLog(log);
-                        logRepository.delete(log);
-                    }
-            );
 
             commentRepository.delete(comment);
-        } else {
-            throw new IllegalStateException();
-        }
+
     }
 
     public List<Comment> findComments(Long postId) {

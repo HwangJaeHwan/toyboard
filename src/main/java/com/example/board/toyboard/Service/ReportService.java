@@ -24,7 +24,9 @@ public class ReportService {
     public void commentReport(User user, Comment comment) {
 
 
-        Report report = new CommentReport(user, comment);
+        CommentReport report = new CommentReport(user, comment);
+
+        comment.getReports().add(report);
 
         reportRepository.save(report);
 

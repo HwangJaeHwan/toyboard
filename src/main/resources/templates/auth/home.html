@@ -53,19 +53,19 @@
   <nav>
     <ul class="pagination">
       <li th:if="${data.pageInfo.prev}">
-        <a th:if="${#strings.isEmpty(searchDTO.content)}" th:href="@{/users(page=${data.pageInfo.start - 1})}" th:text="${num}"></a>
-        <a th:unless="${#strings.isEmpty(searchDTO.content)}" th:href="@{/users(page=${data.pageInfo.start - 1},type=${searchDTO.type},content=${searchDTO.content})}" th:text="${num}"></a>
+        <a th:if="${#strings.isEmpty(searchDTO.content)}" th:href="@{/auth/users(page=${data.pageInfo.start - 1})}" th:text="${num}"></a>
+        <a th:unless="${#strings.isEmpty(searchDTO.content)}" th:href="@{/auth/users(page=${data.pageInfo.start - 1},type=${searchDTO.type},content=${searchDTO.content})}" th:text="${num}"></a>
       </li>
       <li th:class="${data.pageInfo.now == num ? 'active':''}" th:each="num: ${data.pageInfo.pageList}" >
 
-        <a th:if="${#strings.isEmpty(searchDTO.content)}" th:href="@{/users(page=${num})}" th:text="${num}"></a>
-        <a th:unless="${#strings.isEmpty(searchDTO.content)}" th:href="@{/users(page=${num},type=${searchDTO.type},content=${searchDTO.content})}" th:text="${num}"></a>
+        <a th:if="${#strings.isEmpty(searchDTO.content)}" th:href="@{/auth/users(page=${num})}" th:text="${num}"></a>
+        <a th:unless="${#strings.isEmpty(searchDTO.content)}" th:href="@{/auth/users(page=${num},type=${searchDTO.type},content=${searchDTO.content})}" th:text="${num}"></a>
       </li>
 
 
       <li th:if="${data.pageInfo.next}">
-        <a th:if="${#strings.isEmpty(searchDTO.content)}" th:href="@{/users(page=${data.pageInfo.end + 1})}" th:text="${num}"></a>
-        <a th:unless="${#strings.isEmpty(searchDTO.content)}" th:href="@{/users(page=${data.pageInfo.end + 1},type=${searchDTO.type},content=${searchDTO.content})}" th:text="${num}"></a>
+        <a th:if="${#strings.isEmpty(searchDTO.content)}" th:href="@{/auth/users(page=${data.pageInfo.end + 1})}" th:text="${num}"></a>
+        <a th:unless="${#strings.isEmpty(searchDTO.content)}" th:href="@{/auth/users(page=${data.pageInfo.end + 1},type=${searchDTO.type},content=${searchDTO.content})}" th:text="${num}"></a>
       </li>
     </ul>
   </nav>
