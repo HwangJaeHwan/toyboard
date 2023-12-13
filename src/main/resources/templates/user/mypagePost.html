@@ -12,7 +12,7 @@
 
     <div class="flex-c text-center margin-bottom-30">
         <h3>내가 쓴 게시물</h3>
-        <a th:href="@{/mypage/{id}/posts(id = ${userId})}" th:text="${postNum}"></a>
+        <a class="text-size-40" th:href="@{/mypage/{id}/posts(id = ${userId})}" th:text="${postNum}"></a>
     </div>
 
     <div class="flex-box justify-content-end w80" th:if="${session.loginUser.equals(nickname)}">
@@ -56,16 +56,16 @@
 
     <nav>
         <ul class="pagination">
-            <li th:if="${logs.prev}">
+            <li th:if="${logs.pageInfo.prev}">
                 <a th:href="@{/mypage/{id}/posts(page=${logs.start - 1}, id =${userId})}"><</a>
             </li>
-            <li th:class="${logs.now == num ? 'active':''}" th:each="num: ${logs.pageList}" >
+            <li th:class="${logs.pageInfo.now == num ? 'active':''}" th:each="num: ${logs.pageInfo.pageList}" >
 
                 <a th:href="@{/mypage/{id}/posts(page=${num}, id = ${userId})}" th:text="${num}"></a>
             </li>
 
 
-            <li th:if="${logs.next}">
+            <li th:if="${logs.pageInfo.next}">
                 <a th:href="@{/mypage/{id}/posts(page=${logs.end + 1},id=${userId})}">></a>
             </li>
         </ul>

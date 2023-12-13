@@ -17,6 +17,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 @Service
@@ -29,6 +31,8 @@ public class UserService {
     private final LogRepository logRepository;
     private final PasswordEncoder encoder;
 
+    private static final String ID_PATTERN = "^(?=.*[a-zA-Z0-9]).{5,20}$";
+    private static final String PASSWORD_PATTERN = "(?=.*[0-9])(?=.*[a-zA-Z])(?=.*\\W)(?=\\S+$).{8,20}";
 
     public User findById(Long userId) {
 
@@ -79,6 +83,18 @@ public class UserService {
         return userRepository.findByEmail(email).isPresent();
     }
 
+    public Boolean idPatternCheck(String loginId) {
+        Pattern pattern = Pattern.compile(ID_PATTERN);
+        Matcher matcher = pattern.matcher(loginId);
+        return matcher.matches();
+    }
+
+    public Boolean passwordPatternCheck(String password) {
+        Pattern pattern = Pattern.compile(PASSWORD_PATTERN);
+        Matcher matcher = pattern.matcher(password);
+        return matcher.matches();
+    }
+
     public User login(LoginDTO loginDTO) {
 
         return userRepository.findByLoginId(loginDTO.getLoginId())
@@ -88,7 +104,7 @@ public class UserService {
 
     }
 
-    public boolean isPassword(String input , String password) {
+    public boolean isPassword(String input, String password) {
         return encoder.matches(input, password);
     }
 
@@ -138,7 +154,7 @@ public class UserService {
         log.info("비번2 = {}", loginUser.getPassword());
     }
 
-    public PageConvertDTO<UserListDTO,User> makePageResult(Pageable pageable, SearchDTO searchDTO) {
+    public PageConvertDTO<UserListDTO, User> makePageResult(Pageable pageable, SearchDTO searchDTO) {
 
 
         Page<User> entity = userRepository.search(pageable, searchDTO);

@@ -115,15 +115,12 @@ public class CommentController {
     String report(@SessionAttribute(name = SessionConst.LOGIN_USER) String nickname, @PathVariable("id") Long id) {
 
 
-        User loginUser = userService.findByNickname(nickname);
-        Comment comment = commentService.findById(id);
-
-        if (reportService.commentReportCheck(loginUser, comment)) {
-
-            reportService.commentReport(loginUser, comment);
+        if (reportService.commentReport(nickname, id)) {
 
             return "신고 완료";
+
         }
+
 
 
         return "이미 신고한 댓글입니다.";

@@ -22,6 +22,10 @@
             <a th:href="@{/post/delete/{id}(id = ${post.id})}" class="btn btn-danger">삭제</a>
         </div>
 
+        <div class="flex-box justify-content-end" th:unless="${session.loginUser eq post.nickname or userType eq 'ADMIN'}">
+            <button class="btn btn-danger" th:onclick="|postReport(${post.id})|">신고</button>
+        </div>
+
 
 
         <hr>
@@ -183,6 +187,27 @@
 
             $.ajax({
                 url: "/comment/report/" + id,
+                type: "PATCH",
+
+
+                success: function (data){
+                    alert(data);
+                }
+            })
+
+
+        }
+
+        function postReport(id){
+
+
+            if (!confirm("해당 게시글을 신고하시겠습니까?")) {
+                return;
+            }
+
+
+            $.ajax({
+                url: "/post/report/" + id,
                 type: "PATCH",
 
 

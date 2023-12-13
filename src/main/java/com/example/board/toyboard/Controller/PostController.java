@@ -8,6 +8,7 @@ import com.example.board.toyboard.Entity.User;
 import com.example.board.toyboard.Entity.UserType;
 import com.example.board.toyboard.Service.CommentService;
 import com.example.board.toyboard.Service.PostService;
+import com.example.board.toyboard.Service.ReportService;
 import com.example.board.toyboard.Service.UserService;
 import com.example.board.toyboard.file.FileStore;
 import com.example.board.toyboard.file.UploadFile;
@@ -40,6 +41,7 @@ public class PostController {
     private final PostService postService;
     private final UserService userService;
     private final CommentService commentService;
+    private final ReportService reportService;
     private final FileStore fileStore;
     private final AmazonS3 amazonS3;
 
@@ -187,6 +189,18 @@ public class PostController {
         postService.delete(post);
 
         return "redirect:/post";
+
+    }
+
+    @PatchMapping("/report/{postId}")
+    @ResponseBody
+    public String report(@SessionAttribute(SessionConst.LOGIN_USER) String nickname, @PathVariable Long postId) {
+
+        if (reportService.postReport(nickname, postId)) {
+            return "신고 완료";
+        }
+
+        return "이미 신고한 게시물입니다.";
 
     }
 

@@ -47,6 +47,16 @@ public class UserController {
             return "user/register";
         }
 
+        if (!userService.idPatternCheck(registerDTO.getLoginId())) {
+            bindingResult.rejectValue("loginId", "idPatternCheck", "5~20자의 영문, 숫자만 사용 가능합니다.");
+            return "user/register";
+        }
+
+        if (!userService.passwordPatternCheck(registerDTO.getPassword())) {
+            bindingResult.rejectValue("loginId", "passwordPatternCheck", "숫자, 영어, 특수문자 포함 8~20자입니다.");
+            return "user/register";
+        }
+
         if (!registerDTO.getPassword().equals(registerDTO.getPasswordCheck())) {
             bindingResult.rejectValue("password", "passwordCheck", "비밀번호가 다릅니다.");
             return "user/register";
@@ -65,6 +75,8 @@ public class UserController {
             bindingResult.rejectValue("email", "duplicateEmail", "이메일이 중복됩니다.");
             return "user/register";
         }
+
+//        bindingResult.hasErrors();
 
         Long registerId = userService.save(registerDTO);
 
