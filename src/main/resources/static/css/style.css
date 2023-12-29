@@ -8,8 +8,11 @@ textarea {
 }
 
 
-.test{
-    border: 1px black solid ;
+.read{
+    word-wrap: break-word; /* 단어 단위로 자동 개행 */
+    overflow-wrap: break-word;
+    height: auto;
+    min-height: 400px;
 }
 
 li > a {
