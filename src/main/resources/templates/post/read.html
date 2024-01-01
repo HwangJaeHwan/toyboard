@@ -12,7 +12,6 @@
             <p class="margin-right-10" th:text="${post.nickname}" ></p>
             <p class="margin-right-10" th:text="${#temporals.format(post.createTime, 'yyyy/MM/dd HH:mm')}   "></p>
             조회수 : <span th:text="${post.hits}"></span>
-            <p class="margin-right-10" th:text="${userType eq 'ADMIN'}" ></p>
 
         </div>
 
