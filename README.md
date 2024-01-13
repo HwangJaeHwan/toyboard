@@ -1,8 +1,15 @@
 # toyboard
-toyboard
+게시판 토이프로젝트
+
+# 프로젝트 구조
+![게시판 구조도](https://github.com/HwangJaeHwan/toyboard/assets/58110333/9f149677-70c5-4fe0-b421-f3b394351477)
+
+# 데이터베이스 구조
+![디비 구조도](https://github.com/HwangJaeHwan/toyboard/assets/58110333/9cffb2ae-24cc-4498-8c26-133c46655835)
 
 
 
+# 기능
 ## 회원가입
 ![image](https://user-images.githubusercontent.com/58110333/174034422-fbd875d3-2380-4baa-8849-8aec30ed19ac.png)
 __Validation을 통해 올바른 형식인지 확인하였다.__
