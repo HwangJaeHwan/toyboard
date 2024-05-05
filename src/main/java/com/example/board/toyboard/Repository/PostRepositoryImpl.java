@@ -66,13 +66,21 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
                         post.user.nickname,
                         post.createdTime,
                         post.hits,
-                        comment.count().as("commentNum"),
-                        recommendation.count().as("recommendedNumber")
+//                        comment.count().as("commentNum"),
+                        ExpressionUtils.as(
+                                JPAExpressions.select(count(comment.id))
+                                        .from(comment)
+                                        .where(comment.post.id.eq(post.id)),
+                                "commentNum"),
+//                        recommendation.count().as("recommendedNumber"),
+                        ExpressionUtils.as(
+                                JPAExpressions.select(count(recommendation.id))
+                                        .from(recommendation)
+                                        .where(recommendation.post.id.eq(post.id)),
+                                "recommendedNumber")
                 ))
                 .from(post)
                 .join(post.user)
-                .leftJoin(recommendation).on(post.id.eq(recommendation.post.id))
-                .leftJoin(comment).on(post.id.eq(comment.post.id))
                 .groupBy(post.id, post.title, post.user.nickname, post.createdTime, post.hits)
                 .where(builder)
                 .offset(pageable.getOffset())
