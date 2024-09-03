@@ -146,12 +146,12 @@ public class UserService {
 
 
         User loginUser = userRepository.findByNickname(nickname).orElseThrow(UserNotFoundException::new);
-        log.info("비번1 = {}", loginUser.getPassword());
+
         String newPassword = encoder.encode(dto.getNewPassword());
 
         loginUser.passwordChange(newPassword);
 
-        log.info("비번2 = {}", loginUser.getPassword());
+
     }
 
     public PageConvertDTO<UserListDTO, User> makePageResult(Pageable pageable, SearchDTO searchDTO) {

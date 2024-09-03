@@ -37,7 +37,6 @@ public class CommentController {
 
         Post post = postService.findById(postId);
 
-        log.info("시발2 = {}", post);
 
         return commentService.findComments(postId).stream().map(CommentReadDTO::new).collect(Collectors.toList());
     }
@@ -45,7 +44,6 @@ public class CommentController {
     @PostMapping("/{postId}")
     String write(@SessionAttribute(name = SessionConst.LOGIN_USER) String nickname, @PathVariable("postId") Long postId, @RequestBody CommentWriteDTO dto) {
 
-        log.info("시발 = {}", dto.getContent());
 
         commentService.writeComment(dto, nickname, postId);
 

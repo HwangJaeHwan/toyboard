@@ -63,7 +63,6 @@ public class UpService {
 
 
             Log commentLog = new Log(user, post, LogType.UP, comment);
-            log.info("장난={}", comment);
             comment.addLog(commentLog);
             logRepository.save(commentLog);
 

@@ -57,7 +57,6 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
 
         builder.and(post.postType.eq(postType));
 
-        log.info("ㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋ");
 
         List<PostListDTO> content = queryFactory
                 .select(Projections.constructor(PostListDTO.class,
@@ -66,21 +65,13 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
                         post.user.nickname,
                         post.createdTime,
                         post.hits,
-//                        comment.count().as("commentNum"),
-                        ExpressionUtils.as(
-                                JPAExpressions.select(count(comment.id))
-                                        .from(comment)
-                                        .where(comment.post.id.eq(post.id)),
-                                "commentNum"),
-//                        recommendation.count().as("recommendedNumber"),
-                        ExpressionUtils.as(
-                                JPAExpressions.select(count(recommendation.id))
-                                        .from(recommendation)
-                                        .where(recommendation.post.id.eq(post.id)),
-                                "recommendedNumber")
+                        comment.id.count().as("commentNum"),
+                        recommendation.id.count().as("recommendedNumber")
                 ))
                 .from(post)
                 .join(post.user)
+                .leftJoin(comment).on(comment.post.id.eq(post.id))
+                .leftJoin(recommendation).on(recommendation.post.id.eq(post.id))
                 .groupBy(post.id, post.title, post.user.nickname, post.createdTime, post.hits)
                 .where(builder)
                 .offset(pageable.getOffset())
@@ -148,15 +139,13 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
                         post.content.as("content"),
                         post.createdTime.as("createTime"),
                         post.hits.as("hits"),
-                        ExpressionUtils.as(
-                                JPAExpressions.select(count(recommendation.id))
-                                        .from(recommendation)
-                                        .where(recommendation.post.id.eq(postId)),
-                                "recommendedNumber")
+                        recommendation.id.countDistinct().as("recommendedNumber")
                 ))
                 .from(post)
                 .leftJoin(post.user)
+                .leftJoin(recommendation).on(recommendation.post.id.eq(post.id))
                 .where(post.id.eq(postId))
+                .groupBy(post.id, post.user.nickname, post.title, post.content, post.createdTime, post.hits)
                 .fetchOne();
 
 

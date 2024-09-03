@@ -61,7 +61,6 @@ public class CommentService {
 
         commentRepository.save(comment);
 
-        log.info("흐미={}", comment);
 
         Log commentLog = new Log(loginUser, post, LogType.COMMENT, comment);
 
