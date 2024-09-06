@@ -1,6 +1,8 @@
 package com.example.board.toyboard.Controller;
 
 import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.S3Object;
+import com.amazonaws.services.s3.model.S3ObjectInputStream;
 import com.example.board.toyboard.DTO.*;
 import com.example.board.toyboard.Entity.Post.Post;
 import com.example.board.toyboard.Entity.Post.PostCode;
@@ -16,9 +18,15 @@ import com.example.board.toyboard.session.SessionConst;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -226,12 +234,33 @@ public class PostController {
 
     }
 
+
     @ResponseBody
     @GetMapping("/image/{filename}")
-    public UrlResource downloadImage(@PathVariable String filename) throws
-            MalformedURLException {
-//        return new UrlResource("file:" + fileStore.getFullPath(filename));
-        return new UrlResource(amazonS3.getUrl(bucket, filename));
+    public ResponseEntity<Resource> downloadImage(@PathVariable String filename) throws IOException {
+
+        S3Object s3Object = amazonS3.getObject(bucket, filename);
+        S3ObjectInputStream inputStream = s3Object.getObjectContent();
+
+        String contentType = determineContentType(filename);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.parseMediaType(contentType));
+
+        return new ResponseEntity<>(new InputStreamResource(inputStream), headers, HttpStatus.OK);
+    }
+
+
+    private String determineContentType(String filename) {
+        if (filename.toLowerCase().endsWith(".png")) {
+            return "image/png";
+        } else if (filename.toLowerCase().endsWith(".jpg") || filename.toLowerCase().endsWith(".jpeg")) {
+            return "image/jpeg";
+        } else if (filename.toLowerCase().endsWith(".gif")) {
+            return "image/gif";
+        } else {
+            return "application/octet-stream";
+        }
     }
 
 
