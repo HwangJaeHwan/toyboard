@@ -8,10 +8,7 @@ import com.example.board.toyboard.Entity.Post.Post;
 import com.example.board.toyboard.Entity.Post.PostCode;
 import com.example.board.toyboard.Entity.User;
 import com.example.board.toyboard.Entity.UserType;
-import com.example.board.toyboard.Service.CommentService;
-import com.example.board.toyboard.Service.PostService;
-import com.example.board.toyboard.Service.ReportService;
-import com.example.board.toyboard.Service.UserService;
+import com.example.board.toyboard.Service.*;
 import com.example.board.toyboard.file.FileStore;
 import com.example.board.toyboard.file.UploadFile;
 import com.example.board.toyboard.session.SessionConst;
@@ -52,6 +49,7 @@ public class PostController {
     private final ReportService reportService;
     private final FileStore fileStore;
     private final AmazonS3 amazonS3;
+    private final PopularPostService popularPostService;
 
     @Value("${aws.s3.bucket}")
     private String bucket;
@@ -130,6 +128,8 @@ public class PostController {
         model.addAttribute("comments", commentDTOList);
         model.addAttribute("commentNums", commentDTOList.size());
         model.addAttribute("userType", userType);
+
+        popularPostService.incrementPostView(postId);
 
         return "post/read";
 

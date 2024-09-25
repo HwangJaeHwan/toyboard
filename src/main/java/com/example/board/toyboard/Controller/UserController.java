@@ -2,6 +2,7 @@ package com.example.board.toyboard.Controller;
 import com.example.board.toyboard.DTO.*;
 import com.example.board.toyboard.Entity.User;
 import com.example.board.toyboard.Entity.log.Log;
+import com.example.board.toyboard.Service.PopularPostService;
 import com.example.board.toyboard.Service.UserService;
 import com.example.board.toyboard.session.SessionConst;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +17,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 
+import java.util.List;
+
 
 @Controller
 @Slf4j
@@ -23,10 +26,29 @@ import jakarta.validation.Valid;
 public class UserController {
 
     private final UserService userService;
+    private final PopularPostService popularPostService;
 
+
+    @GetMapping("/test")
+    public void test(){
+
+        for (String postId : popularPostService.getPopularPost()) {
+
+            log.info("postId = {}", postId);
+        }
+
+        popularPostService.test();
+
+    }
 
     @GetMapping("/")
     public String toPosts(){
+
+        for (String postId : popularPostService.getPopularPost()) {
+
+            log.info("postId = {}", postId);
+        }
+
 
         return "redirect:/post";
     }
