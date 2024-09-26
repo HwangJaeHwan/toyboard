@@ -41,6 +41,13 @@ public class UserController {
 
     }
 
+    @GetMapping("/home")
+    public String home(){
+
+
+        return "post/home";
+    }
+
     @GetMapping("/")
     public String toPosts(){
 
