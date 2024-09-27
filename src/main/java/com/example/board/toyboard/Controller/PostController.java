@@ -54,6 +54,20 @@ public class PostController {
     @Value("${aws.s3.bucket}")
     private String bucket;
 
+    @GetMapping("/")
+    public String home(Model model) {
+
+        log.info("헤헤");
+
+        List<PostTitle> popularPost = popularPostService.getPopularPost();
+        LatestPosts latestPosts = postService.getLatestPosts();
+
+        model.addAttribute("popularPost", popularPost);
+        model.addAttribute("latestPosts", latestPosts);
+
+        return "post/home";
+    }
+
 
     @GetMapping
     public String posts(PageListDTO pageListDTO, SearchDTO searchDTO

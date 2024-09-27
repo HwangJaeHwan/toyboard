@@ -7,7 +7,7 @@ import org.springframework.data.domain.Pageable;
 
 public interface PostRepositoryCustom {
 
-
+    LatestPosts getLatestPosts();
     Page<PostListDTO> search(SearchDTO searchDTO, Pageable pageable, String postType);
 
     Page<PostReportDTO> reportedList(Pageable pageable);

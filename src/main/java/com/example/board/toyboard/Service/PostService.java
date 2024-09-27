@@ -60,9 +60,20 @@ public class PostService {
         return postRepository.findByIdWithUser(postId).orElseThrow(PostNotFoundException::new);
     }
 
+    @Transactional(readOnly = true)
     public PostReadDTO read(Long postId) {
 
         return postRepository.postRead(postId);
+    }
+
+    public LatestPosts getLatestPosts() {
+
+        return postRepository.getLatestPosts();
+
+    }
+
+    public void getPopularPosts() {
+
     }
 
 

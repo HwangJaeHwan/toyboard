@@ -26,39 +26,9 @@ import java.util.List;
 public class UserController {
 
     private final UserService userService;
-    private final PopularPostService popularPostService;
 
 
-    @GetMapping("/test")
-    public void test(){
 
-        for (String postId : popularPostService.getPopularPost()) {
-
-            log.info("postId = {}", postId);
-        }
-
-        popularPostService.test();
-
-    }
-
-    @GetMapping("/home")
-    public String home(){
-
-
-        return "post/home";
-    }
-
-    @GetMapping("/")
-    public String toPosts(){
-
-        for (String postId : popularPostService.getPopularPost()) {
-
-            log.info("postId = {}", postId);
-        }
-
-
-        return "redirect:/post";
-    }
 
 
     @GetMapping("/register")
@@ -122,7 +92,7 @@ public class UserController {
 
     @PostMapping("/login")
     public String loginEnd(@Valid @ModelAttribute(name = "user") LoginDTO loginDTO, BindingResult bindingResult,
-                           HttpServletRequest request,@RequestParam(defaultValue = "/post") String redirectURI) {
+                           HttpServletRequest request,@RequestParam(defaultValue = "/") String redirectURI) {
 
         if (bindingResult.hasErrors()) {
             return "user/login";

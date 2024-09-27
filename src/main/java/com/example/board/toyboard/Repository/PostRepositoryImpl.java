@@ -39,6 +39,71 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
     private final JPAQueryFactory queryFactory;
 
 
+    @Override
+    public LatestPosts getLatestPosts() {
+
+//        LatestPosts latestPosts = new LatestPosts();
+
+//        latestPosts.getFreeList().addAll(getLatestPosts("FREE", FreeTitle.class));
+//        latestPosts.getQnaList().addAll(getLatestPosts("QNA", QnaTitle.class));
+//        latestPosts.getNoticeList().addAll(getLatestPosts("NOTICE", NoticeTitle.class));
+//        latestPosts.getInfoList().addAll(getLatestPosts("INFO", InfoTitle.class));
+
+        List<PostTitle> allPosts = queryFactory.select(Projections.constructor(PostTitle.class,
+                        post.id,
+                        post.title,
+                        post.postType))
+                .from(post)
+                .orderBy(post.createdTime.desc())
+                .fetch();
+
+        LatestPosts latestPosts = new LatestPosts();
+
+        int freeCount = 0;
+        int qnaCount = 0;
+        int noticeCount = 0;
+        int infoCount = 0;
+
+        for (PostTitle post : allPosts) {
+            if (post.getPostType().equals("FREE") && freeCount < 5) {
+                latestPosts.getFreeList().add(new FreeTitle(post.getId(), post.getTitle()));
+                freeCount++;
+            } else if (post.getPostType().equals("QNA") && qnaCount < 5) {
+                latestPosts.getQnaList().add(new QnaTitle(post.getId(), post.getTitle()));
+                qnaCount++;
+            } else if (post.getPostType().equals("NOTICE") && noticeCount < 5) {
+                latestPosts.getNoticeList().add(new NoticeTitle(post.getId(), post.getTitle()));
+                noticeCount++;
+            } else if (post.getPostType().equals("INFO") && infoCount < 5) {
+                latestPosts.getInfoList().add(new InfoTitle(post.getId(), post.getTitle()));
+                infoCount++;
+            }
+
+            // 모든 리스트가 5개씩 채워지면 종료
+            if (freeCount == 5 && qnaCount == 5 && noticeCount == 5 && infoCount == 5) {
+                break;
+            }
+        }
+
+        return latestPosts;
+
+
+
+    }
+
+
+
+    private <T> List<T> getLatestPosts(String type, Class<T> clazz) {
+        return queryFactory.select(Projections.constructor(clazz,
+                        post.id,
+                        post.title
+                ))
+                .from(post)
+                .where(post.postType.eq(type))
+                .orderBy(post.createdTime.desc())
+                .limit(5)
+                .fetch();
+    }
 
     @Override
     public Page<PostListDTO> search(SearchDTO searchDTO, Pageable pageable, String postType) {

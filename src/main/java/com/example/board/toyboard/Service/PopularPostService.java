@@ -1,5 +1,8 @@
 package com.example.board.toyboard.Service;
 
+import com.example.board.toyboard.DTO.PostTitle;
+import com.example.board.toyboard.Entity.Post.Post;
+import com.example.board.toyboard.Repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -8,8 +11,10 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -17,32 +22,29 @@ import java.util.Set;
 public class PopularPostService {
 
     private final RedisTemplate<String, String> redisTemplate;
+    private final PostRepository postRepository;
 
     public void test() {
         redisTemplate.delete("popular-posts");
     }
 
 
-    public List<String> getPopularPost() {
-
-        Set<ZSetOperations.TypedTuple<String>> setWithScores = redisTemplate.opsForZSet().reverseRangeWithScores("popular-posts", 0, 10);
-
-        for (ZSetOperations.TypedTuple<String> tuple : setWithScores) {
-            String postId = tuple.getValue();  // ZSET의 요소 (postId)
-            Double score = tuple.getScore();   // ZSET의 점수 (조회수 등)
-
-            log.info("Post ID: " + postId + ", Score: " + score);
-        }
-
-
+    public List<PostTitle> getPopularPost() {
 
         Set<String> set = redisTemplate.opsForZSet().reverseRange("popular-posts", 0, 10);
+
 
         if (set == null) {
             return null;
         }
 
-        return new ArrayList<>(set); // 순서가 보장된 List 반환
+
+        List<Long> ids = set.stream().map(Long::valueOf).toList();
+        List<Post> popularPosts = postRepository.findPopularPosts(ids);
+        popularPosts.sort(Comparator.comparing(post -> ids.indexOf(post.getId())));
+
+        return popularPosts.stream().map(PostTitle::new).toList();
+
     }
     public void incrementPostView(Long postId) {
 
