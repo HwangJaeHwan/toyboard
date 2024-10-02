@@ -60,7 +60,6 @@ public class PostService {
         return postRepository.findByIdWithUser(postId).orElseThrow(PostNotFoundException::new);
     }
 
-    @Transactional(readOnly = true)
     public PostReadDTO read(Long postId) {
 
         return postRepository.postRead(postId);
@@ -72,11 +71,7 @@ public class PostService {
 
     }
 
-    public void getPopularPosts() {
-
-    }
-
-
+    
 
     public Long write(PostWriteDTO dto, User loginUser) {
 
