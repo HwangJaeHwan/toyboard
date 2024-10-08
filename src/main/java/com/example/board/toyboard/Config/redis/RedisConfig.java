@@ -1,4 +1,4 @@
-package com.example.board.toyboard.Config;
+package com.example.board.toyboard.Config.redis;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

@@ -69,8 +69,8 @@ public class Post extends BaseEntity {
     }
 
 
-    public void addHits() {
-        hits++;
+    public void addHits(int hits) {
+        this.hits += hits;
     }
 
 

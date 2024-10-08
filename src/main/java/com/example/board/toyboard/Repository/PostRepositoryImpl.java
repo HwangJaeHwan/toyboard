@@ -1,5 +1,6 @@
 package com.example.board.toyboard.Repository;
 
+import com.example.board.toyboard.Config.redis.RedisKey;
 import com.example.board.toyboard.DTO.*;
 import com.example.board.toyboard.Entity.Post.Post;
 import com.example.board.toyboard.Entity.Post.QPost;
@@ -8,6 +9,7 @@ import com.example.board.toyboard.Entity.QComment;
 import com.example.board.toyboard.Entity.QUser;
 import com.example.board.toyboard.Entity.Report.PostReport;
 import com.example.board.toyboard.Entity.Report.QPostReport;
+import com.example.board.toyboard.Exception.PostNotFoundException;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.*;
@@ -19,6 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.util.StringUtils;
 
@@ -37,6 +40,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
 
 
     private final JPAQueryFactory queryFactory;
+    private final RedisTemplate<String, String> redisTemplate;
 
 
     @Override
@@ -213,13 +217,21 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
                 .groupBy(post.id, post.user.nickname, post.title, post.content, post.createdTime, post.hits)
                 .fetchOne();
 
-
-        if (postReadDTO != null) {
-            queryFactory.update(post)
-                    .set(post.hits, post.hits.add(1))
-                    .where(post.id.eq(postId))
-                    .execute();
+        if (postReadDTO == null) {
+            throw new PostNotFoundException();
         }
+
+
+        String redisKey = RedisKey.REDIS_VIEW_KEY_PREFIX + postId;
+
+        redisTemplate.opsForValue().increment(redisKey);
+
+//        if (postReadDTO != null) {
+//            queryFactory.update(post)
+//                    .set(post.hits, post.hits.add(1))
+//                    .where(post.id.eq(postId))
+//                    .execute();
+//        }
 
         return postReadDTO;
 

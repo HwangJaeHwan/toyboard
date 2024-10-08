@@ -71,7 +71,7 @@ public class PostService {
 
     }
 
-    
+
 
     public Long write(PostWriteDTO dto, User loginUser) {
 
