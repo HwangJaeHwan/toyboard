@@ -112,6 +112,14 @@ public class PostService {
 
     }
 
+
+    public void updatePostHits(Long postId, int hits) {
+        Post post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
+        post.addHits(hits);
+    }
+
+
+
     public int recommend(Long postId, String nickname) {
         Post post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
         User user = userRepository.findByNickname(nickname).orElseThrow(UserNotFoundException::new);

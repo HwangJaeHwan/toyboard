@@ -1,10 +1,7 @@
 package com.example.board.toyboard.Service;
 
 import com.example.board.toyboard.Config.redis.RedisKey;
-import com.example.board.toyboard.Entity.Post.Post;
-import com.example.board.toyboard.Exception.PostNotFoundException;
 import com.example.board.toyboard.Repository.PostRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -20,6 +17,7 @@ public class PostScheduler {
 
     private final RedisTemplate<String, String> redisTemplate;
     private final PostRepository postRepository;
+    private final PostService postService;
 
 
 
@@ -41,17 +39,17 @@ public class PostScheduler {
     }
     @Scheduled(fixedRate = 60000)
     public void updateHits() {
-        Set<String> keys = redisTemplate.keys(RedisKey.REDIS_VIEW_KEY_PREFIX + "*");
+        Set<String> keys = redisTemplate.keys(RedisKey.REDIS_HITS_KEY_PREFIX + "*");
 
         if (keys != null) {
             for (String key : keys) {
 
-                Long postId = Long.valueOf(key.replace(RedisKey.REDIS_VIEW_KEY_PREFIX, ""));
+                Long postId = Long.valueOf(key.replace(RedisKey.REDIS_HITS_KEY_PREFIX, ""));
 
                 String hitsStr = redisTemplate.opsForValue().get(key);
                 if (hitsStr != null) {
 
-                    updatePostHits(postId, Integer.parseInt(hitsStr));
+                    postService.updatePostHits(postId, Integer.parseInt(hitsStr));
 
                     redisTemplate.delete(key);
                 }
@@ -59,11 +57,6 @@ public class PostScheduler {
         }
     }
 
-    @Transactional
-    public void updatePostHits(Long postId, int hits) {
-        Post post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
-        post.addHits(hits);  // 조회수 증가
-    }
 
 
 }

@@ -1,5 +1,6 @@
 package com.example.board.toyboard.Service;
 
+import com.example.board.toyboard.DTO.HomePost;
 import com.example.board.toyboard.DTO.PostTitle;
 import com.example.board.toyboard.Entity.Post.Post;
 import com.example.board.toyboard.Repository.PostRepository;
@@ -29,7 +30,7 @@ public class PopularPostService {
     }
 
 
-    public List<PostTitle> getPopularPost() {
+    public List<HomePost> getPopularPost() {
 
         Set<String> set = redisTemplate.opsForZSet().reverseRange("popular-posts", 0, 10);
 
@@ -43,7 +44,7 @@ public class PopularPostService {
         List<Post> popularPosts = postRepository.findPopularPosts(ids);
         popularPosts.sort(Comparator.comparing(post -> ids.indexOf(post.getId())));
 
-        return popularPosts.stream().map(PostTitle::new).toList();
+        return popularPosts.stream().map(HomePost::new).toList();
 
     }
     public void incrementPostView(Long postId) {

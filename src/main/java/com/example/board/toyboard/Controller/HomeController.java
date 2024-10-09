@@ -1,5 +1,6 @@
 package com.example.board.toyboard.Controller;
 
+import com.example.board.toyboard.DTO.HomePost;
 import com.example.board.toyboard.DTO.LatestPosts;
 import com.example.board.toyboard.DTO.PostTitle;
 import com.example.board.toyboard.Service.PopularPostService;
@@ -20,7 +21,7 @@ public class HomeController {
 
     @GetMapping("/")
     public String home(Model model) {
-        List<PostTitle> popularPost = popularPostService.getPopularPost();
+        List<HomePost> popularPost = popularPostService.getPopularPost();
         LatestPosts latestPosts = postService.getLatestPosts();
 
         model.addAttribute("popularPost", popularPost);

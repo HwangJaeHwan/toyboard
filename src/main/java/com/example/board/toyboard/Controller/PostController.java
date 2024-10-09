@@ -59,7 +59,7 @@ public class PostController {
 
         log.info("헤헤");
 
-        List<PostTitle> popularPost = popularPostService.getPopularPost();
+        List<HomePost> popularPost = popularPostService.getPopularPost();
         LatestPosts latestPosts = postService.getLatestPosts();
 
         model.addAttribute("popularPost", popularPost);

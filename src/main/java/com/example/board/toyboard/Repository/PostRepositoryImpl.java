@@ -3,17 +3,10 @@ package com.example.board.toyboard.Repository;
 import com.example.board.toyboard.Config.redis.RedisKey;
 import com.example.board.toyboard.DTO.*;
 import com.example.board.toyboard.Entity.Post.Post;
-import com.example.board.toyboard.Entity.Post.QPost;
-import com.example.board.toyboard.Entity.Post.QRecommendation;
 import com.example.board.toyboard.Entity.QComment;
-import com.example.board.toyboard.Entity.QUser;
-import com.example.board.toyboard.Entity.Report.PostReport;
-import com.example.board.toyboard.Entity.Report.QPostReport;
 import com.example.board.toyboard.Exception.PostNotFoundException;
 import com.querydsl.core.BooleanBuilder;
-import com.querydsl.core.Tuple;
 import com.querydsl.core.types.*;
-import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -25,14 +18,12 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.util.StringUtils;
 
-import jakarta.persistence.EntityManager;
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.example.board.toyboard.Entity.Post.QPost.post;
 import static com.example.board.toyboard.Entity.Post.QRecommendation.*;
-import static com.example.board.toyboard.Entity.QUser.*;
 import static com.example.board.toyboard.Entity.Report.QPostReport.*;
-import static com.querydsl.core.types.ExpressionUtils.count;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -46,48 +37,53 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
     @Override
     public LatestPosts getLatestPosts() {
 
+
+//        List<PostTitle> allPosts = queryFactory.select(Projections.constructor(PostTitle.class,
+//                        post.id,
+//                        post.title,
+//                        post.postType))
+//                .from(post)
+//                .orderBy(post.createdTime.desc())
+//                .fetch();
+//
 //        LatestPosts latestPosts = new LatestPosts();
-
-//        latestPosts.getFreeList().addAll(getLatestPosts("FREE", FreeTitle.class));
-//        latestPosts.getQnaList().addAll(getLatestPosts("QNA", QnaTitle.class));
-//        latestPosts.getNoticeList().addAll(getLatestPosts("NOTICE", NoticeTitle.class));
-//        latestPosts.getInfoList().addAll(getLatestPosts("INFO", InfoTitle.class));
-
-        List<PostTitle> allPosts = queryFactory.select(Projections.constructor(PostTitle.class,
-                        post.id,
-                        post.title,
-                        post.postType))
-                .from(post)
-                .orderBy(post.createdTime.desc())
-                .fetch();
+//
+//        int freeCount = 0;
+//        int qnaCount = 0;
+//        int noticeCount = 0;
+//        int infoCount = 0;
+//
+//        for (PostTitle post : allPosts) {
+//            if (post.getPostType().equals("FREE") && freeCount < 5) {
+//                latestPosts.getFreeList().add(new FreeTitle(post.getId(), post.getTitle()));
+//                freeCount++;
+//            } else if (post.getPostType().equals("QNA") && qnaCount < 5) {
+//                latestPosts.getQnaList().add(new QnaTitle(post.getId(), post.getTitle()));
+//                qnaCount++;
+//            } else if (post.getPostType().equals("NOTICE") && noticeCount < 5) {
+//                latestPosts.getNoticeList().add(new NoticeTitle(post.getId(), post.getTitle()));
+//                noticeCount++;
+//            } else if (post.getPostType().equals("INFO") && infoCount < 5) {
+//                latestPosts.getInfoList().add(new InfoTitle(post.getId(), post.getTitle()));
+//                infoCount++;
+//            }
+//
+//            // 모든 리스트가 5개씩 채워지면 종료
+//            if (freeCount == 5 && qnaCount == 5 && noticeCount == 5 && infoCount == 5) {
+//                break;
+//            }
+//        }
 
         LatestPosts latestPosts = new LatestPosts();
 
-        int freeCount = 0;
-        int qnaCount = 0;
-        int noticeCount = 0;
-        int infoCount = 0;
+        latestPosts.getFree().addAll(getLatestPosts("FREE"));
+        latestPosts.getFree().addAll(getLatestPosts("QNA"));
+        latestPosts.getFree().addAll(getLatestPosts("NOTICE"));
+        latestPosts.getFree().addAll(getLatestPosts("INFO"));
 
-        for (PostTitle post : allPosts) {
-            if (post.getPostType().equals("FREE") && freeCount < 5) {
-                latestPosts.getFreeList().add(new FreeTitle(post.getId(), post.getTitle()));
-                freeCount++;
-            } else if (post.getPostType().equals("QNA") && qnaCount < 5) {
-                latestPosts.getQnaList().add(new QnaTitle(post.getId(), post.getTitle()));
-                qnaCount++;
-            } else if (post.getPostType().equals("NOTICE") && noticeCount < 5) {
-                latestPosts.getNoticeList().add(new NoticeTitle(post.getId(), post.getTitle()));
-                noticeCount++;
-            } else if (post.getPostType().equals("INFO") && infoCount < 5) {
-                latestPosts.getInfoList().add(new InfoTitle(post.getId(), post.getTitle()));
-                infoCount++;
-            }
 
-            // 모든 리스트가 5개씩 채워지면 종료
-            if (freeCount == 5 && qnaCount == 5 && noticeCount == 5 && infoCount == 5) {
-                break;
-            }
-        }
+
+
 
         return latestPosts;
 
@@ -96,17 +92,23 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
     }
 
 
+    private List<HomePost> getLatestPosts(String category) {
 
-    private <T> List<T> getLatestPosts(String type, Class<T> clazz) {
-        return queryFactory.select(Projections.constructor(clazz,
-                        post.id,
-                        post.title
-                ))
-                .from(post)
-                .where(post.postType.eq(type))
-                .orderBy(post.createdTime.desc())
-                .limit(5)
-                .fetch();
+
+        String redisKey = RedisKey.REDIS_LATEST_KEY_PREFIX + category;
+
+        List<HomePost> posts = new ArrayList<>();
+        List<String> items = redisTemplate.opsForList().range(redisKey, 0, 4);
+
+        if (items != null) {
+            for (String item : items) {
+                posts.add(new HomePost(item));
+            }
+
+        }
+
+        return posts;
+
     }
 
     @Override
@@ -222,7 +224,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
         }
 
 
-        String redisKey = RedisKey.REDIS_VIEW_KEY_PREFIX + postId;
+        String redisKey = RedisKey.REDIS_HITS_KEY_PREFIX + postId;
 
         redisTemplate.opsForValue().increment(redisKey);
 
