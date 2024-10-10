@@ -77,9 +77,9 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
         LatestPosts latestPosts = new LatestPosts();
 
         latestPosts.getFree().addAll(getLatestPosts("FREE"));
-        latestPosts.getFree().addAll(getLatestPosts("QNA"));
-        latestPosts.getFree().addAll(getLatestPosts("NOTICE"));
-        latestPosts.getFree().addAll(getLatestPosts("INFO"));
+        latestPosts.getQna().addAll(getLatestPosts("QNA"));
+        latestPosts.getNotice().addAll(getLatestPosts("NOTICE"));
+        latestPosts.getInfo().addAll(getLatestPosts("INFO"));
 
 
 

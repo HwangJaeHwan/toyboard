@@ -1,5 +1,6 @@
 package com.example.board.toyboard.Service;
 
+import com.example.board.toyboard.Config.redis.RedisKey;
 import com.example.board.toyboard.DTO.*;
 import com.example.board.toyboard.Entity.Post.Post;
 import com.example.board.toyboard.Entity.Post.Recommendation;
@@ -14,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +31,7 @@ public class PostService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
     private final RecommendationRepository recommendationRepository;
+    private final RedisTemplate<String, String> redisTemplate;
 
     private final ReportRepository reportRepository;
 
@@ -75,6 +78,8 @@ public class PostService {
 
     public Long write(PostWriteDTO dto, User loginUser) {
 
+        String redisKey = RedisKey.REDIS_LATEST_KEY_PREFIX + dto.getPostType();
+
         Post post = Post.builder()
                 .title(dto.getTitle())
                 .content(dto.getContent())
@@ -89,6 +94,8 @@ public class PostService {
 
         logRepository.save(new Log(loginUser, post, LogType.POST));
 
+        redisTemplate.opsForList().leftPush(redisKey, post.getId() + ":" + post.getTitle());
+        redisTemplate.opsForList().trim(redisKey, 0, 4);
         return save.getId();
 
     }

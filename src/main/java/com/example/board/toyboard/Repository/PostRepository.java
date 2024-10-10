@@ -18,4 +18,8 @@ public interface PostRepository extends JpaRepository<Post, Long>, PostRepositor
     @Query("select p from Post p where p.id in :ids")
     List<Post> findPopularPosts(@Param("ids") List<Long> ids);
 
+
+    List<Post> findTop5PostByPostTypeOrderByCreatedTimeDesc(String postType);
+
+
 }

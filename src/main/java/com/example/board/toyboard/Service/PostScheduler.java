@@ -1,6 +1,7 @@
 package com.example.board.toyboard.Service;
 
 import com.example.board.toyboard.Config.redis.RedisKey;
+import com.example.board.toyboard.Entity.Post.Post;
 import com.example.board.toyboard.Repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -8,6 +9,8 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 @Service
@@ -21,9 +24,13 @@ public class PostScheduler {
 
 
 
-    @Scheduled(fixedRate = 60000) // 10분마다 실행
+    @Scheduled(fixedRate = 60000)
     public void decayPostScores() {
         Set<String> allPosts = redisTemplate.opsForZSet().reverseRange("popular-posts", 0, 100);
+
+        if (allPosts == null) {
+            return;
+        }
 
         for (String postId : allPosts) {
             Double currentScore = redisTemplate.opsForZSet().score("popular-posts", postId);
@@ -34,7 +41,7 @@ public class PostScheduler {
             }
         }
 
-        // 상위 100개를 제외한 나머지 삭제 (101번째부터 끝까지 삭제)
+
         redisTemplate.opsForZSet().removeRange("popular-posts", 101, -1);
     }
     @Scheduled(fixedRate = 60000)
@@ -46,6 +53,8 @@ public class PostScheduler {
 
                 Long postId = Long.valueOf(key.replace(RedisKey.REDIS_HITS_KEY_PREFIX, ""));
 
+                log.info("레디스 조회수 포스트 ID = {}", postId);
+
                 String hitsStr = redisTemplate.opsForValue().get(key);
                 if (hitsStr != null) {
 
@@ -55,6 +64,33 @@ public class PostScheduler {
                 }
             }
         }
+    }
+
+    @Scheduled(fixedRate = 60000)
+    public void updateLatestPosts() {
+
+        for (String category : makeCategoryList()) {
+            String redisKey = RedisKey.REDIS_LATEST_KEY_PREFIX + category;
+            redisTemplate.delete(redisKey);
+
+            List<Post> posts = postRepository.findTop5PostByPostTypeOrderByCreatedTimeDesc(category);
+
+            for (Post post : posts) {
+                String postString = post.getId() + ":" + post.getTitle();
+                redisTemplate.opsForList().rightPush(redisKey, postString);
+            }
+
+        }
+
+
+
+
+
+    }
+
+    private List<String> makeCategoryList() {
+
+        return List.of("FREE", "NOTICE", "INFO", "QNA");
     }
 
 
