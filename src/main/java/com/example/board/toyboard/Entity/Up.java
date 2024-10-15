@@ -13,6 +13,9 @@ import static jakarta.persistence.FetchType.LAZY;
 
 @Entity
 @Getter
+@Table(uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"user_id", "comment_id"})
+})
 @NoArgsConstructor
 public class Up extends BaseEntity{
 

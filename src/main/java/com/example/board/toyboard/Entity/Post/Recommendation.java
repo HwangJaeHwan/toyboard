@@ -9,6 +9,9 @@ import jakarta.persistence.*;
 import static jakarta.persistence.FetchType.LAZY;;
 @Entity
 @Getter
+@Table(uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"user_id", "post_id"})
+})
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Recommendation extends BaseEntity {
 
