@@ -18,13 +18,17 @@ public interface CommentRepository extends JpaRepository<Comment,Long>,CommentRe
     Optional<Comment> findByIdWithUser(@Param("id") Long id);
 
 
-    @Query("select c from Comment c join fetch c.user where c.post.id = :postId")
+    @Query("select c from Comment c join fetch c.user where c.post.id = :postId and c.parent is null")
     List<Comment> findCommentsByPost(@Param("postId") Long postId);
 
     @Query("select c from Comment c join fetch c.post join fetch c.user where c.id = :id")
     Optional<Comment> findWithPostAndUser(@Param("id") Long id);
 
     void deleteAllByPost(Post post);
+
+    @Query("select r from Comment r join fetch r.user where r.parent.id = :commentId")
+    List<Comment> findRepliesByCommentId(Long commentId);
+
 
 
 }

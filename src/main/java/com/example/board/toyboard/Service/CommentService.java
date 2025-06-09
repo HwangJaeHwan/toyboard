@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Slf4j
@@ -52,10 +53,11 @@ public class CommentService {
         User loginUser = userRepository.findByNickname(nickname).orElseThrow(UserNotFoundException::new);
         Post post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
 
+
         Comment comment = Comment.builder()
                 .user(loginUser)
-                .comment(dto.getContent())
                 .post(post)
+                .comment(dto.getContent())
                 .build();
 
 
@@ -71,6 +73,32 @@ public class CommentService {
 
     }
 
+    public Long writeReply(CommentWriteDTO dto, String nickname, Long commentId) {
+
+        User loginUser = userRepository.findByNickname(nickname).orElseThrow(UserNotFoundException::new);
+        Comment parent = commentRepository.findById(commentId).orElseThrow(CommentNotFoundException::new);
+
+        Comment comment = Comment.builder()
+                .user(loginUser)
+                .comment(dto.getContent())
+                .post(parent.getPost())
+                .parent(parent)
+                .build();
+
+
+        commentRepository.save(comment);
+
+
+        Log commentLog = new Log(loginUser, parent.getPost(), LogType.COMMENT, comment);
+
+        comment.addLog(commentLog);
+        logRepository.save(commentLog);
+
+
+        return comment.getId();
+
+    }
+
     public void delete(Comment comment) {
 
 
@@ -78,9 +106,16 @@ public class CommentService {
 
     }
 
-    public List<Comment> findComments(Long postId) {
+    public List<CommentReadDTO> findComments(Long postId) {
 
-        return commentRepository.findCommentsByPost(postId);
+        if (!postRepository.existsById(postId)) {
+            throw new PostNotFoundException();
+        }
+
+        List<Comment> comments = commentRepository.findCommentsByPost(postId);
+
+        return getCommentReadDTOS(comments);
+
 
     }
 
@@ -89,9 +124,41 @@ public class CommentService {
         return new PageDTO<>(commentRepository.commentReports(pageListDTO.getPageable()));
     }
 
-    public List<CommentReadDTO> test(Post post) {
-        return commentRepository.commentInfo(post);
+
+    public List<CommentReadDTO> getReplies(Long commentId) {
+
+        if (!commentRepository.existsById(commentId)) {
+            throw new CommentNotFoundException();
+        }
+
+        List<Comment> replies = commentRepository.findRepliesByCommentId(commentId);
+
+        return getCommentReadDTOS(replies);
     }
 
+    private List<CommentReadDTO> getCommentReadDTOS(List<Comment> comments) {
 
+        log.info("comments = {}", comments.size());
+
+        List<Long> ids = comments.stream().map(Comment::getId).toList();
+        log.info("ids={}", ids);
+        Map<Long, Long> upCounts = commentRepository.getUpCounts(ids);
+        Map<Long, Long> downCounts = commentRepository.getDownCounts(ids);
+        Map<Long, Long> reportCounts = commentRepository.getReportCounts(ids);
+        Map<Long, Long> replyCounts = commentRepository.getReplyCounts(ids);
+
+
+        return comments.stream()
+                .map(reply -> CommentReadDTO.builder()
+                        .id(reply.getId())
+                        .nickname(reply.getUser().getNickname())
+                        .content(reply.getComment())
+                        .up(upCounts.getOrDefault(reply.getId(), 0L))
+                        .down(downCounts.getOrDefault(reply.getId(), 0L))
+                        .report(reportCounts.getOrDefault(reply.getId(), 0L))
+                        .reply(replyCounts.getOrDefault(reply.getId(), 0L))
+                        .build()
+                )
+                .toList();
+    }
 }

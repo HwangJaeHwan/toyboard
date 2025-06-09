@@ -5,6 +5,8 @@ import com.example.board.toyboard.DTO.CommentReportDTO;
 import com.example.board.toyboard.Entity.Comment;
 import com.example.board.toyboard.Entity.Post.Post;
 import com.example.board.toyboard.Entity.QComment;
+import com.example.board.toyboard.Entity.QDown;
+import com.example.board.toyboard.Entity.QUp;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.JPAExpressions;
@@ -17,7 +19,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
+import static com.example.board.toyboard.Entity.QDown.*;
+import static com.example.board.toyboard.Entity.QUp.*;
 import static com.example.board.toyboard.Entity.Report.QCommentReport.*;
 
 @Slf4j
@@ -29,30 +35,77 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom{
 
 
 
-    @Override
-    public List<CommentReadDTO> commentInfo(Post post) {
 
+    @Override
+    public Map<Long, Long> getUpCounts(List<Long> commentIds) {
         QComment comment = new QComment("comment");
 
         return queryFactory
-                .select(Projections.constructor(CommentReadDTO.class,
-                        comment.id,
-                        comment.user.nickname,
-                        comment.comment,
-                        comment.ups.size(),
-                        comment.downs.size(),
-                        commentReport.count()
-                        ))
-                .from(comment)
-                .join(comment.user)
-                .join(commentReport).on(comment.id.eq(commentReport.comment.id))
+                .select(comment.id, up.count())
+                .from(up)
+                .join(up.comment, comment)
+                .where(comment.id.in(commentIds))
                 .groupBy(comment.id)
-                .where(comment.post.eq(post))
-                .orderBy(comment.createdTime.asc())
-                .fetch();
+                .fetch()
+                .stream()
+                .collect(Collectors.toMap(
+                        tuple -> tuple.get(comment.id),
+                        tuple -> tuple.get(up.count())
+                ));
+    }
+
+    @Override
+    public Map<Long, Long> getDownCounts(List<Long> commentIds) {
+        QComment comment = new QComment("comment");
+        return queryFactory
+                .select(comment.id, down.count())
+                .from(down)
+                .join(down.comment, comment)
+                .where(comment.id.in(commentIds))
+                .groupBy(comment.id)
+                .fetch()
+                .stream()
+                .collect(Collectors.toMap(
+                        tuple -> tuple.get(comment.id),
+                        tuple -> tuple.get(down.count())
+                ));
+    }
+
+    @Override
+    public Map<Long, Long> getReportCounts(List<Long> commentIds) {
+        QComment comment = new QComment("comment");
+        return queryFactory
+                .select(comment.id, commentReport.count())
+                .from(commentReport)
+                .join(commentReport.comment, comment)
+                .where(comment.id.in(commentIds))
+                .groupBy(comment.id)
+                .fetch()
+                .stream()
+                .collect(Collectors.toMap(
+                        tuple -> tuple.get(comment.id),
+                        tuple -> tuple.get(commentReport.count())
+                ));
+    }
 
 
+    @Override
+    public Map<Long, Long> getReplyCounts(List<Long> commentIds) {
+        QComment comment = new QComment("comment");
+        QComment reply = new QComment("reply");
 
+        return queryFactory
+                .select(comment.id, reply.count())
+                .from(reply)
+                .join(reply.parent, comment)
+                .where(comment.id.in(commentIds))
+                .groupBy(comment.id)
+                .fetch()
+                .stream()
+                .collect(Collectors.toMap(
+                        tuple -> tuple.get(comment.id),
+                        tuple -> tuple.get(reply.count())
+                ));
     }
 
 

@@ -21,9 +21,11 @@ public class Recommendation extends BaseEntity {
     private Long id;
 
     @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "user_id")
     private User user;
 
     @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "post_id")
     private Post post;
 
     public Recommendation(User user, Post post) {

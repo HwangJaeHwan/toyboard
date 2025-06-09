@@ -28,8 +28,6 @@ public class Comment extends BaseEntity{
 
     private String comment;
 
-
-
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "user_id")
     private User user;
@@ -37,6 +35,10 @@ public class Comment extends BaseEntity{
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "post_id")
     private Post post;
+
+    @ManyToOne(fetch = LAZY, cascade = CascadeType.REMOVE)
+    @JoinColumn(name = "reply_id")
+    private Comment parent;
 
     @OneToMany(mappedBy = "comment", cascade = CascadeType.REMOVE)
     private final List<Up> ups = new ArrayList<>();
@@ -50,10 +52,11 @@ public class Comment extends BaseEntity{
     @OneToMany(mappedBy = "comment", cascade = CascadeType.REMOVE)
     private final List<CommentReport> reports = new ArrayList<>();
     @Builder
-    public Comment(String comment, User user, Post post) {
+    public Comment(String comment, User user, Post post,Comment parent) {
         this.comment = comment;
         this.user = user;
         this.post = post;
+        this.parent = parent;
     }
 
     public void addUp(Up up) {
@@ -80,5 +83,10 @@ public class Comment extends BaseEntity{
 
     public void removeLog(Log commentLog) {
         commentLogs.remove(commentLog);
+    }
+
+    public void replyTo(Comment parent) {
+
+        this.parent = parent;
     }
 }

@@ -37,6 +37,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
     @Override
     public LatestPosts getLatestPosts() {
 
+        long startTime = System.currentTimeMillis();
 
 //        List<PostTitle> allPosts = queryFactory.select(Projections.constructor(PostTitle.class,
 //                        post.id,
@@ -55,16 +56,16 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
 //
 //        for (PostTitle post : allPosts) {
 //            if (post.getPostType().equals("FREE") && freeCount < 5) {
-//                latestPosts.getFreeList().add(new FreeTitle(post.getId(), post.getTitle()));
+//                latestPosts.getFree().add(new HomePost(post.getId() + ":"+ post.getTitle()));
 //                freeCount++;
 //            } else if (post.getPostType().equals("QNA") && qnaCount < 5) {
-//                latestPosts.getQnaList().add(new QnaTitle(post.getId(), post.getTitle()));
+//                latestPosts.getQna().add(new HomePost(post.getId() + ":"+ post.getTitle()));
 //                qnaCount++;
 //            } else if (post.getPostType().equals("NOTICE") && noticeCount < 5) {
-//                latestPosts.getNoticeList().add(new NoticeTitle(post.getId(), post.getTitle()));
+//                latestPosts.getNotice().add(new HomePost(post.getId() + ":"+ post.getTitle()));
 //                noticeCount++;
 //            } else if (post.getPostType().equals("INFO") && infoCount < 5) {
-//                latestPosts.getInfoList().add(new InfoTitle(post.getId(), post.getTitle()));
+//                latestPosts.getInfo().add(new HomePost(post.getId() + ":"+ post.getTitle()));
 //                infoCount++;
 //            }
 //
@@ -73,7 +74,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
 //                break;
 //            }
 //        }
-
+//
         LatestPosts latestPosts = new LatestPosts();
 
         latestPosts.getFree().addAll(getLatestPosts("FREE"));
@@ -82,7 +83,10 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
         latestPosts.getInfo().addAll(getLatestPosts("INFO"));
 
 
+        long endTime = System.currentTimeMillis();
 
+        // 실행 시간 출력
+        log.info("getLatestPosts() 실행 시간: {} ms",(endTime - startTime));
 
 
         return latestPosts;

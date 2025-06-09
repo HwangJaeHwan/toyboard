@@ -130,10 +130,7 @@ public class PostController {
 
         PostReadDTO readDTO = postService.read(postId);
 
-        List<CommentReadDTO> commentDTOList = commentService.findComments(postId)
-                                                .stream()
-                                                .map(CommentReadDTO::new)
-                                                .collect(Collectors.toList());
+        List<CommentReadDTO> commentDTOList = commentService.findComments(postId);
 
 
 

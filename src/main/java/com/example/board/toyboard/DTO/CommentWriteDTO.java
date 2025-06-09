@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 @Data
 public class CommentWriteDTO {
 
-
     String content;
 
 

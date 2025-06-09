@@ -35,20 +35,31 @@ public class CommentController {
     @GetMapping("/{postId}")
     List<CommentReadDTO> findAll(@PathVariable("postId") Long postId) {
 
-        Post post = postService.findById(postId);
+        return commentService.findComments(postId);
+    }
 
+    @GetMapping("/{commentId}/replies")
+    List<CommentReadDTO> getReplies(@PathVariable Long commentId) {
 
-        return commentService.findComments(postId).stream().map(CommentReadDTO::new).collect(Collectors.toList());
+        return commentService.getReplies(commentId);
+
     }
 
     @PostMapping("/{postId}")
     String write(@SessionAttribute(name = SessionConst.LOGIN_USER) String nickname, @PathVariable("postId") Long postId, @RequestBody CommentWriteDTO dto) {
 
-
         commentService.writeComment(dto, nickname, postId);
 
         return "Ok";
 
+    }
+
+    @PostMapping("/{commentId}/reply")
+    String writeReply(@SessionAttribute(name = SessionConst.LOGIN_USER) String nickname, @PathVariable("commentId") Long commentId, @RequestBody CommentWriteDTO dto) {
+
+        commentService.writeReply(dto, nickname, commentId);
+
+        return "OK";
     }
 
     @GetMapping("/upButton/{id}")
