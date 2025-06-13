@@ -2,7 +2,6 @@ package com.example.board.toyboard.Controller;
 import com.example.board.toyboard.DTO.*;
 import com.example.board.toyboard.Entity.User;
 import com.example.board.toyboard.Entity.log.Log;
-import com.example.board.toyboard.Service.PopularPostService;
 import com.example.board.toyboard.Service.UserService;
 import com.example.board.toyboard.session.SessionConst;
 import lombok.RequiredArgsConstructor;
@@ -16,8 +15,6 @@ import org.springframework.web.bind.annotation.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
-
-import java.util.List;
 
 
 @Controller

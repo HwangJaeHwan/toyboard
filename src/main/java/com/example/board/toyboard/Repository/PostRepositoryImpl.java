@@ -7,6 +7,7 @@ import com.example.board.toyboard.Entity.QComment;
 import com.example.board.toyboard.Exception.PostNotFoundException;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.*;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,7 @@ import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static com.example.board.toyboard.Entity.Post.QPost.post;
 import static com.example.board.toyboard.Entity.Post.QRecommendation.*;
@@ -203,44 +205,27 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
     }
 
     @Override
-    public PostReadDTO postRead(Long postId) {
-
-        PostReadDTO postReadDTO = queryFactory
+    public Optional<PostReadDTO> postRead(Long postId) {
+        PostReadDTO dto = queryFactory
                 .select(Projections.constructor(
                         PostReadDTO.class,
-                        post.id.as("id"),
-                        post.user.nickname.as("nickname"),
-                        post.title.as("title"),
-                        post.content.as("content"),
-                        post.createdTime.as("createTime"),
-                        post.hits.as("hits"),
-                        recommendation.id.countDistinct().as("recommendedNumber")
+                        post.id,
+                        post.user.nickname,
+                        post.title,
+                        post.content,
+                        post.createdTime,
+                        post.hits,
+                        JPAExpressions
+                                .select(recommendation.id.count())
+                                .from(recommendation)
+                                .where(recommendation.post.id.eq(post.id))
                 ))
                 .from(post)
-                .leftJoin(post.user)
-                .leftJoin(recommendation).on(recommendation.post.id.eq(post.id))
+                .join(post.user)
                 .where(post.id.eq(postId))
-                .groupBy(post.id, post.user.nickname, post.title, post.content, post.createdTime, post.hits)
                 .fetchOne();
 
-        if (postReadDTO == null) {
-            throw new PostNotFoundException();
-        }
-
-
-        String redisKey = RedisKey.REDIS_HITS_KEY_PREFIX + postId;
-
-        redisTemplate.opsForValue().increment(redisKey);
-
-//        if (postReadDTO != null) {
-//            queryFactory.update(post)
-//                    .set(post.hits, post.hits.add(1))
-//                    .where(post.id.eq(postId))
-//                    .execute();
-//        }
-
-        return postReadDTO;
-
+        return Optional.ofNullable(dto);
     }
 
     private OrderSpecifier<?> postSort(Pageable page) {

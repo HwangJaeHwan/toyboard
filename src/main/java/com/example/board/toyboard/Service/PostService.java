@@ -12,8 +12,6 @@ import com.example.board.toyboard.Exception.UserNotFoundException;
 import com.example.board.toyboard.Repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -32,6 +30,7 @@ public class PostService {
     private final UserRepository userRepository;
     private final RecommendationRepository recommendationRepository;
     private final RedisTemplate<String, String> redisTemplate;
+    private final PostRedisService redisService;
 
     private final ReportRepository reportRepository;
 
@@ -63,9 +62,13 @@ public class PostService {
         return postRepository.findByIdWithUser(postId).orElseThrow(PostNotFoundException::new);
     }
 
-    public PostReadDTO read(Long postId) {
+    public PostReadDTO read(Long postId, String nickname) {
 
-        return postRepository.postRead(postId);
+        PostReadDTO postReadDTO = postRepository.postRead(postId).orElseThrow(PostNotFoundException::new);
+
+        redisService.incrementViewCount(postId, nickname);
+
+        return postReadDTO;
     }
 
     public LatestPosts getLatestPosts() {
@@ -120,7 +123,7 @@ public class PostService {
     }
 
 
-    public void updatePostHits(Long postId, int hits) {
+    public void updatePostViewCounts(Long postId, int hits) {
         Post post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
         post.addHits(hits);
     }

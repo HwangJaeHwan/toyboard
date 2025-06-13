@@ -17,7 +17,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
@@ -32,10 +31,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import jakarta.validation.Valid;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Controller
 @Slf4j
@@ -49,7 +46,7 @@ public class PostController {
     private final ReportService reportService;
     private final FileStore fileStore;
     private final AmazonS3 amazonS3;
-    private final PopularPostService popularPostService;
+    private final PostRedisService postRedisService;
 
     @Value("${aws.s3.bucket}")
     private String bucket;
@@ -59,7 +56,7 @@ public class PostController {
 
         log.info("헤헤");
 
-        List<HomePost> popularPost = popularPostService.getPopularPost();
+        List<HomePost> popularPost = postRedisService.getPopularPost();
         LatestPosts latestPosts = postService.getLatestPosts();
 
         model.addAttribute("popularPost", popularPost);
@@ -125,14 +122,13 @@ public class PostController {
     @GetMapping("/{postId}")
     public String readPost(
             @SessionAttribute(SessionConst.USER_TYPE) String userType,
+            @SessionAttribute(SessionConst.LOGIN_USER) String nickname,
             @PathVariable("postId") Long postId, Model model) {
 
 
-        PostReadDTO readDTO = postService.read(postId);
+        PostReadDTO readDTO = postService.read(postId, nickname);
 
         List<CommentReadDTO> commentDTOList = commentService.findComments(postId);
-
-
 
 
         model.addAttribute("post", readDTO);
@@ -140,7 +136,7 @@ public class PostController {
         model.addAttribute("commentNums", commentDTOList.size());
         model.addAttribute("userType", userType);
 
-        popularPostService.incrementPostView(postId);
+        postRedisService.incrementPostView(postId);
 
         return "post/read";
 
