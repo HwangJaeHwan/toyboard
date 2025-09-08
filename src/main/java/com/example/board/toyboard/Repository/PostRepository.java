@@ -15,7 +15,11 @@ public interface PostRepository extends JpaRepository<Post, Long>, PostRepositor
     @Query("select p from Post p join fetch p.user where p.id = :id")
     Optional<Post> findByIdWithUser(@Param("id") Long id);
 
-    @Query("select p from Post p where p.id in :ids")
+    @Query(value =
+            "SELECT * FROM post " +
+                    "WHERE id IN (:ids) " +
+                    "ORDER BY FIELD(id, :ids)",
+            nativeQuery = true)
     List<Post> findPopularPosts(@Param("ids") List<Long> ids);
 
 

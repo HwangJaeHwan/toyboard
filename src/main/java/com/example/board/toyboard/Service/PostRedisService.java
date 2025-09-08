@@ -10,10 +10,13 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.IntStream;
 
 import static com.example.board.toyboard.Config.redis.RedisKey.*;
 
@@ -41,6 +44,7 @@ public class PostRedisService {
             String viewCountKey = REDIS_VIEW_COUNT_KEY_PREFIX + postId;
             redisTemplate.opsForValue().increment(viewCountKey);
             redisTemplate.expire(postKey, Duration.ofDays(1));
+            recordPopularPostView(postId);
 
         }
 
@@ -50,17 +54,25 @@ public class PostRedisService {
 
     public List<HomePost> getPopularPost() {
 
-        Set<String> set = redisTemplate.opsForZSet().reverseRange(REDIS_POPULAR_POSTS_KEY_PREFIX, 0, 10);
+        List<String> keys = IntStream.range(0, 2).mapToObj(i ->
+                        REDIS_POST_VIEWERS_KEY_PREFIX + LocalDateTime.now().minusHours(i)
+                                .format(DateTimeFormatter.ofPattern("yyyyMMddHH")))
+                .toList();
+
+        String top10Key = REDIS_POPULAR_POSTS_KEY_PREFIX + "top10";
+
+        redisTemplate.opsForZSet().unionAndStore(keys.get(0), keys.subList(1, keys.size()), top10Key);
 
 
-        if (set == null) {
+        Set<String> set = redisTemplate.opsForZSet().reverseRange(top10Key, 0, 9);
+
+        if (set == null || set.isEmpty()) {
             return null;
         }
 
 
         List<Long> ids = set.stream().map(Long::valueOf).toList();
         List<Post> popularPosts = postRepository.findPopularPosts(ids);
-        popularPosts.sort(Comparator.comparing(post -> ids.indexOf(post.getId())));
 
         return popularPosts.stream().map(HomePost::new).toList();
 
@@ -68,6 +80,14 @@ public class PostRedisService {
     public void incrementPostView(Long postId) {
 
         redisTemplate.opsForZSet().incrementScore(REDIS_POPULAR_POSTS_KEY_PREFIX, String.valueOf(postId), 1);
+    }
+
+    private void recordPopularPostView(Long postId) {
+
+        String now = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHH"));
+        String key = REDIS_POPULAR_POSTS_KEY_PREFIX + now;
+
+        redisTemplate.opsForZSet().incrementScore(key, String.valueOf(postId), 1);
     }
 
 
