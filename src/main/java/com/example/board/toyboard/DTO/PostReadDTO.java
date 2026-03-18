@@ -23,9 +23,19 @@ public class PostReadDTO {
 
     private LocalDateTime createTime;
 
-    private int hits;
+    private long viewCount;
 
     private long recommendedNumber;
 
+
+    public void highlightTitle(String highlightTitle) {
+        this.title = highlightTitle;
+
+    }
+
+    public void highlightContent(String highlightContent) {
+        this.content = highlightContent;
+
+    }
 
 }

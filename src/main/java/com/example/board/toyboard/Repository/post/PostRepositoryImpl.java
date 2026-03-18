@@ -1,17 +1,12 @@
-package com.example.board.toyboard.Repository;
+package com.example.board.toyboard.Repository.post;
 
 import com.example.board.toyboard.DTO.*;
-import com.example.board.toyboard.Entity.Post.Post;
-import com.example.board.toyboard.Entity.Post.QPost;
-import com.example.board.toyboard.Entity.Post.QRecommendation;
+import com.example.board.toyboard.Entity.Post.PostType;
 import com.example.board.toyboard.Entity.QComment;
-import com.example.board.toyboard.Entity.QUser;
-import com.example.board.toyboard.Entity.Report.PostReport;
-import com.example.board.toyboard.Entity.Report.QPostReport;
+import com.example.board.toyboard.Repository.post.PostRepositoryCustom;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.*;
-import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -20,34 +15,47 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.support.PageableExecutionUtils;
+import org.springframework.util.StopWatch;
 import org.springframework.util.StringUtils;
 
-import jakarta.persistence.EntityManager;
+import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import static com.example.board.toyboard.Entity.Post.QPost.post;
 import static com.example.board.toyboard.Entity.Post.QRecommendation.*;
-import static com.example.board.toyboard.Entity.QUser.*;
 import static com.example.board.toyboard.Entity.Report.QPostReport.*;
-import static com.querydsl.core.types.ExpressionUtils.count;
 
 @Slf4j
 @RequiredArgsConstructor
-public class PostRepositoryImpl implements PostRepositoryCustom{
+public class PostRepositoryImpl implements PostRepositoryCustom {
 
 
     private final JPAQueryFactory queryFactory;
 
 
+
+    @Override
+    public List<PostTitle> findLatestPostsByType(PostType postType, int limit) {
+
+        return queryFactory.select(Projections.constructor(PostTitle.class,
+                        post.id,
+                        post.title,
+                        post.postType))
+                .from(post)
+                .where(post.postType.eq(postType))
+                .orderBy(post.createdTime.desc())
+                .limit(limit)
+                .fetch();
+    }
+
+
     @Override
     public LatestPosts getLatestPosts() {
 
-//        LatestPosts latestPosts = new LatestPosts();
-
-//        latestPosts.getFreeList().addAll(getLatestPosts("FREE", FreeTitle.class));
-//        latestPosts.getQnaList().addAll(getLatestPosts("QNA", QnaTitle.class));
-//        latestPosts.getNoticeList().addAll(getLatestPosts("NOTICE", NoticeTitle.class));
-//        latestPosts.getInfoList().addAll(getLatestPosts("INFO", InfoTitle.class));
+        LatestPosts latestPosts = new LatestPosts();
 
         List<PostTitle> allPosts = queryFactory.select(Projections.constructor(PostTitle.class,
                         post.id,
@@ -57,7 +65,43 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
                 .orderBy(post.createdTime.desc())
                 .fetch();
 
-        LatestPosts latestPosts = new LatestPosts();
+        List<PostTitle> free = queryFactory.select(Projections.constructor(PostTitle.class,
+                        post.id,
+                        post.title,
+                        post.postType))
+                .from(post)
+                .where(post.postType.eq(PostType.FREE))
+                .orderBy(post.createdTime.desc())
+                .offset(0)
+                .limit(5)
+                .fetch();
+
+        List<PostTitle> info = queryFactory.select(Projections.constructor(PostTitle.class,
+                        post.id,
+                        post.title,
+                        post.postType))
+                .from(post)
+                .where(post.postType.eq(PostType.INFO))
+                .orderBy(post.createdTime.desc())
+                .offset(0)
+                .limit(5)
+                .fetch();
+
+        List<PostTitle> qna = queryFactory.select(Projections.constructor(PostTitle.class,
+                        post.id,
+                        post.title,
+                        post.postType))
+                .from(post)
+                .where(post.postType.eq(PostType.QNA))
+                .orderBy(post.createdTime.desc())
+                .offset(0)
+                .limit(5)
+                .fetch();
+
+        latestPosts.getFreeList().addAll(free);
+        latestPosts.getFreeList().addAll(free);
+        latestPosts.getFreeList().addAll(free);
+
 
         int freeCount = 0;
         int qnaCount = 0;
@@ -93,7 +137,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
 
 
 
-    private <T> List<T> getLatestPosts(String type, Class<T> clazz) {
+    private <T> List<T> getLatestPosts(PostType type, Class<T> clazz) {
         return queryFactory.select(Projections.constructor(clazz,
                         post.id,
                         post.title
@@ -106,22 +150,11 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
     }
 
     @Override
-    public Page<PostListDTO> search(SearchDTO searchDTO, Pageable pageable, String postType) {
+    public Page<PostListDTO> list(Pageable pageable, PostType postType) {
 
         QComment comment = new QComment("comment");
 
         BooleanBuilder builder = new BooleanBuilder();
-
-        if (StringUtils.hasText(searchDTO.getType())&&StringUtils.hasText(searchDTO.getContent())) {
-            if (searchDTO.getType().equals("t")) {
-                builder.and(post.title.contains(searchDTO.getContent()));
-            } else {
-                builder.and(post.user.nickname.contains(searchDTO.getContent()));
-            }
-        }
-
-        builder.and(post.postType.eq(postType));
-
 
         List<PostListDTO> content = queryFactory
                 .select(Projections.constructor(PostListDTO.class,
@@ -129,7 +162,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
                         post.title,
                         post.user.nickname,
                         post.createdTime,
-                        post.hits,
+                        post.viewCount,
                         comment.id.count().as("commentNum"),
                         recommendation.id.count().as("recommendedNumber")
                 ))
@@ -137,8 +170,8 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
                 .join(post.user)
                 .leftJoin(comment).on(comment.post.id.eq(post.id))
                 .leftJoin(recommendation).on(recommendation.post.id.eq(post.id))
-                .groupBy(post.id, post.title, post.user.nickname, post.createdTime, post.hits)
-                .where(builder)
+                .groupBy(post.id, post.title, post.user.nickname, post.createdTime, post.viewCount)
+                .where(post.postType.eq(postType))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .orderBy(postSort(pageable))
@@ -152,9 +185,76 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
                 .from(post)
                 .where(builder);
 
+
         return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
 
     }
+
+
+    @Override
+    public Page<PostListDTO> findPosts(Pageable pageable, PostType postType) {
+
+        List<PostListDTO> content = queryFactory
+                .select(Projections.constructor(PostListDTO.class,
+                        post.id,
+                        post.title,
+                        post.user.nickname,
+                        post.createdTime,
+                        post.viewCount
+                ))
+                .from(post)
+                .join(post.user)
+                .where(post.postType.eq(postType))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .orderBy(postSort(pageable))
+                .fetch();
+
+        JPAQuery<Long> countQuery = queryFactory
+                .select(post.count())
+                .from(post)
+                .where(post.postType.eq(postType));
+
+        return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
+
+
+    }
+
+    @Override
+    public Map<Long, Long> countCommentsByPostIds(List<Long> ids) {
+        QComment comment = QComment.comment1;
+
+        return queryFactory
+                .select(post.id, comment.id.count())
+                .from(comment)
+                .join(comment.post, post)
+                .where(post.id.in(ids))
+                .groupBy(post.id)
+                .fetch()
+                .stream()
+                .collect(Collectors.toMap(
+                        tuple -> tuple.get(post.id),
+                        tuple -> tuple.get(comment.id.count())
+                ));
+    }
+
+    @Override
+    public Map<Long, Long> countRecommendationsByPostIds(List<Long> ids) {
+        return queryFactory
+                .select(post.id, recommendation.id.count())
+                .from(recommendation)
+                .join(recommendation.post, post)
+                .where(post.id.in(ids))
+                .groupBy(post.id)
+                .fetch()
+                .stream()
+                .collect(Collectors.toMap(
+                        tuple -> tuple.get(post.id),
+                        tuple -> tuple.get(recommendation.id.count())
+                ));
+    }
+
+
 
     @Override
     public Page<PostReportDTO> reportedList(Pageable pageable) {
@@ -203,20 +303,20 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
                         post.title.as("title"),
                         post.content.as("content"),
                         post.createdTime.as("createTime"),
-                        post.hits.as("hits"),
+                        post.viewCount.as("viewCount"),
                         recommendation.id.countDistinct().as("recommendedNumber")
                 ))
                 .from(post)
                 .leftJoin(post.user)
                 .leftJoin(recommendation).on(recommendation.post.id.eq(post.id))
                 .where(post.id.eq(postId))
-                .groupBy(post.id, post.user.nickname, post.title, post.content, post.createdTime, post.hits)
+                .groupBy(post.id, post.user.nickname, post.title, post.content, post.createdTime, post.viewCount)
                 .fetchOne();
 
 
         if (postReadDTO != null) {
             queryFactory.update(post)
-                    .set(post.hits, post.hits.add(1))
+                    .set(post.viewCount, post.viewCount.add(1))
                     .where(post.id.eq(postId))
                     .execute();
         }
@@ -224,6 +324,43 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
         return postReadDTO;
 
     }
+
+    @Override
+    public Map<Long, SearchInfo> search(List<Long> ids) {
+
+        QComment comment = new QComment("comment");
+
+
+        List<Tuple> result = queryFactory.select(
+                        post.id,
+                        post.viewCount,
+                        post.createdTime,
+                        recommendation.id.countDistinct()
+                )
+                .from(post)
+                .where(post.id.in(ids))
+                .leftJoin(comment).on(comment.post.id.eq(post.id))
+                .leftJoin(recommendation).on(recommendation.post.id.eq(post.id))
+                .groupBy(post.id, post.title, post.user.nickname, post.createdTime, post.viewCount)
+                .fetch();
+
+        return result.stream()
+                .collect(Collectors.toMap(
+                        tuple -> tuple.get(post.id),
+                        tuple -> new SearchInfo(
+                                tuple.get(post.id),
+                                tuple.get(post.createdTime),
+                                tuple.get(post.viewCount),
+                                tuple.get(recommendation.id.countDistinct()))
+                ));
+
+    }
+
+    @Override
+    public PostReadDTO postReadWithHighlight(Long postId, String keyword) {
+        return null;
+    }
+
 
     private OrderSpecifier<?> postSort(Pageable page) {
 
@@ -235,8 +372,8 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
                 switch (order.getProperty()){
                     case "createdTime":
                         return new OrderSpecifier<>(Order.DESC, post.createdTime);
-                    case "hits":
-                        return new OrderSpecifier<>(Order.DESC, post.hits);
+                    case "viewCount":
+                        return new OrderSpecifier<>(Order.DESC, post.viewCount);
                     case "recommendedNumber":
                         return new OrderSpecifier<>(Order.DESC, recommendation.count());
                 }
@@ -244,5 +381,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
         }
         return new OrderSpecifier<>(Order.DESC, post.createdTime);
     }
+
+
 
 }

@@ -38,16 +38,16 @@ public class Comment extends BaseEntity{
     @JoinColumn(name = "post_id")
     private Post post;
 
-    @OneToMany(mappedBy = "comment", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL, orphanRemoval = true)
     private final List<Up> ups = new ArrayList<>();
 
-    @OneToMany(mappedBy = "comment", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL, orphanRemoval = true)
     private final List<Down> downs = new ArrayList<>();
 
-    @OneToMany(mappedBy = "comment", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL, orphanRemoval = true)
     private final List<Log> commentLogs = new ArrayList<>();
 
-    @OneToMany(mappedBy = "comment", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL, orphanRemoval = true)
     private final List<CommentReport> reports = new ArrayList<>();
     @Builder
     public Comment(String comment, User user, Post post) {
@@ -80,5 +80,14 @@ public class Comment extends BaseEntity{
 
     public void removeLog(Log commentLog) {
         commentLogs.remove(commentLog);
+    }
+
+    public void addReport(User user) {
+        CommentReport report = new CommentReport(user, this);
+        reports.add(report);
+    }
+
+    public void removeReport(CommentReport report) {
+        reports.remove(report);
     }
 }

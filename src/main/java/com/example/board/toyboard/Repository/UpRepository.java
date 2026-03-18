@@ -11,7 +11,10 @@ import java.util.Optional;
 @Repository
 public interface UpRepository extends JpaRepository<Up, Long> {
 
-    public Optional<Up> findByUserAndComment(User user, Comment comment);
+    Optional<Up> findByUserAndComment(User user, Comment comment);
+
+    Boolean existsByUserAndComment(User user, Comment comment);
+
 
 
 }

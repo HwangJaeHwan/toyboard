@@ -8,12 +8,12 @@ import java.util.List;
 @Getter
 public class LatestPosts {
 
-    List<QnaTitle> qnaList = new ArrayList<>();
+    List<PostTitle> qnaList = new ArrayList<>();
 
-    List<FreeTitle> freeList = new ArrayList<>();
+    List<PostTitle> freeList = new ArrayList<>();
 
-    List<NoticeTitle> noticeList = new ArrayList<>();
+    List<PostTitle> noticeList = new ArrayList<>();
 
-    List<InfoTitle> infoList = new ArrayList<>();
+    List<PostTitle> infoList = new ArrayList<>();
 
 }

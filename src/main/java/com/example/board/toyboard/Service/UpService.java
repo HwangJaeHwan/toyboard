@@ -1,12 +1,15 @@
 package com.example.board.toyboard.Service;
 
 
+import com.example.board.toyboard.DTO.UpResponse;
 import com.example.board.toyboard.Entity.Comment;
 import com.example.board.toyboard.Entity.Post.Post;
 import com.example.board.toyboard.Entity.Up;
 import com.example.board.toyboard.Entity.User;
 import com.example.board.toyboard.Entity.log.Log;
 import com.example.board.toyboard.Entity.log.LogType;
+import com.example.board.toyboard.Exception.CommentNotFoundException;
+import com.example.board.toyboard.Exception.UserNotFoundException;
 import com.example.board.toyboard.Repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,25 +31,23 @@ public class UpService {
     private final LogRepository logRepository;
 
 
-    public boolean upClick(User user, Comment comment) {
+    public UpResponse upClick(Long userId, Long commentId) {
 
-        Optional<Up> check = upRepository.findByUserAndComment(user, comment);
+        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+        Comment comment = commentRepository.findCommentWithUps(commentId).orElseThrow(CommentNotFoundException::new);
 
-        if (downRepository.findByUserAndComment(user, comment).isPresent()) {
-            return false;
+
+        if (downRepository.existsByUserAndComment(user, comment)) {
+            return new UpResponse(true, null);
         }
 
-        if (check.isPresent()) {
-            Up up = check.get();
+        Optional<Up> existingUp = upRepository.findByUserAndComment(user, comment);
+
+        if (existingUp.isPresent()) {
+            Up up = existingUp.get();
             comment.subUp(up);
-            upRepository.delete(up);
-
-            logRepository.findLogByUserAndCommentAndLogType(user, comment,LogType.UP).ifPresent(log -> {
-                comment.removeLog(log);
-                logRepository.delete(log);
-            });
-
-
+            logRepository.findLogByUserAndCommentAndLogType(user, comment, LogType.UP)
+                    .ifPresent(comment::removeLog);
 
         } else {
             Post post = comment.getPost();
@@ -58,17 +59,13 @@ public class UpService {
 
 
             comment.addUp(up);
-            upRepository.save(up);
-
-
 
             Log commentLog = new Log(user, post, LogType.UP, comment);
             comment.addLog(commentLog);
-            logRepository.save(commentLog);
 
         }
 
-        return true;
+        return new UpResponse(false, comment.getUps().size());
     }
 
 

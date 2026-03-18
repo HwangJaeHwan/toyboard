@@ -1,6 +1,8 @@
 package com.example.board.toyboard.Repository;
 
 import com.example.board.toyboard.DTO.SearchDTO;
+import com.example.board.toyboard.DTO.UserSearch;
+import com.example.board.toyboard.DTO.UserSearchType;
 import com.example.board.toyboard.Entity.User;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQuery;
@@ -24,15 +26,15 @@ public class UserRepositoryImpl implements UserRepositoryCustom{
 
 
     @Override
-    public Page<User> search(Pageable pageable, SearchDTO searchDTO) {
+    public Page<User> search(Pageable pageable, UserSearch search) {
 
         BooleanBuilder builder = new BooleanBuilder();
 
-        if (StringUtils.hasText(searchDTO.getType())&&StringUtils.hasText(searchDTO.getContent())) {
-            if (searchDTO.getType().equals("n")) {
-                builder.and(user.nickname.contains(searchDTO.getContent()));
+        if (search.getType() != null) {
+            if (search.getType() == UserSearchType.NICKNAME) {
+                builder.and(user.nickname.contains(search.getContent()));
             } else {
-                builder.and(user.loginId.contains(searchDTO.getContent()));
+                builder.and(user.loginId.contains(search.getContent()));
             }
         }
 

@@ -1,4 +1,4 @@
-package com.example.board.toyboard.Config;
+package com.example.board.toyboard.config;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;

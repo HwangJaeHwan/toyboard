@@ -5,6 +5,9 @@ import com.example.board.toyboard.Entity.User;
 import com.example.board.toyboard.Entity.UserType;
 import com.example.board.toyboard.Entity.log.Log;
 import com.example.board.toyboard.Entity.log.LogType;
+import com.example.board.toyboard.Exception.InvalidPasswordException;
+import com.example.board.toyboard.Exception.PasswordMismatchException;
+import com.example.board.toyboard.Exception.SamePasswordException;
 import com.example.board.toyboard.Exception.UserNotFoundException;
 import com.example.board.toyboard.Repository.LogRepository;
 import com.example.board.toyboard.Repository.UserRepository;
@@ -140,12 +143,25 @@ public class UserService {
     }
 
     @Transactional
-    public void passwordChange(String nickname, PasswordChangeDTO dto) {
+    public void passwordChange(Long userId, PasswordChangeDTO dto) {
 
         log.info("dto = {}", dto.getNewPassword());
 
 
-        User loginUser = userRepository.findByNickname(nickname).orElseThrow(UserNotFoundException::new);
+        User loginUser = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+
+        if (!encoder.matches(dto.getNowPassword(), loginUser.getPassword())) {
+            throw new InvalidPasswordException();
+        }
+
+        if (dto.getNowPassword().equals(dto.getNewPassword())) {
+            throw new SamePasswordException();
+        }
+
+        if (!dto.getNewPassword().equals(dto.getNewPasswordCheck())) {
+            throw new PasswordMismatchException();
+        }
+
 
         String newPassword = encoder.encode(dto.getNewPassword());
 
@@ -154,10 +170,10 @@ public class UserService {
 
     }
 
-    public PageConvertDTO<UserListDTO, User> makePageResult(Pageable pageable, SearchDTO searchDTO) {
+    public PageConvertDTO<UserListDTO, User> makePageResult(Pageable pageable, UserSearch search) {
 
 
-        Page<User> entity = userRepository.search(pageable, searchDTO);
+        Page<User> entity = userRepository.search(pageable, search);
         Function<User, UserListDTO> fn = UserListDTO::new;
         return new PageConvertDTO<>(entity, fn);
 

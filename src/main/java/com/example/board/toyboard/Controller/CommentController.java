@@ -3,12 +3,15 @@ package com.example.board.toyboard.Controller;
 
 import com.example.board.toyboard.DTO.CommentReadDTO;
 import com.example.board.toyboard.DTO.CommentWriteDTO;
+import com.example.board.toyboard.DTO.DownResponse;
+import com.example.board.toyboard.DTO.UpResponse;
 import com.example.board.toyboard.Entity.Comment;
 import com.example.board.toyboard.Entity.Post.Post;
 import com.example.board.toyboard.Entity.User;
 import com.example.board.toyboard.Entity.UserType;
 import com.example.board.toyboard.Service.*;
 import com.example.board.toyboard.session.SessionConst;
+import com.example.board.toyboard.session.UserSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -42,78 +45,44 @@ public class CommentController {
     }
 
     @PostMapping("/{postId}")
-    String write(@SessionAttribute(name = SessionConst.LOGIN_USER) String nickname, @PathVariable("postId") Long postId, @RequestBody CommentWriteDTO dto) {
+    String write(UserSession userSession, @PathVariable("postId") Long postId, @RequestBody CommentWriteDTO dto) {
 
 
-        commentService.writeComment(dto, nickname, postId);
+        commentService.writeComment(dto, userSession.getUserId(), postId);
 
         return "Ok";
 
     }
 
     @GetMapping("/upButton/{id}")
-    Map upButton(@SessionAttribute(name = SessionConst.LOGIN_USER) String nickname, @PathVariable("id") Long id) {
+    UpResponse upButton(UserSession userSession, @PathVariable("id") Long id) {
 
-        HashMap<String, Integer> upCount = new HashMap<>();
-        HashMap<String, Boolean> check = new HashMap<>();
 
-        User loginUser = userService.findByNickname(nickname);
-        Comment comment = commentService.findWithPostAndUser(id);
-
-        if (!upService.upClick(loginUser, comment)) {
-            check.put("dup", true);
-            return check;
-        }
-
-        upCount.put("upCount", comment.getUps().size());
-
-        return upCount;
+        return upService.upClick(userSession.getUserId(), id);
 
     }
 
     @GetMapping("/downButton/{id}")
-    Map downButton(@SessionAttribute(name = SessionConst.LOGIN_USER) String nickname, @PathVariable("id") Long id) {
+    DownResponse downButton(UserSession userSession, @PathVariable("id") Long id) {
 
-        HashMap<String, Integer> downCount = new HashMap<>();
-        HashMap<String, Boolean> check = new HashMap<>();
-
-        User loginUser = userService.findByNickname(nickname);
-        Comment comment = commentService.findById(id);
-
-        if (!downService.downClick(loginUser, comment)) {
-            check.put("dup", true);
-            return check;
-        }
-
-        downCount.put("downCount", comment.getDowns().size());
-
-        return downCount;
+        return downService.downClick(userSession.getUserId(), id);
 
     }
 
     @DeleteMapping("/{id}")
-    String delete(@SessionAttribute(name = SessionConst.LOGIN_USER) String nickname,
-                  @SessionAttribute(SessionConst.USER_TYPE) UserType userType,
+    String delete(UserSession userSession,
                   @PathVariable("id") Long id) {
 
-        Comment comment = commentService.findByIdWithUser(id);
-        log.info("userType = {}", userType);
-        log.info("userType == admin : {}", userType == UserType.ADMIN);
-
-        if (!(userType == UserType.ADMIN) && !comment.getUser().getNickname().equals(nickname)) {
-            throw new RuntimeException();//수정
-        }
-
-        commentService.delete(comment);
+        commentService.delete(id, userSession.getUserId(), userSession.getUserType());
 
         return "삭제 완료";
     }
 
     @PatchMapping("/report/{id}")
-    String report(@SessionAttribute(name = SessionConst.LOGIN_USER) String nickname, @PathVariable("id") Long id) {
+    String report(UserSession userSession, @PathVariable("id") Long id) {
 
 
-        if (reportService.commentReport(nickname, id)) {
+        if (reportService.commentReport(userSession.getUserId(), id)) {
 
             return "신고 완료";
 

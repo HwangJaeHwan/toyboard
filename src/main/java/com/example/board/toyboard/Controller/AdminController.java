@@ -25,9 +25,9 @@ public class AdminController {
 
 
     @GetMapping("/users")
-    public String users(PageListDTO pageListDTO, SearchDTO searchDTO, Model model) {
+    public String users(PageListDTO pageListDTO, UserSearch search, Model model) {
         Pageable pageable = pageListDTO.getPageable();
-        PageConvertDTO<UserListDTO, User> users = userService.makePageResult(pageable, searchDTO);
+        PageConvertDTO<UserListDTO, User> users = userService.makePageResult(pageable, search);
 
 
         log.info("dto = {}", users);

@@ -11,7 +11,7 @@
         <div class="flex-box justify-content-start border-bottom">
             <p class="margin-right-10" th:text="${post.nickname}" ></p>
             <p class="margin-right-10" th:text="${#temporals.format(post.createTime, 'yyyy/MM/dd HH:mm')}   "></p>
-            조회수 : <span th:text="${post.hits}"></span>
+            조회수 : <span th:text="${post.viewCount}"></span>
 
         </div>
 

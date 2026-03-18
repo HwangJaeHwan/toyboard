@@ -4,6 +4,7 @@ import com.example.board.toyboard.DTO.*;
 import com.example.board.toyboard.Entity.Comment;
 import com.example.board.toyboard.Entity.Post.Post;
 import com.example.board.toyboard.Entity.User;
+import com.example.board.toyboard.Entity.UserType;
 import com.example.board.toyboard.Entity.log.Log;
 import com.example.board.toyboard.Entity.log.LogType;
 import com.example.board.toyboard.Exception.CommentNotFoundException;
@@ -11,7 +12,7 @@ import com.example.board.toyboard.Exception.PostNotFoundException;
 import com.example.board.toyboard.Exception.UserNotFoundException;
 import com.example.board.toyboard.Repository.CommentRepository;
 import com.example.board.toyboard.Repository.LogRepository;
-import com.example.board.toyboard.Repository.PostRepository;
+import com.example.board.toyboard.Repository.post.PostRepository;
 import com.example.board.toyboard.Repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,23 +34,9 @@ public class CommentService {
     private final LogRepository logRepository;
 
 
-    public Comment findById(Long id) {
+    public Long writeComment(CommentWriteDTO dto, Long userId, Long postId) {
 
-        return commentRepository.findById(id).orElseThrow(CommentNotFoundException::new);
-    }
-
-    public Comment findByIdWithUser(Long id) {
-
-        return commentRepository.findByIdWithUser(id).orElseThrow(CommentNotFoundException::new);
-    }
-
-    public Comment findWithPostAndUser(Long id) {
-        return commentRepository.findWithPostAndUser(id).orElseThrow(CommentNotFoundException::new);
-    }
-
-    public Long writeComment(CommentWriteDTO dto, String nickname, Long postId) {
-
-        User loginUser = userRepository.findByNickname(nickname).orElseThrow(UserNotFoundException::new);
+        User loginUser = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
         Post post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
 
         Comment comment = Comment.builder()
@@ -71,10 +58,17 @@ public class CommentService {
 
     }
 
-    public void delete(Comment comment) {
+    public void delete(Long commentId,Long userId, UserType userType) {
 
 
-            commentRepository.delete(comment);
+        Comment comment = commentRepository.findById(commentId).orElseThrow(CommentNotFoundException::new);
+
+        if (!(userType == UserType.ADMIN) && !comment.getUser().getId().equals(userId)) {
+            throw new RuntimeException();//수정
+        }
+
+
+        commentRepository.delete(comment);
 
     }
 

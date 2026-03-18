@@ -6,18 +6,21 @@ import com.amazonaws.services.s3.model.S3ObjectInputStream;
 import com.example.board.toyboard.DTO.*;
 import com.example.board.toyboard.Entity.Post.Post;
 import com.example.board.toyboard.Entity.Post.PostCode;
+import com.example.board.toyboard.Entity.Post.PostType;
 import com.example.board.toyboard.Entity.User;
 import com.example.board.toyboard.Entity.UserType;
 import com.example.board.toyboard.Service.*;
 import com.example.board.toyboard.file.FileStore;
 import com.example.board.toyboard.file.UploadFile;
 import com.example.board.toyboard.session.SessionConst;
+import com.example.board.toyboard.session.UserSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
@@ -70,16 +73,16 @@ public class PostController {
 
 
     @GetMapping
-    public String posts(PageListDTO pageListDTO, SearchDTO searchDTO
-            , @RequestParam(defaultValue = "createdTime") String sort ,@RequestParam(defaultValue = "free") String postType, Model model) {
+    public String posts(PageListDTO pageListDTO
+            , @RequestParam(defaultValue = "createdTime") String sort
+            , @RequestParam(defaultValue = "FREE") PostType postType, Model model) {
 
         Pageable pageable = pageListDTO.getPageable(Sort.by(Sort.Direction.DESC, sort));
 
-        log.info("searchDTO = {}", searchDTO);
         log.info("sort={}", sort);
 
-
-        model.addAttribute("posts", postService.makePageResult(pageable, searchDTO, postType.toUpperCase()));
+        model.addAttribute("searchDTO", new SearchDTO());
+        model.addAttribute("posts", postService.makePageResult(pageable, postType));
         model.addAttribute("postType", postType);
         model.addAttribute("sort", sort);
 
@@ -87,9 +90,24 @@ public class PostController {
 
     }
 
+    @GetMapping("/search")
+    String search(PageListDTO pageListDTO, SearchDTO searchDTO
+            , @RequestParam(defaultValue = "createdTime") String sort
+            , @RequestParam(defaultValue = "free") PostType postType
+            , Model model) {
+
+        Pageable pageable = pageListDTO.getPageable(Sort.by(Sort.Direction.DESC, sort));
+
+        model.addAttribute("posts", new PageDTO<>(postService.search(pageable, searchDTO, postType)));
+        model.addAttribute("postType", postType);
+        model.addAttribute("sort", sort);
+
+        return "post/list";
+    }
 
 
-    @GetMapping("/write")
+
+        @GetMapping("/write")
     public String writeStart(@ModelAttribute(name = "post") PostWriteDTO dto, Model model) {
 
         model.addAttribute("postCodes", makePostCodes());
@@ -100,7 +118,7 @@ public class PostController {
 
 
     @PostMapping("/write")
-    public String writeEnd(@SessionAttribute(name = SessionConst.LOGIN_USER) String nickname,
+    public String writeEnd(UserSession userSession,
                            @Valid @ModelAttribute(name = "post") PostWriteDTO dto, BindingResult bindingResult,
                            Model model) {
 
@@ -111,9 +129,7 @@ public class PostController {
             return "post/write";
         }
 
-        User loginUser = userService.findByNickname(nickname);
-
-        Long postId = postService.write(dto, loginUser);
+        Long postId = postService.write(dto, userSession.getUserId());
 
 
         return "redirect:/post/" + postId;
@@ -125,10 +141,12 @@ public class PostController {
     @GetMapping("/{postId}")
     public String readPost(
             @SessionAttribute(SessionConst.USER_TYPE) String userType,
-            @PathVariable("postId") Long postId, Model model) {
+            @PathVariable("postId") Long postId,
+            Model model) {
 
 
         PostReadDTO readDTO = postService.read(postId);
+
 
         List<CommentReadDTO> commentDTOList = commentService.findComments(postId)
                                                 .stream()
@@ -153,14 +171,10 @@ public class PostController {
 
     @GetMapping("/update/{postId}")
     public String updateStart(@PathVariable("postId") Long postId,
-                              @SessionAttribute(SessionConst.USER_TYPE) UserType userType,
-                              @SessionAttribute(SessionConst.LOGIN_USER) String nickname,
+                              UserSession userSession,
                               Model model) {
 
-        Post post = postService.findByIdWithUser(postId);
-
-        postCheck(userType, nickname, post);
-
+        Post post = postService.findPostWithAuthCheck(postId, userSession.getUserId(), userSession.getUserType());
 
         model.addAttribute("id", postId);
         model.addAttribute("post", new PostUpdateDTO(post));
@@ -175,15 +189,10 @@ public class PostController {
     @PostMapping("/update/{postId}")
     public String updateEnd(@PathVariable("postId") Long postId,
                             @Valid @ModelAttribute(name = "post") PostUpdateDTO dto,
-                            @SessionAttribute(SessionConst.USER_TYPE) UserType userType,
-                            @SessionAttribute(SessionConst.LOGIN_USER) String nickname,
+                            UserSession userSession,
                             BindingResult bindingResult, Model model) {
 
         log.info("dto = {}", dto);
-
-        Post post = postService.findByIdWithUser(postId);
-
-        postCheck(userType, nickname,post);
 
         model.addAttribute("id", postId);
 
@@ -191,8 +200,7 @@ public class PostController {
             return "post/update";
         }
 
-
-        postService.update(post, dto);
+        postService.update(postId, dto, userSession.getUserId(), userSession.getUserType());
 
         log.info("dto ={}", dto);
 
@@ -201,14 +209,9 @@ public class PostController {
     }
 
     @GetMapping("/delete/{postId}")
-    public String deletePost(@SessionAttribute(SessionConst.LOGIN_USER) String nickname,
-                             @SessionAttribute(SessionConst.USER_TYPE) UserType userType,
+    public String deletePost(UserSession userSession,
                              @PathVariable Long postId) {
-        Post post = postService.findByIdWithUser(postId);
-
-        postCheck(userType, nickname, post);
-
-        postService.delete(post);
+        postService.delete(postId, userSession.getUserId(), userSession.getUserType());
 
         return "redirect:/post";
 
@@ -216,9 +219,9 @@ public class PostController {
 
     @PatchMapping("/report/{postId}")
     @ResponseBody
-    public String report(@SessionAttribute(SessionConst.LOGIN_USER) String nickname, @PathVariable Long postId) {
+    public String report(UserSession userSession, @PathVariable Long postId) {
 
-        if (reportService.postReport(nickname, postId)) {
+        if (reportService.postReport(userSession.getUserId(), postId)) {
             return "신고 완료";
         }
 
@@ -230,9 +233,9 @@ public class PostController {
 
     @GetMapping("/recommend/{postId}")
     @ResponseBody
-    public int recommend(@SessionAttribute(SessionConst.LOGIN_USER) String nickname,  @PathVariable Long postId) {
+    public int recommend(UserSession userSession,  @PathVariable Long postId) {
 
-        return postService.recommend(postId, nickname);
+        return postService.recommend(postId, userSession.getUserId());
 
     }
 
@@ -241,27 +244,34 @@ public class PostController {
     @ResponseBody
     public String uploadImage(@RequestParam MultipartFile file) throws IOException {
 
-//        UploadFile uploadFile = fileStore.storeFile(file);
-        UploadFile uploadFile = fileStore.saveFile(file);
+        UploadFile uploadFile = fileStore.storeFile(file);
+//        UploadFile uploadFile = fileStore.saveFile(file);
 
         return "/post/image/" + uploadFile.getStoreFileName();
 
     }
 
 
+//    @ResponseBody
+//    @GetMapping("/image/{filename}")
+//    public ResponseEntity<Resource> downloadImage(@PathVariable String filename) throws IOException {
+//
+//        S3Object s3Object = amazonS3.getObject(bucket, filename);
+//        S3ObjectInputStream inputStream = s3Object.getObjectContent();
+//
+//        String contentType = determineContentType(filename);
+//
+//        HttpHeaders headers = new HttpHeaders();
+//        headers.setContentType(MediaType.parseMediaType(contentType));
+//
+//        return new ResponseEntity<>(new InputStreamResource(inputStream), headers, HttpStatus.OK);
+//    }
+
     @ResponseBody
     @GetMapping("/image/{filename}")
-    public ResponseEntity<Resource> downloadImage(@PathVariable String filename) throws IOException {
+    public Resource downloadImage(@PathVariable String filename) throws IOException {
 
-        S3Object s3Object = amazonS3.getObject(bucket, filename);
-        S3ObjectInputStream inputStream = s3Object.getObjectContent();
-
-        String contentType = determineContentType(filename);
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.parseMediaType(contentType));
-
-        return new ResponseEntity<>(new InputStreamResource(inputStream), headers, HttpStatus.OK);
+        return new UrlResource("file:" + fileStore.getFullPath(filename));
     }
 
 

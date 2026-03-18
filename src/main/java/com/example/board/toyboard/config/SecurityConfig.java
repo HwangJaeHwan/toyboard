@@ -1,4 +1,4 @@
-package com.example.board.toyboard.Config;
+package com.example.board.toyboard.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

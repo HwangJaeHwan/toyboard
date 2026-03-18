@@ -2,12 +2,13 @@ package com.example.board.toyboard.Entity.Post;
 
 
 import com.example.board.toyboard.Entity.BaseEntity;
-import com.example.board.toyboard.Entity.Comment;
+import com.example.board.toyboard.Entity.Report.CommentReport;
+import com.example.board.toyboard.Entity.Report.PostReport;
 import com.example.board.toyboard.Entity.User;
 import lombok.*;
 
 import jakarta.persistence.*;
-import java.time.LocalDateTime;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,9 +32,12 @@ public class Post extends BaseEntity {
     @Lob
     private String content;
 
-    private String postType;
+    private PostType postType;
 
-    private int hits;
+    private long viewCount;
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PostReport> reports = new ArrayList<>();
 
 
 
@@ -42,12 +46,12 @@ public class Post extends BaseEntity {
     private User user;
 
     @Builder
-    public Post(String title, String content, String postType, int hits, User user) {
+    public Post(String title, String content, PostType postType, long viewCount, User user) {
 
         this.title = title;
         this.content = content;
         this.postType = postType;
-        this.hits = hits;
+        this.viewCount = viewCount;
         this.user = user;
     }
 
@@ -58,7 +62,7 @@ public class Post extends BaseEntity {
         this.content = content;
     }
 
-    public void updatePostType(String postType){
+    public void updatePostType(PostType postType){
         this.postType = postType;
     }
 
@@ -70,7 +74,16 @@ public class Post extends BaseEntity {
 
 
     public void addHits() {
-        hits++;
+        viewCount++;
+    }
+
+    public void addReport(User user) {
+        PostReport report = new PostReport(user, this);
+        reports.add(report);
+    }
+
+    public void removeReport(PostReport report) {
+        reports.remove(report);
     }
 
 

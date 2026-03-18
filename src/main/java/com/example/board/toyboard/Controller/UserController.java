@@ -2,9 +2,13 @@ package com.example.board.toyboard.Controller;
 import com.example.board.toyboard.DTO.*;
 import com.example.board.toyboard.Entity.User;
 import com.example.board.toyboard.Entity.log.Log;
+import com.example.board.toyboard.Exception.InvalidPasswordException;
+import com.example.board.toyboard.Exception.PasswordMismatchException;
+import com.example.board.toyboard.Exception.SamePasswordException;
 import com.example.board.toyboard.Service.PopularPostService;
 import com.example.board.toyboard.Service.UserService;
 import com.example.board.toyboard.session.SessionConst;
+import com.example.board.toyboard.session.UserSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
@@ -110,8 +114,13 @@ public class UserController {
 
         HttpSession session = request.getSession();
 
-        session.setAttribute(SessionConst.LOGIN_USER, loginUser.getNickname());
+        session.setAttribute(SessionConst.NICKNAME, loginUser.getNickname());
         session.setAttribute(SessionConst.USER_TYPE, loginUser.getUserType());
+        session.setAttribute(SessionConst.USER_ID, loginUser.getId());
+
+        log.info("닉네임={}",session.getAttribute(SessionConst.NICKNAME));
+        log.info("타입={}",session.getAttribute(SessionConst.USER_TYPE));
+        log.info("유저아이디={}",session.getAttribute(SessionConst.USER_ID));
 
 
         return "redirect:" + redirectURI;
@@ -134,11 +143,9 @@ public class UserController {
 
 
     @GetMapping("/mypage")
-    public String myPage(@SessionAttribute(name = SessionConst.LOGIN_USER) String nickname) {
+    public String myPage(UserSession userSession) {
 
-        User user = userService.findByNickname(nickname);
-
-        return "redirect:/mypage/" + user.getId();
+        return "redirect:/mypage/" + userSession.getUserId();
     }
 
 
@@ -176,10 +183,10 @@ public class UserController {
     }
 
     @GetMapping("/mypage/edit")
-    public String editStart(@SessionAttribute(name = SessionConst.LOGIN_USER) String nickname, Model model) {
+    public String editStart(UserSession userSession, Model model) {
 
 
-        model.addAttribute("user", new UserEditDTO(nickname));
+        model.addAttribute("user", new UserEditDTO(userSession.getNickname()));
 
 
         return "user/edit";
@@ -187,7 +194,7 @@ public class UserController {
     }
 
     @PostMapping("mypage/edit")
-    public String editEnd(@SessionAttribute(name = SessionConst.LOGIN_USER) String nickname, UserEditDTO userEditDTO,
+    public String editEnd(UserSession userSession, UserEditDTO userEditDTO,
                           BindingResult bindingResult,HttpServletRequest request) {
 
         if (bindingResult.hasErrors()) {
@@ -200,10 +207,10 @@ public class UserController {
         }
 
 
-        Long userId = userService.nicknameChange(nickname, userEditDTO);
+        Long userId = userService.nicknameChange(userSession.getNickname(), userEditDTO);
 
         HttpSession session = request.getSession(false);
-        session.setAttribute(SessionConst.LOGIN_USER, userEditDTO.getNickname());
+        session.setAttribute(SessionConst.NICKNAME, userEditDTO.getNickname());
         return "redirect:/mypage/" + userId;
 
 
@@ -218,33 +225,28 @@ public class UserController {
     }
 
     @PostMapping("/mypage/passwordChange")
-    public String passwordChangeEnd(@SessionAttribute(name = SessionConst.LOGIN_USER) String nickname,@ModelAttribute("password") PasswordChangeDTO dto,
+    public String passwordChangeEnd(UserSession userSession,
+                                    @ModelAttribute("password") PasswordChangeDTO dto,
                                     BindingResult bindingResult) {
 
         if (bindingResult.hasErrors()) {
             return "user/passwordChange";
         }
 
-        User loginUser = userService.findByNickname(nickname);
-
-        if (!userService.isPassword(dto.getNowPassword(), loginUser.getPassword())) {
-            bindingResult.rejectValue("nowPassword", "difPassword", "현재 비밀번호가 틀립니다.");
+        try {
+            userService.passwordChange(userSession.getUserId(), dto);
+        } catch (InvalidPasswordException e) {
+            bindingResult.rejectValue("nowPassword", "difPassword", e.getMessage());
+            return "user/passwordChange";
+        } catch (SamePasswordException e) {
+            bindingResult.rejectValue("newPassword", "samePassword", e.getMessage());
+            return "user/passwordChange";
+        } catch (PasswordMismatchException e) {
+            bindingResult.rejectValue("newPasswordCheck", "mismatchPassword", e.getMessage());
             return "user/passwordChange";
         }
 
-        if (dto.getNowPassword().equals(dto.getNewPassword())) {
-            bindingResult.rejectValue("newPassword", "samePassword", "현재 비밀번호와 새 비밀번호가 동일합니다.");
-            return "user/passwordChange";
-        }
-
-        if (!dto.getNewPassword().equals(dto.getNewPasswordCheck())) {
-            bindingResult.rejectValue("newPassword", "samePassword", "비밀번호가 일치하지 않습니다.");
-            return "user/passwordChange";
-        }
-
-        userService.passwordChange(nickname, dto);
-
-        return "redirect:/mypage/"+loginUser.getId();
+        return "redirect:/mypage/"+userSession.getUserId();
 
 
     }

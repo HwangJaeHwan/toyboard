@@ -2,19 +2,16 @@ package com.example.board.toyboard.Service;
 
 import com.example.board.toyboard.DTO.PostTitle;
 import com.example.board.toyboard.Entity.Post.Post;
-import com.example.board.toyboard.Repository.PostRepository;
+import com.example.board.toyboard.Repository.post.PostRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j

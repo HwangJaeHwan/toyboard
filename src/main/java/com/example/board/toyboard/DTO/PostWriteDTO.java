@@ -1,5 +1,7 @@
 package com.example.board.toyboard.DTO;
 
+import com.example.board.toyboard.Entity.Post.PostType;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import jakarta.validation.constraints.NotEmpty;
@@ -8,8 +10,8 @@ import jakarta.validation.constraints.NotEmpty;
 public class PostWriteDTO {
 
 
-    @NotEmpty
-    private String postType;
+    @NotNull(message = "타입을 지정해주세요.")
+    private PostType postType;
 
 
     @NotEmpty(message = "제목을 입력해주세요.")
