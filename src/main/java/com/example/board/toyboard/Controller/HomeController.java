@@ -1,8 +1,8 @@
 package com.example.board.toyboard.Controller;
 
+import com.example.board.toyboard.DTO.HomePost;
 import com.example.board.toyboard.DTO.LatestPosts;
-import com.example.board.toyboard.DTO.PostTitle;
-import com.example.board.toyboard.Service.PopularPostService;
+import com.example.board.toyboard.Service.PostRedisService;
 import com.example.board.toyboard.Service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -16,11 +16,11 @@ import java.util.List;
 public class HomeController {
 
     private final PostService postService;
-    private final PopularPostService popularPostService;
+    private final PostRedisService postRedisService;
 
     @GetMapping("/")
     public String home(Model model) {
-        List<PostTitle> popularPost = popularPostService.getPopularPost();
+        List<HomePost> popularPost = postRedisService.getPopularPost();
         LatestPosts latestPosts = postService.getLatestPosts();
 
         model.addAttribute("popularPost", popularPost);

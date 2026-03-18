@@ -16,7 +16,7 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr th:each="post : ${latestPosts.noticeList}">
+                <tr th:each="post : ${latestPosts.notice}">
                     <td><a th:href="@{/post/{id}(id=${post.id})}" th:text="${post.title}"></a></td>
                 </tr>
                 </tbody>
@@ -30,7 +30,7 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr th:each="post : ${latestPosts.freeList}">
+                <tr th:each="post : ${latestPosts.free}">
                     <td><a th:href="@{/post/{id}(id=${post.id})}" th:text="${post.title}"></a></td>
                 </tr>
                 </tbody>
@@ -44,7 +44,7 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr th:each="post : ${latestPosts.infoList}">
+                <tr th:each="post : ${latestPosts.info}">
                     <td><a th:href="@{/post/{id}(id=${post.id})}" th:text="${post.title}"></a></td>
                 </tr>
                 </tbody>
@@ -58,7 +58,7 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr th:each="post : ${latestPosts.qnaList}">
+                <tr th:each="post : ${latestPosts.qna}">
                     <td><a th:href="@{/post/{id}(id=${post.id})}" th:text="${post.title}"></a></td>
                 </tr>
                 </tbody>

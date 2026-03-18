@@ -9,6 +9,9 @@ import jakarta.persistence.*;
 import static jakarta.persistence.FetchType.LAZY;;
 @Entity
 @Getter
+@Table(uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"user_id", "post_id"})
+})
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Recommendation extends BaseEntity {
 
@@ -18,9 +21,11 @@ public class Recommendation extends BaseEntity {
     private Long id;
 
     @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "user_id")
     private User user;
 
     @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "post_id")
     private Post post;
 
     public Recommendation(User user, Post post) {

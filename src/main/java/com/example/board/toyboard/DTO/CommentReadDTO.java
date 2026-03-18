@@ -19,18 +19,12 @@ public class CommentReadDTO {
 
     String content;
 
-    int up;
+    Long up;
 
-    int down;
+    Long down;
 
     Long report;
 
-    public CommentReadDTO(Comment comment) {
-        this.id = comment.getId();
-        this.nickname = comment.getUser().getNickname();
-        this.content = comment.getComment();
-        this.up = comment.getUps().size();
-        this.down = comment.getDowns().size();
-        this.report = 1L;
-    }
+    Long reply;
+
 }
