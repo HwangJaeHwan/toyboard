@@ -33,8 +33,6 @@ public class UserController {
 
 
 
-
-
     @GetMapping("/register")
     public String registerStart(@ModelAttribute(name = "user") RegisterDTO registerDTO) {
 
@@ -88,7 +86,7 @@ public class UserController {
     }
 
     @GetMapping("/login")
-    public String loginStart(User loginUser) {
+    public String loginStart(User user) {
 
 
         return "user/login";
@@ -114,14 +112,14 @@ public class UserController {
 
         HttpSession session = request.getSession();
 
-        session.setAttribute(SessionConst.NICKNAME, loginUser.getNickname());
-        session.setAttribute(SessionConst.USER_TYPE, loginUser.getUserType());
-        session.setAttribute(SessionConst.USER_ID, loginUser.getId());
 
-        log.info("닉네임={}",session.getAttribute(SessionConst.NICKNAME));
-        log.info("타입={}",session.getAttribute(SessionConst.USER_TYPE));
-        log.info("유저아이디={}",session.getAttribute(SessionConst.USER_ID));
+        UserSession userSession = UserSession.builder()
+                .id(loginUser.getId())
+                .userType(loginUser.getUserType())
+                .nickname(loginUser.getNickname())
+                .build();
 
+        session.setAttribute(SessionConst.LOGIN_USER, userSession);
 
         return "redirect:" + redirectURI;
     }
@@ -145,7 +143,7 @@ public class UserController {
     @GetMapping("/mypage")
     public String myPage(UserSession userSession) {
 
-        return "redirect:/mypage/" + userSession.getUserId();
+        return "redirect:/mypage/" + userSession.getId();
     }
 
 
@@ -210,7 +208,15 @@ public class UserController {
         Long userId = userService.nicknameChange(userSession.getNickname(), userEditDTO);
 
         HttpSession session = request.getSession(false);
-        session.setAttribute(SessionConst.NICKNAME, userEditDTO.getNickname());
+
+
+        UserSession newSession = UserSession.builder()
+                .id(userSession.getId())
+                .userType(userSession.getUserType())
+                .nickname(userEditDTO.getNickname())
+                .build();
+
+        session.setAttribute(SessionConst.LOGIN_USER, newSession);
         return "redirect:/mypage/" + userId;
 
 
@@ -234,7 +240,7 @@ public class UserController {
         }
 
         try {
-            userService.passwordChange(userSession.getUserId(), dto);
+            userService.passwordChange(userSession.getId(), dto);
         } catch (InvalidPasswordException e) {
             bindingResult.rejectValue("nowPassword", "difPassword", e.getMessage());
             return "user/passwordChange";
@@ -246,7 +252,7 @@ public class UserController {
             return "user/passwordChange";
         }
 
-        return "redirect:/mypage/"+userSession.getUserId();
+        return "redirect:/mypage/"+userSession.getId();
 
 
     }

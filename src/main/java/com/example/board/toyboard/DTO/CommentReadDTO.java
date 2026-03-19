@@ -15,6 +15,8 @@ public class CommentReadDTO {
 
     Long id;
 
+    Long userId;
+
     String nickname;
 
     String content;

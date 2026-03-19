@@ -33,8 +33,8 @@
             //여기 아래 부분
             $('#summernote').summernote({
                 width: '100%',
-                height: 500,                 // 에디터 높이
-                lang: "ko-KR",					// 한글 설정
+                height: 500,
+                lang: "ko-KR",
                 callbacks : {
                     onImageUpload: function(files) {
                         uploadSummernoteImageFile(files[0],this);
@@ -59,11 +59,10 @@
             $.ajax({
                 data : data,
                 type : "POST",
-                url : "/post/image",
+                url : "/posts/image",
                 contentType : false,
                 processData : false,
                 success : function(data) {
-                    //항상 업로드된 파일의 url이 있어야 한다.
                     console.log(data);
                     $(editor).summernote('insertImage', data);
                 }

@@ -1,15 +1,20 @@
 package com.example.board.toyboard.Service;
 
 import com.example.board.toyboard.Entity.Post.Post;
-import com.example.board.toyboard.Repository.PostRepository;
+import com.example.board.toyboard.Entity.Post.PostType;
+import com.example.board.toyboard.Repository.post.PostRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
+import java.util.stream.IntStream;
 
 import static com.example.board.toyboard.Config.redis.RedisKey.*;
 
@@ -20,64 +25,69 @@ public class PostScheduler {
 
     private final RedisTemplate<String, String> redisTemplate;
     private final PostRepository postRepository;
-    private final PostService postService;
+
+
+
+    @Scheduled(fixedRate = 600000)
+    public void setTop10Post() {
+
+        LocalDateTime now = LocalDateTime.now();
+
+        List<String> keys = IntStream.range(0,2)
+                .mapToObj(i ->
+                        REDIS_POPULAR_POSTS_KEY_PREFIX +
+                                now.minusHours(i)
+                                        .format(DateTimeFormatter.ofPattern("yyyyMMddHH")))
+                .toList();
+
+        String top10Key = REDIS_POPULAR_POSTS_KEY_PREFIX + "top10";
+
+        redisTemplate.opsForZSet()
+                .unionAndStore(keys.get(0), keys.subList(1, keys.size()), top10Key);
+    }
 
 
 
     @Scheduled(fixedRate = 60000)
-    public void decayPostScores() {
-        Set<String> allPosts = redisTemplate.opsForZSet().reverseRange(REDIS_POPULAR_POSTS_KEY_PREFIX, 0, 99);
+    public void syncViewCounts() {
 
-        if (allPosts == null) {
+        Map<Object, Object> viewCounts =
+                redisTemplate.opsForHash().entries(REDIS_VIEW_COUNT_KEY);
+
+        if (viewCounts.isEmpty()) {
             return;
         }
 
-        for (String postId : allPosts) {
-            Double currentScore = redisTemplate.opsForZSet().score(REDIS_POPULAR_POSTS_KEY_PREFIX, postId);
+        Map<Long, Integer> viewCountMap = new HashMap<>();
 
-            if (currentScore != null) {
-                // 기존 점수의 90%로 줄이기
-                redisTemplate.opsForZSet().add(REDIS_POPULAR_POSTS_KEY_PREFIX, postId, currentScore * 0.9);
-            }
+        for (Map.Entry<Object, Object> entry : viewCounts.entrySet()) {
+
+            long postId = Long.parseLong(entry.getKey().toString());
+            int count = Integer.parseInt(entry.getValue().toString());
+
+            viewCountMap.put(postId, count);
+
         }
 
+        postRepository.bulkUpdateViewCounts(viewCountMap);
 
-        redisTemplate.opsForZSet().removeRange(REDIS_POPULAR_POSTS_KEY_PREFIX, 101, -1);
+
+        redisTemplate.delete(REDIS_VIEW_COUNT_KEY);
     }
-    @Scheduled(fixedDelay = 60000)
-    public void updateViewCounts() {
-        Set<String> keys = redisTemplate.keys(REDIS_VIEW_COUNT_KEY_PREFIX + "*");
 
 
-        if (keys == null || keys.isEmpty()) {
-            return;
-        }
 
 
-        for (String key : keys) {
 
-            String viewCountsString = redisTemplate.opsForValue().get(key);
-            redisTemplate.delete(key);
-
-            if (viewCountsString == null) {
-                continue;
-            }
-
-            Long postId = Long.valueOf(key.substring(REDIS_VIEW_COUNT_KEY_PREFIX.length()));
-            int viewCount = Integer.parseInt(viewCountsString);
-            postService.updatePostViewCounts(postId, viewCount);
-        }
-
-    }
 
     @Scheduled(fixedRate = 60000)
     public void updateLatestPosts() {
 
-        for (String category : makeCategoryList()) {
-            String redisKey = REDIS_LATEST_KEY_PREFIX + category;
+        for (PostType postType : PostType.values()) {
+            String redisKey = REDIS_LATEST_KEY_PREFIX + postType.name();
             redisTemplate.delete(redisKey);
 
-            List<Post> posts = postRepository.findTop5PostByPostTypeOrderByCreatedTimeDesc(category);
+            List<Post> posts = postRepository.findTop5PostByPostTypeOrderByCreatedTimeDesc(postType);
 
             for (Post post : posts) {
                 String postString = post.getId() + ":" + post.getTitle();
@@ -91,12 +101,6 @@ public class PostScheduler {
 
 
     }
-
-    private List<String> makeCategoryList() {
-
-        return List.of("FREE", "NOTICE", "INFO", "QNA");
-    }
-
 
 
 }

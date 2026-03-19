@@ -9,7 +9,10 @@ import com.example.board.toyboard.Entity.Comment;
 import com.example.board.toyboard.Entity.Post.Post;
 import com.example.board.toyboard.Entity.User;
 import com.example.board.toyboard.Entity.UserType;
+import com.example.board.toyboard.Entity.vote.VoteType;
+import com.example.board.toyboard.Entity.vote.response.VoteResponse;
 import com.example.board.toyboard.Service.*;
+import com.example.board.toyboard.response.ApiResponse;
 import com.example.board.toyboard.session.SessionConst;
 import com.example.board.toyboard.session.UserSession;
 import lombok.RequiredArgsConstructor;
@@ -24,74 +27,128 @@ import java.util.stream.Collectors;
 @Slf4j
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/comment")
+@RequestMapping("/comments")
 public class CommentController {
 
-    private final UserService userService;
-    private final PostService postService;
     private final ReportService reportService;
     private final CommentService commentService;
-    private final UpService upService;
-    private final DownService downService;
-
+    private final VoteService voteService;
 
     @GetMapping("/{postId}")
-    List<CommentReadDTO> findAll(@PathVariable("postId") Long postId) {
+    ApiResponse<List<CommentReadDTO>> getComments(@PathVariable("postId") Long postId) {
 
-        Post post = postService.findById(postId);
+        return ApiResponse.success("댓글 리스트", commentService.findComments(postId));
+    }
 
+    @GetMapping("/{commentId}/replies")
+    ApiResponse<List<CommentReadDTO>> getReplies(@PathVariable Long commentId) {
 
-        return commentService.findComments(postId).stream().map(CommentReadDTO::new).collect(Collectors.toList());
+        return ApiResponse.success("대댓글 리스트", commentService.getReplies(commentId));
     }
 
     @PostMapping("/{postId}")
-    String write(UserSession userSession, @PathVariable("postId") Long postId, @RequestBody CommentWriteDTO dto) {
 
+    ApiResponse<Long> write(UserSession userSession, @PathVariable("postId") Long postId, @RequestBody CommentWriteDTO dto) {
 
-        commentService.writeComment(dto, userSession.getUserId(), postId);
+        Long commentId = commentService.writeComment(dto, userSession.getId(), postId);
 
-        return "Ok";
-
-    }
-
-    @GetMapping("/upButton/{id}")
-    UpResponse upButton(UserSession userSession, @PathVariable("id") Long id) {
-
-
-        return upService.upClick(userSession.getUserId(), id);
+        return ApiResponse.create("댓글 작성 완료",commentId);
 
     }
 
-    @GetMapping("/downButton/{id}")
-    DownResponse downButton(UserSession userSession, @PathVariable("id") Long id) {
+//<<<<<<< Updated upstream
+//    @GetMapping("/upButton/{id}")
+//    UpResponse upButton(UserSession userSession, @PathVariable("id") Long id) {
+//
+//
+//        return upService.upClick(userSession.getUserId(), id);
+//
+//    }
+//
+//    @GetMapping("/downButton/{id}")
+//    DownResponse downButton(UserSession userSession, @PathVariable("id") Long id) {
+//
+//        return downService.downClick(userSession.getUserId(), id);
+//=======
+    @PostMapping("/{commentId}/replies")
+    ApiResponse<Long> writeReply(UserSession userSession, @PathVariable("commentId") Long commentId, @RequestBody CommentWriteDTO dto) {
 
-        return downService.downClick(userSession.getUserId(), id);
+        Long replyId = commentService.writeReply(dto, userSession.getNickname(), commentId);
+
+        return ApiResponse.create("대댓글 작성 완료", replyId);
+    }
+
+
+    @GetMapping("/{id}/ups")
+    ApiResponse<VoteResponse> up(UserSession userSession, @PathVariable("id") Long commentId){
+
+        return voteService.vote(userSession.getNickname(), commentId, VoteType.UP);
 
     }
+
+    @GetMapping("/{id}/downs")
+    ApiResponse<VoteResponse> down(UserSession userSession, @PathVariable("id") Long commentId){
+
+        return voteService.vote(userSession.getNickname(), commentId, VoteType.DOWN);
+
+    }
+
+
+
+//    @GetMapping("/upButton/{id}")
+//    Map upButton(@SessionAttribute(name = SessionConst.LOGIN_USER) String nickname, @PathVariable("id") Long id) {
+//
+//        HashMap<String, Integer> upCount = new HashMap<>();
+//        HashMap<String, Boolean> check = new HashMap<>();
+//
+//        User loginUser = userService.findByNickname(nickname);
+//        Comment comment = commentService.findWithPostAndUser(id);
+//
+//        if (!upService.upClick(loginUser, comment)) {
+//            check.put("dup", true);
+//            return check;
+//        }
+//
+//        upCount.put("upCount", comment.getUps().size());
+//
+//        return upCount;
+//
+//    }
+//
+//    @GetMapping("/downButton/{id}")
+//    Map downButton(@SessionAttribute(name = SessionConst.LOGIN_USER) String nickname, @PathVariable("id") Long id) {
+//
+//        HashMap<String, Integer> downCount = new HashMap<>();
+//        HashMap<String, Boolean> check = new HashMap<>();
+//
+//        User loginUser = userService.findByNickname(nickname);
+//        Comment comment = commentService.findById(id);
+//
+//        if (!downService.downClick(loginUser, comment)) {
+//            check.put("dup", true);
+//            return check;
+//        }
+//
+//        downCount.put("downCount", comment.getDowns().size());
+//
+//        return downCount;
+//
+//    }
 
     @DeleteMapping("/{id}")
-    String delete(UserSession userSession,
-                  @PathVariable("id") Long id) {
+    ApiResponse<Long> delete(@PathVariable("id") Long id, UserSession userSession) {
 
-        commentService.delete(id, userSession.getUserId(), userSession.getUserType());
+        Long deleteCommentId = commentService.delete(id, userSession.getId(), userSession.getUserType());
 
-        return "삭제 완료";
+
+        return ApiResponse.success("삭제 완료", deleteCommentId);
     }
 
-    @PatchMapping("/report/{id}")
-    String report(UserSession userSession, @PathVariable("id") Long id) {
 
+    @PatchMapping("/{id}/reports")
+    ApiResponse<Long> report(UserSession userSession, @PathVariable("id") Long id) {
 
-        if (reportService.commentReport(userSession.getUserId(), id)) {
-
-            return "신고 완료";
-
-        }
-
-
-
-        return "이미 신고한 댓글입니다.";
-
+        return reportService.commentReport(userSession.getNickname(), id);
     }
 
 }

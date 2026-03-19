@@ -8,12 +8,12 @@ public class SearchInfo {
 
     private Long id;
     private LocalDateTime createAt;
-    private Long viewCount;
+    private Long hits;
 
-    public SearchInfo(Long id, LocalDateTime createAt, Long viewCount, Long recommendCount) {
+    public SearchInfo(Long id, LocalDateTime createAt, Long hits, Long recommendCount) {
         this.id = id;
         this.createAt = createAt;
-        this.viewCount = viewCount;
+        this.hits = hits;
         this.recommendCount = recommendCount;
     }
 

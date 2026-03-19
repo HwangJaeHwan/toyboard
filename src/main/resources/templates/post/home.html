@@ -17,7 +17,7 @@
                 </thead>
                 <tbody>
                 <tr th:each="post : ${latestPosts.notice}">
-                    <td><a th:href="@{/post/{id}(id=${post.id})}" th:text="${post.title}"></a></td>
+                    <td><a th:href="@{/posts/{id}(id=${post.id})}" th:text="${post.title}"></a></td>
                 </tr>
                 </tbody>
             </table>
@@ -31,7 +31,7 @@
                 </thead>
                 <tbody>
                 <tr th:each="post : ${latestPosts.free}">
-                    <td><a th:href="@{/post/{id}(id=${post.id})}" th:text="${post.title}"></a></td>
+                    <td><a th:href="@{/posts/{id}(id=${post.id})}" th:text="${post.title}"></a></td>
                 </tr>
                 </tbody>
             </table>
@@ -45,7 +45,7 @@
                 </thead>
                 <tbody>
                 <tr th:each="post : ${latestPosts.info}">
-                    <td><a th:href="@{/post/{id}(id=${post.id})}" th:text="${post.title}"></a></td>
+                    <td><a th:href="@{/posts/{id}(id=${post.id})}" th:text="${post.title}"></a></td>
                 </tr>
                 </tbody>
             </table>
@@ -59,7 +59,7 @@
                 </thead>
                 <tbody>
                 <tr th:each="post : ${latestPosts.qna}">
-                    <td><a th:href="@{/post/{id}(id=${post.id})}" th:text="${post.title}"></a></td>
+                    <td><a th:href="@{/posts/{id}(id=${post.id})}" th:text="${post.title}"></a></td>
                 </tr>
                 </tbody>
             </table>
@@ -75,7 +75,7 @@
                 </thead>
                 <tbody>
                 <tr th:each="post : ${popularPost}">
-                    <td><a th:href="@{/post/{id}(id=${post.id})}" th:text="${post.title}"></a></td>
+                    <td><a th:href="@{/posts/{id}(id=${post.id})}" th:text="${post.title}"></a></td>
                 </tr>
                 </tbody>
             </table>

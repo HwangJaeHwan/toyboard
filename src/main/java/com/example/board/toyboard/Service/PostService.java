@@ -15,8 +15,7 @@ import com.example.board.toyboard.Exception.UserNotFoundException;
 import com.example.board.toyboard.Repository.*;
 import com.example.board.toyboard.Repository.post.PostDocumentRepository;
 import com.example.board.toyboard.Repository.post.PostRepository;
-import com.example.board.toyboard.session.UserSession;
-import jakarta.annotation.PostConstruct;
+import com.example.board.toyboard.Repository.report.PostReportRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -25,7 +24,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.elasticsearch.client.elc.NativeQuery;
 import org.springframework.data.elasticsearch.client.elc.NativeQueryBuilder;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
-import org.springframework.data.elasticsearch.core.SearchHit;
 import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.data.elasticsearch.core.query.HighlightQuery;
 import org.springframework.data.elasticsearch.core.query.highlight.Highlight;
@@ -33,57 +31,57 @@ import org.springframework.data.elasticsearch.core.query.highlight.HighlightFiel
 import org.springframework.data.elasticsearch.core.query.highlight.HighlightParameters;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StopWatch;
-
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
+
 
 @Service
 @Slf4j
-@Transactional
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class PostService {
 
     private final PostRepository postRepository;
     private final UserRepository userRepository;
     private final RecommendationRepository recommendationRepository;
+    private final PostReportRepository postReportRepository;
 
-    private final ReportRepository reportRepository;
-
+    private final PostRedisService redisService;
     private final CommentRepository commentRepository;
-
     private final LogRepository logRepository;
 
     private final PostDocumentRepository postDocumentRepository;
     private final ElasticsearchOperations operations;
 
-    @Transactional(readOnly = true)
-    public List<Post> findAll() {
-        return postRepository.findAll();
-    }
+
 
     @Transactional(readOnly = true)
     public PageDTO<PostListDTO> makePageResult(Pageable pageable, PostType postType) {
 
         long start = System.currentTimeMillis();
 
+        boolean sortByRecommendation = pageable.getSort().stream()
+                .anyMatch(order -> order.getProperty().equals("recommendedNumber"));
 
-//        Page<PostListDTO> list1 = postRepository.list(pageable, postType);
+        Page<PostListDTO> list = sortByRecommendation
+                ? postRepository.findPostsOrderByRecommendation(pageable, postType)
+                : postRepository.findPosts(pageable, postType);
 
-        Page<PostListDTO> list = postRepository.findPosts(pageable, postType);
-
-        List<Long> ids = list.stream().map(PostListDTO::getId).toList();
-
+        List<Long> ids = list.getContent().stream().map(PostListDTO::getId).toList();
         Map<Long, Long> commentCountMap = postRepository.countCommentsByPostIds(ids);
 
-        Map<Long, Long> recommendationCountMap = postRepository.countRecommendationsByPostIds(ids);
+        if (sortByRecommendation) {
+            for (PostListDTO dto : list.getContent()) {
+                dto.setCommentNum(commentCountMap.getOrDefault(dto.getId(), 0L));
+            }
+        } else {
+            Map<Long, Long> recommendationCountMap = postRepository.countRecommendationsByPostIds(ids);
 
-        for (PostListDTO dto : list) {
-            dto.setCommentNum(commentCountMap.getOrDefault(dto.getId(), 0L));
-            dto.setRecommendedNumber(recommendationCountMap.getOrDefault(dto.getId(), 0L));
+            for (PostListDTO dto : list.getContent()) {
+                dto.setCommentNum(commentCountMap.getOrDefault(dto.getId(), 0L));
+                dto.setRecommendedNumber(recommendationCountMap.getOrDefault(dto.getId(), 0L));
+            }
         }
 
         long end = System.currentTimeMillis();
@@ -93,31 +91,27 @@ public class PostService {
 
     }
 
+
+//    @Transactional(readOnly = true)
+//    public Post findPostWithAuthCheck(Long postId, Long userId, UserType userType) {
+//
+//        Post post = postRepository.findByIdWithUser(postId).orElseThrow(PostNotFoundException::new);
+//
+//        authCheck(post, userId, userType);
+//
+//        return post;
+//    }
+
     @Transactional(readOnly = true)
-    public Post findById(Long postId) {
+    public PostReadDTO read(Long postId, Long userId) {
 
-        return postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
+        PostReadDTO postReadDTO = postRepository.postRead(postId);
 
+        redisService.incrementViewCount(postId, userId);
+
+        return postReadDTO;
     }
-
     @Transactional(readOnly = true)
-    public Post findPostWithAuthCheck(Long postId, Long userId, UserType userType) {
-
-        Post post = postRepository.findByIdWithUser(postId).orElseThrow(PostNotFoundException::new);
-
-        authCheck(post, userId, userType);
-
-        return post;
-    }
-
-
-
-    public PostReadDTO read(Long postId) {
-
-        return postRepository.postRead(postId);
-    }
-
-
     public LatestPosts getLatestPosts() {
 
         LatestPosts latestPosts = new LatestPosts();
@@ -131,24 +125,23 @@ public class PostService {
 
     }
 
-    
+//    @Transactional(readOnly = true)
+//    public LatestPosts getLatestPosts() {
+//
+//        return postRepository.getLatestPosts();
+//
+//    }
 
+    @Transactional
     public Long write(PostWriteDTO dto, Long userId) {
-
-        log.info("아이디 = {}", userId);
 
         User loginUser = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
 
-        Post post = Post.builder()
-                .title(dto.getTitle())
-                .content(dto.getContent())
-                .viewCount(0)
-                .postType(dto.getPostType())
-                .build();
-
-        post.setWriter(loginUser);
+        Post post = Post.create(dto, loginUser);
 
         Post save = postRepository.save(post);
+
+        logRepository.save(new Log(loginUser, post, LogType.POST));
 
         PostDocument postDocument = PostDocument.builder()
                 .id(post.getId().toString())
@@ -163,34 +156,45 @@ public class PostService {
 
         postDocumentRepository.save(postDocument);
 
-        logRepository.save(new Log(loginUser, post, LogType.POST));
+        redisService.saveLatestPost(dto.getPostType(), post.getId());
 
         return save.getId();
 
     }
 
-    public void delete(Long postId, Long userId, UserType userType) {
+    @Transactional
+    public void delete(Long userId, UserType userType, Long postId) {
 
-        Post post = postRepository.findByIdWithUser(postId).orElseThrow(PostNotFoundException::new);
-        if (!post.getUser().getId().equals(userId) && userType != UserType.ADMIN) {
-            throw new RuntimeException("삭제할 권한이 없습니다.");
-        }
+        Post deletePost = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
 
-        logRepository.deleteAllByPost(post);
-        commentRepository.deleteAllByPost(post);
-        recommendationRepository.deleteAllByPost(post);
-        postRepository.delete(post);
+        adminCheck(userId,userType, deletePost);
 
-        postDocumentRepository.deleteById(post.getId().toString());
+        logRepository.deleteAllByPost(deletePost);
+        commentRepository.deleteAllByPost(deletePost);
+        recommendationRepository.deleteAllByPost(deletePost);
+        postRepository.delete(deletePost);
+
+        postDocumentRepository.deleteById(deletePost.getId().toString());
 
 
     }
 
-    public void update(Long postId, PostUpdateDTO dto, Long userId, UserType userType) {
 
-        Post post = postRepository.findByIdWithUser(postId).orElseThrow(PostNotFoundException::new);
+    public PostUpdateDTO getUpdateForm(Long postId, Long userId, UserType userType) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(PostNotFoundException::new);
 
-        authCheck(post, userId, userType);
+        adminCheck(userId,userType, post);
+
+        return new PostUpdateDTO(post);
+    }
+
+    @Transactional
+    public void update(Long postId, Long userId, UserType userType, PostUpdateDTO dto) {
+
+        Post post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
+
+        adminCheck(userId,userType, post);
 
         post.updateTitle(dto.getTitle());
         post.updateContent(dto.getContent());
@@ -198,19 +202,22 @@ public class PostService {
 
     }
 
+    @Transactional
     public int recommend(Long postId, Long userId) {
+
+
         Post post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
 
 
-        Optional<Recommendation> check = recommendationRepository.findByUserAndPost(user, post);
+        Recommendation recommendation = recommendationRepository
+                .findByUserAndPost(user, post)
+                .orElse(null);
 
 
-        if (check.isPresent()) {
-            recommendationRepository.delete(check.get());
-
-            logRepository.findLogByUserAndPostAndLogType(user, post, LogType.RECOMMEND).ifPresent(logRepository::delete);
-
+        if (recommendation != null) {
+            recommendationRepository.delete(recommendation);
+            logRepository.deleteLogByUserAndPostAndLogType(user, post, LogType.RECOMMEND);
         } else {
 
             recommendationRepository.save(new Recommendation(user, post));
@@ -218,20 +225,22 @@ public class PostService {
             logRepository.save(new Log(user, post, LogType.RECOMMEND));
         }
 
-//        recommendationRepository
 
-
-//        return post.getRecommendedNumber();
-
-        return recommendationRepository.countAllByPost(post);
-
+        return recommendationRepository.countAllByPostId(postId);
 
 
     }
-
+    @Transactional(readOnly = true)
     public PageDTO<PostReportDTO> postsWithReport(PageListDTO pageListDTO) {
 
         return new PageDTO<>(postRepository.reportedList(pageListDTO.getPageable()));
+    }
+
+    private void adminCheck(Long userId, UserType userType, Post post) {
+
+        if (!post.getUser().getId().equals(userId) && !(userType == UserType.ADMIN)) {
+            throw new RuntimeException();
+        }
     }
 
 
@@ -321,9 +330,9 @@ public class PostService {
                     .id(info.getId())
                     .title(result.getTitle())
                     .nickname(result.getNickname())
-                    .viewCount(info.getViewCount())
+                    .hits(info.getHits())
                     .recommendedNumber(info.getRecommendCount())
-                    .createTime(info.getCreateAt())
+                    .createdTime(info.getCreateAt())
                     .build());
 
         }

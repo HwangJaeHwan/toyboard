@@ -19,7 +19,7 @@
         </textarea>
         <div>
             <button href="#" class="w-300 btn btn-success" type="submit">수정</button>
-            <a th:href="@{/post/{postId}(postId = ${id})}" class="w-300 btn btn-danger">취소</a>
+            <a th:href="@{/post/{postId}(postId = ${post.id})}" class="w-300 btn btn-danger">취소</a>
         </div>
 
     </form>
@@ -52,7 +52,7 @@
             $.ajax({
                 data : data,
                 type : "POST",
-                url : "/post/image",
+                url : "/posts/image",
                 contentType : false,
                 processData : false,
                 success : function(data) {

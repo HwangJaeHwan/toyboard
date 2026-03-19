@@ -12,7 +12,10 @@ import jakarta.validation.constraints.NotNull;
 public class PostUpdateDTO {
 
 
-    @NotEmpty
+    @NotNull
+    private Long id;
+
+    @NotNull
     private PostType postType;
 
     @NotEmpty(message = "제목을 입력해주세요.")
@@ -22,8 +25,9 @@ public class PostUpdateDTO {
     @NotEmpty(message = "내용을 입력해주세요.")
     private String content;
 
-    public PostUpdateDTO(Post post) {
 
+    public PostUpdateDTO(Post post) {
+        this.id = post.getId();
         this.postType = post.getPostType();
         this.title = post.getTitle();
         this.content = post.getContent();

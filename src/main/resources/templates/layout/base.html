@@ -29,7 +29,7 @@
 
     <div th:if="${session.loginUser != null}" class="flex-box justify-content-center">
         <div class="flex-box justify-content-end w80">
-            <a class="text-right makeBlock margin-right-10" href="#" th:href="@{/mypage}" th:text="${session.loginUser}">닉네임</a>
+            <a class="text-right makeBlock margin-right-10" href="#" th:href="@{/mypage}" th:text="${session.loginUser.nickname}">닉네임</a>
             <a class="text-right makeBlock" href="#" th:href="@{/logout}">로그아웃</a>
         </div>
     </div>
@@ -39,10 +39,10 @@
     <br>
         <div class="flex-box justify-content-center">
 
-                <a class="w20 text-center makeBlock btn-info" href="/post?postType=NOTICE">공지사항</a>
-                <a class="w20 text-center makeBlock btn-info" href="/post?postType=FREE">자유 게시판</a>
-                <a  class="w20 text-center makeBlock btn-info" href="/post?postType=INFO">정보 게시판</a>
-                <a  class="w20 text-center makeBlock btn-info" href="/post?postType=QNA">Q&A</a>
+                <a class="w20 text-center makeBlock btn-info" href="/posts?postType=NOTICE">공지사항</a>
+                <a class="w20 text-center makeBlock btn-info" href="/posts?postType=FREE">자유 게시판</a>
+                <a  class="w20 text-center makeBlock btn-info" href="/posts?postType=INFO">정보 게시판</a>
+                <a  class="w20 text-center makeBlock btn-info" href="/posts?postType=QNA">Q&A</a>
 
         </div>
 

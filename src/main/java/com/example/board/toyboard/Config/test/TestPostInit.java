@@ -1,6 +1,7 @@
 package com.example.board.toyboard.Config.test;
 
 import com.example.board.toyboard.DTO.PostWriteDTO;
+import com.example.board.toyboard.Entity.Post.PostType;
 import com.example.board.toyboard.Entity.User;
 import com.example.board.toyboard.Entity.UserType;
 import com.example.board.toyboard.Repository.UserRepository;
@@ -9,6 +10,8 @@ import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+
+import static com.example.board.toyboard.Entity.Post.PostType.*;
 
 @Component
 @RequiredArgsConstructor
@@ -32,25 +35,25 @@ public class TestPostInit {
         userRepository.save(user);
 
 
-        initPost(user,"QNA");
+        initPost(user, QNA);
 
-        initPost(user,"FREE");
+        initPost(user,FREE);
 
-        initPost(user,"NOTICE");
+        initPost(user,NOTICE);
 
-        initPost(user,"INFO");
+        initPost(user,INFO);
 
 
     }
 
-    private void initPost(User user, String postType) {
+    private void initPost(User user, PostType postType) {
         for (int i = 1; i <= 250; i++) {
             PostWriteDTO dto = new PostWriteDTO();
             dto.setTitle(postType + " 테스트 제목 " + i);
             dto.setContent(postType + " 테스트 내용 " + i);
-            dto.setPostType(postType); // 예시용 게시물 유형 설정
+            dto.setPostType(postType);
 
-            postService.write(dto, user);
+            postService.write(dto, user.getId());
         }
 
     }

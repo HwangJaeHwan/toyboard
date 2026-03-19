@@ -1,15 +1,9 @@
 package com.example.board.toyboard.Repository;
 
-import com.example.board.toyboard.DTO.CommentReadDTO;
 import com.example.board.toyboard.DTO.CommentReportDTO;
-import com.example.board.toyboard.Entity.Comment;
-import com.example.board.toyboard.Entity.Post.Post;
+
 import com.example.board.toyboard.Entity.QComment;
-import com.example.board.toyboard.Entity.QDown;
-import com.example.board.toyboard.Entity.QUp;
-import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Projections;
-import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -22,9 +16,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static com.example.board.toyboard.Entity.QDown.*;
-import static com.example.board.toyboard.Entity.QUp.*;
-import static com.example.board.toyboard.Entity.Report.QCommentReport.*;
+import static com.example.board.toyboard.Entity.QDown.down;
+import static com.example.board.toyboard.Entity.QUp.up;
+import static com.example.board.toyboard.Entity.Report.QCommentReport.commentReport;
+
 
 @Slf4j
 @RequiredArgsConstructor

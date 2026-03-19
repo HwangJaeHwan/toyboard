@@ -26,9 +26,14 @@ public interface PostRepositoryCustom {
 
     Page<PostListDTO> findPosts(Pageable pageable, PostType postType);
 
+    Page<PostListDTO> findPostsOrderByRecommendation(Pageable pageable, PostType postType);
+
     Map<Long, Long> countRecommendationsByPostIds(List<Long> ids);
 
     Map<Long, Long> countCommentsByPostIds(List<Long> ids);
+
+    void bulkUpdateViewCounts(Map<Long, Integer> viewCountMap);
+
 
 
 }

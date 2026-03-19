@@ -12,6 +12,7 @@ import com.example.board.toyboard.Entity.UserType;
 import com.example.board.toyboard.Service.*;
 import com.example.board.toyboard.file.FileStore;
 import com.example.board.toyboard.file.UploadFile;
+import com.example.board.toyboard.response.ApiResponse;
 import com.example.board.toyboard.session.SessionConst;
 import com.example.board.toyboard.session.UserSession;
 import lombok.RequiredArgsConstructor;
@@ -43,7 +44,7 @@ import java.util.stream.Collectors;
 @Controller
 @Slf4j
 @RequiredArgsConstructor
-@RequestMapping("/post")
+@RequestMapping("/posts")
 public class PostController {
 
     private final PostService postService;
@@ -53,6 +54,7 @@ public class PostController {
     private final FileStore fileStore;
     private final AmazonS3 amazonS3;
     private final PopularPostService popularPostService;
+    private final PostRedisService postRedisService;
 
     @Value("${aws.s3.bucket}")
     private String bucket;
@@ -62,7 +64,9 @@ public class PostController {
 
         log.info("헤헤");
 
-        List<PostTitle> popularPost = popularPostService.getPopularPost();
+//        List<PostTitle> popularPost = popularPostService.getPopularPost();
+        List<HomePost> popularPost = postRedisService.getPopularPost();
+
         LatestPosts latestPosts = postService.getLatestPosts();
 
         model.addAttribute("popularPost", popularPost);
@@ -73,13 +77,14 @@ public class PostController {
 
 
     @GetMapping
+
     public String posts(PageListDTO pageListDTO
             , @RequestParam(defaultValue = "createdTime") String sort
             , @RequestParam(defaultValue = "FREE") PostType postType, Model model) {
 
+
         Pageable pageable = pageListDTO.getPageable(Sort.by(Sort.Direction.DESC, sort));
 
-        log.info("sort={}", sort);
 
         model.addAttribute("searchDTO", new SearchDTO());
         model.addAttribute("posts", postService.makePageResult(pageable, postType));
@@ -93,7 +98,7 @@ public class PostController {
     @GetMapping("/search")
     String search(PageListDTO pageListDTO, SearchDTO searchDTO
             , @RequestParam(defaultValue = "createdTime") String sort
-            , @RequestParam(defaultValue = "free") PostType postType
+            , @RequestParam(defaultValue = "FREE") PostType postType
             , Model model) {
 
         Pageable pageable = pageListDTO.getPageable(Sort.by(Sort.Direction.DESC, sort));
@@ -122,17 +127,17 @@ public class PostController {
                            @Valid @ModelAttribute(name = "post") PostWriteDTO dto, BindingResult bindingResult,
                            Model model) {
 
-
         if (bindingResult.hasErrors()) {
 
             model.addAttribute("postCodes", makePostCodes());
             return "post/write";
         }
 
-        Long postId = postService.write(dto, userSession.getUserId());
+
+        Long postId = postService.write(dto, userSession.getId());
 
 
-        return "redirect:/post/" + postId;
+        return "redirect:+/posts/" + postId;
 
 
     }
@@ -140,26 +145,18 @@ public class PostController {
 
     @GetMapping("/{postId}")
     public String readPost(
-            @SessionAttribute(SessionConst.USER_TYPE) String userType,
-            @PathVariable("postId") Long postId,
-            Model model) {
+            UserSession userSession,
+            @PathVariable("postId") Long postId, Model model) {
 
 
-        PostReadDTO readDTO = postService.read(postId);
+        PostReadDTO postResponse = postService.read(postId, userSession.getId());
+        List<CommentReadDTO> commentsResponse = commentService.findComments(postId);
 
 
-        List<CommentReadDTO> commentDTOList = commentService.findComments(postId)
-                                                .stream()
-                                                .map(CommentReadDTO::new)
-                                                .collect(Collectors.toList());
-
-
-
-
-        model.addAttribute("post", readDTO);
-        model.addAttribute("comments", commentDTOList);
-        model.addAttribute("commentNums", commentDTOList.size());
-        model.addAttribute("userType", userType);
+        model.addAttribute("post", postResponse);
+        model.addAttribute("comments", commentsResponse);
+        model.addAttribute("commentNums", commentsResponse.size());
+        model.addAttribute("userType", userSession.getUserType());
 
         popularPostService.incrementPostView(postId);
 
@@ -169,15 +166,15 @@ public class PostController {
     }
 
 
-    @GetMapping("/update/{postId}")
+    @GetMapping("/{postId}/update")
     public String updateStart(@PathVariable("postId") Long postId,
                               UserSession userSession,
                               Model model) {
 
-        Post post = postService.findPostWithAuthCheck(postId, userSession.getUserId(), userSession.getUserType());
 
-        model.addAttribute("id", postId);
-        model.addAttribute("post", new PostUpdateDTO(post));
+
+        model.addAttribute("post",
+                postService.getUpdateForm(postId, userSession.getId(),userSession.getUserType()));
         model.addAttribute("postCodes", makePostCodes());
 
 
@@ -186,56 +183,55 @@ public class PostController {
 
 
 
-    @PostMapping("/update/{postId}")
+    @PostMapping("/{postId}/update")
     public String updateEnd(@PathVariable("postId") Long postId,
-                            @Valid @ModelAttribute(name = "post") PostUpdateDTO dto,
                             UserSession userSession,
+                            @Valid @ModelAttribute(name = "post") PostUpdateDTO dto,
                             BindingResult bindingResult, Model model) {
 
         log.info("dto = {}", dto);
 
-        model.addAttribute("id", postId);
 
         if (bindingResult.hasErrors()) {
             return "post/update";
         }
 
-        postService.update(postId, dto, userSession.getUserId(), userSession.getUserType());
+
+        postService.update(postId, userSession.getId(), userSession.getUserType(), dto);
 
         log.info("dto ={}", dto);
 
-        return "redirect:/post/" + postId;
+        return "redirect:/posts/" + postId;
 
     }
 
-    @GetMapping("/delete/{postId}")
-    public String deletePost(UserSession userSession,
-                             @PathVariable Long postId) {
-        postService.delete(postId, userSession.getUserId(), userSession.getUserType());
+    @GetMapping("/{postId}/delete")
+    public String deletePost(@PathVariable Long postId,
+                             UserSession userSession) {
 
-        return "redirect:/post";
+
+        postService.delete(userSession.getId(),userSession.getUserType(),postId);
+
+        return "redirect:/posts";
 
     }
 
-    @PatchMapping("/report/{postId}")
+    @PatchMapping("/{postId}/reports")
     @ResponseBody
-    public String report(UserSession userSession, @PathVariable Long postId) {
+    public ApiResponse<Long> report(@PathVariable Long postId, UserSession userSession) {
 
-        if (reportService.postReport(userSession.getUserId(), postId)) {
-            return "신고 완료";
-        }
-
-        return "이미 신고한 게시물입니다.";
+        return reportService.postReport(userSession.getId(), postId);
 
     }
 
 
 
-    @GetMapping("/recommend/{postId}")
-    @ResponseBody
-    public int recommend(UserSession userSession,  @PathVariable Long postId) {
 
-        return postService.recommend(postId, userSession.getUserId());
+    @GetMapping("/{postId}/recommends")
+    @ResponseBody
+    public int recommend(@PathVariable Long postId, UserSession userSession) {
+
+        return postService.recommend(postId, userSession.getId());
 
     }
 
@@ -247,7 +243,7 @@ public class PostController {
         UploadFile uploadFile = fileStore.storeFile(file);
 //        UploadFile uploadFile = fileStore.saveFile(file);
 
-        return "/post/image/" + uploadFile.getStoreFileName();
+        return "/posts/image/" + uploadFile.getStoreFileName();
 
     }
 

@@ -1,6 +1,7 @@
 package com.example.board.toyboard.Entity.Post;
 
 
+import com.example.board.toyboard.DTO.PostWriteDTO;
 import com.example.board.toyboard.Entity.BaseEntity;
 import com.example.board.toyboard.Entity.Report.CommentReport;
 import com.example.board.toyboard.Entity.Report.PostReport;
@@ -34,7 +35,7 @@ public class Post extends BaseEntity {
 
     private PostType postType;
 
-    private long viewCount;
+    private long hits;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PostReport> reports = new ArrayList<>();
@@ -46,12 +47,12 @@ public class Post extends BaseEntity {
     private User user;
 
     @Builder
-    public Post(String title, String content, PostType postType, long viewCount, User user) {
 
+    public Post(String title, String content, PostType postType, int hits, User user) {
         this.title = title;
         this.content = content;
         this.postType = postType;
-        this.viewCount = viewCount;
+        this.hits = hits;
         this.user = user;
     }
 
@@ -67,14 +68,14 @@ public class Post extends BaseEntity {
     }
 
 
-    public void setWriter(User user) {
+    public void assignWriter(User user) {
         this.user = user;
         user.addPost(this);
     }
 
 
     public void addHits() {
-        viewCount++;
+        hits++;
     }
 
     public void addReport(User user) {
@@ -85,6 +86,19 @@ public class Post extends BaseEntity {
     public void removeReport(PostReport report) {
         reports.remove(report);
     }
+
+    public static Post create(PostWriteDTO dto, User user) {
+        Post post = new Post();
+        post.title = dto.getTitle();
+        post.content = dto.getContent();
+        post.postType = dto.getPostType();
+        post.hits = 0;
+
+        post.assignWriter(user);
+
+        return post;
+    }
+
 
 
 

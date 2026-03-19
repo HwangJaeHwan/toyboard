@@ -13,8 +13,12 @@ import java.util.Optional;
 @Repository
 public interface DownRepository extends JpaRepository<Down, Long> {
 
-    Optional<Down> findByUserAndComment(User user, Comment comment);
-
-    Boolean existsByUserAndComment(User user, Comment comment);
+//    Optional<Down> findByUserAndComment(User user, Comment comment);
+//
+//<<<<<<< Updated upstream
+//    Boolean existsByUserAndComment(User user, Comment comment);
+//=======
+//    boolean existsByUserAndComment(User user, Comment comment);
+//>>>>>>> Stashed changes
 
 }

@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Slf4j
@@ -58,7 +59,33 @@ public class CommentService {
 
     }
 
-    public void delete(Long commentId,Long userId, UserType userType) {
+    public Long writeReply(CommentWriteDTO dto, String nickname, Long commentId) {
+
+        User loginUser = userRepository.findByNickname(nickname).orElseThrow(UserNotFoundException::new);
+        Comment parent = commentRepository.findById(commentId).orElseThrow(CommentNotFoundException::new);
+
+        Comment comment = Comment.builder()
+                .user(loginUser)
+                .comment(dto.getContent())
+                .post(parent.getPost())
+                .parent(parent)
+                .build();
+
+
+        commentRepository.save(comment);
+
+
+        Log commentLog = new Log(loginUser, parent.getPost(), LogType.COMMENT, comment);
+
+        comment.addLog(commentLog);
+        logRepository.save(commentLog);
+
+
+        return comment.getId();
+
+    }
+
+    public Long delete(Long commentId,Long userId, UserType userType) {
 
 
         Comment comment = commentRepository.findById(commentId).orElseThrow(CommentNotFoundException::new);
@@ -67,25 +94,61 @@ public class CommentService {
             throw new RuntimeException();//수정
         }
 
-
         commentRepository.delete(comment);
 
-    }
 
-    public List<Comment> findComments(Long postId) {
-
-        return commentRepository.findCommentsByPost(postId);
+        return comment.getId();
 
     }
+
+
+    public List<CommentReadDTO> findComments(Long postId) {
+
+        return makeReadResponse(commentRepository.findCommentsByPost(postId));
+
+    }
+
+    public List<CommentReadDTO> getReplies(Long commentId) {
+
+        return makeReadResponse(commentRepository.findRepliesByCommentId(commentId));
+    }
+
 
     public PageDTO<CommentReportDTO> commentsWithReport(PageListDTO pageListDTO) {
 
         return new PageDTO<>(commentRepository.commentReports(pageListDTO.getPageable()));
     }
 
-    public List<CommentReadDTO> test(Post post) {
-        return commentRepository.commentInfo(post);
+
+    private List<CommentReadDTO> makeReadResponse(List<Comment> comments) {
+
+        log.info("comments = {}", comments.size());
+
+        List<Long> ids = comments.stream().map(Comment::getId).toList();
+        log.info("ids={}", ids);
+        Map<Long, Long> upCounts = commentRepository.getUpCounts(ids);
+        Map<Long, Long> downCounts = commentRepository.getDownCounts(ids);
+        Map<Long, Long> reportCounts = commentRepository.getReportCounts(ids);
+        Map<Long, Long> replyCounts = commentRepository.getReplyCounts(ids);
+
+
+        return comments.stream()
+                .map(reply -> CommentReadDTO.builder()
+                        .id(reply.getId())
+                        .userId(reply.getUser().getId())
+                        .nickname(reply.getUser().getNickname())
+                        .content(reply.getComment())
+                        .up(upCounts.getOrDefault(reply.getId(), 0L))
+                        .down(downCounts.getOrDefault(reply.getId(), 0L))
+                        .report(reportCounts.getOrDefault(reply.getId(), 0L))
+                        .reply(replyCounts.getOrDefault(reply.getId(), 0L))
+                        .build()
+                )
+                .toList();
+
+
     }
+
 
 
 }

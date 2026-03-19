@@ -9,6 +9,8 @@ import com.querydsl.core.Tuple;
 import com.querydsl.core.types.*;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import jakarta.persistence.EntityManager;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -19,9 +21,7 @@ import org.springframework.util.StopWatch;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.example.board.toyboard.Entity.Post.QPost.post;
@@ -34,6 +34,11 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
 
 
     private final JPAQueryFactory queryFactory;
+    private final EntityManager em;
+
+    private static final String SORT_CREATED_TIME = "createdTime";
+    private static final String SORT_HITS = "hits";
+    private static final String SORT_RECOMMENDED_NUMBER = "recommendedNumber";
 
 
 
@@ -108,26 +113,26 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
         int noticeCount = 0;
         int infoCount = 0;
 
-        for (PostTitle post : allPosts) {
-            if (post.getPostType().equals("FREE") && freeCount < 5) {
-                latestPosts.getFreeList().add(new FreeTitle(post.getId(), post.getTitle()));
-                freeCount++;
-            } else if (post.getPostType().equals("QNA") && qnaCount < 5) {
-                latestPosts.getQnaList().add(new QnaTitle(post.getId(), post.getTitle()));
-                qnaCount++;
-            } else if (post.getPostType().equals("NOTICE") && noticeCount < 5) {
-                latestPosts.getNoticeList().add(new NoticeTitle(post.getId(), post.getTitle()));
-                noticeCount++;
-            } else if (post.getPostType().equals("INFO") && infoCount < 5) {
-                latestPosts.getInfoList().add(new InfoTitle(post.getId(), post.getTitle()));
-                infoCount++;
-            }
-
-            // 모든 리스트가 5개씩 채워지면 종료
-            if (freeCount == 5 && qnaCount == 5 && noticeCount == 5 && infoCount == 5) {
-                break;
-            }
-        }
+//        for (PostTitle post : allPosts) {
+//            if (post.getPostType().equals("FREE") && freeCount < 5) {
+//                latestPosts.getFreeList().add(new FreeTitle(post.getId(), post.getTitle()));
+//                freeCount++;
+//            } else if (post.getPostType().equals("QNA") && qnaCount < 5) {
+//                latestPosts.getQnaList().add(new QnaTitle(post.getId(), post.getTitle()));
+//                qnaCount++;
+//            } else if (post.getPostType().equals("NOTICE") && noticeCount < 5) {
+//                latestPosts.getNoticeList().add(new NoticeTitle(post.getId(), post.getTitle()));
+//                noticeCount++;
+//            } else if (post.getPostType().equals("INFO") && infoCount < 5) {
+//                latestPosts.getInfoList().add(new InfoTitle(post.getId(), post.getTitle()));
+//                infoCount++;
+//            }
+//
+//            // 모든 리스트가 5개씩 채워지면 종료
+//            if (freeCount == 5 && qnaCount == 5 && noticeCount == 5 && infoCount == 5) {
+//                break;
+//            }
+//        }
 
         return latestPosts;
 
@@ -162,7 +167,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                         post.title,
                         post.user.nickname,
                         post.createdTime,
-                        post.viewCount,
+                        post.hits,
                         comment.id.count().as("commentNum"),
                         recommendation.id.count().as("recommendedNumber")
                 ))
@@ -170,7 +175,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                 .join(post.user)
                 .leftJoin(comment).on(comment.post.id.eq(post.id))
                 .leftJoin(recommendation).on(recommendation.post.id.eq(post.id))
-                .groupBy(post.id, post.title, post.user.nickname, post.createdTime, post.viewCount)
+                .groupBy(post.id, post.title, post.user.nickname, post.createdTime, post.hits)
                 .where(post.postType.eq(postType))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -200,7 +205,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                         post.title,
                         post.user.nickname,
                         post.createdTime,
-                        post.viewCount
+                        post.hits
                 ))
                 .from(post)
                 .join(post.user)
@@ -221,8 +226,44 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
     }
 
     @Override
+    public Page<PostListDTO> findPostsOrderByRecommendation(Pageable pageable, PostType postType) {
+
+        List<PostListDTO> content = queryFactory
+                .select(Projections.constructor(PostListDTO.class,
+                        post.id,
+                        post.title,
+                        post.user.nickname,
+                        post.createdTime,
+                        post.hits,
+                        recommendation.id.countDistinct().as("recommendedNumber")
+                ))
+                .from(post)
+                .join(post.user)
+                .leftJoin(recommendation).on(recommendation.post.id.eq(post.id))
+                .where(post.postType.eq(postType))
+                .groupBy(post.id, post.title, post.user.nickname, post.createdTime, post.hits)
+                .orderBy(postSort(pageable))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        JPAQuery<Long> countQuery = queryFactory
+                .select(post.count())
+                .from(post)
+                .where(post.postType.eq(postType));
+
+        return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
+    }
+
+
+
+    @Override
     public Map<Long, Long> countCommentsByPostIds(List<Long> ids) {
         QComment comment = QComment.comment1;
+
+        if (ids == null || ids.isEmpty()) {
+            return Collections.emptyMap();
+        }
 
         return queryFactory
                 .select(post.id, comment.id.count())
@@ -240,6 +281,11 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
 
     @Override
     public Map<Long, Long> countRecommendationsByPostIds(List<Long> ids) {
+
+        if (ids == null || ids.isEmpty()) {
+            return Collections.emptyMap();
+        }
+
         return queryFactory
                 .select(post.id, recommendation.id.count())
                 .from(recommendation)
@@ -270,7 +316,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                                 postReport.count().as("reposts")))
                 .from(post)
                 .leftJoin(postReport).on(post.id.eq(postReport.post.id))
-                .groupBy(post.id)
+                .groupBy(post.id, post.title, post.user.loginId, post.user.nickname)
                 .having(postReport.count().goe(10L))
                 .orderBy(postReport.count().desc())
                 .offset(pageable.getOffset())
@@ -303,20 +349,20 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                         post.title.as("title"),
                         post.content.as("content"),
                         post.createdTime.as("createTime"),
-                        post.viewCount.as("viewCount"),
+                        post.hits.as("hits"),
                         recommendation.id.countDistinct().as("recommendedNumber")
                 ))
                 .from(post)
                 .leftJoin(post.user)
                 .leftJoin(recommendation).on(recommendation.post.id.eq(post.id))
                 .where(post.id.eq(postId))
-                .groupBy(post.id, post.user.nickname, post.title, post.content, post.createdTime, post.viewCount)
+                .groupBy(post.id, post.user.nickname, post.title, post.content, post.createdTime, post.hits)
                 .fetchOne();
 
 
         if (postReadDTO != null) {
             queryFactory.update(post)
-                    .set(post.viewCount, post.viewCount.add(1))
+                    .set(post.hits, post.hits.add(1))
                     .where(post.id.eq(postId))
                     .execute();
         }
@@ -333,7 +379,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
 
         List<Tuple> result = queryFactory.select(
                         post.id,
-                        post.viewCount,
+                        post.hits,
                         post.createdTime,
                         recommendation.id.countDistinct()
                 )
@@ -341,7 +387,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                 .where(post.id.in(ids))
                 .leftJoin(comment).on(comment.post.id.eq(post.id))
                 .leftJoin(recommendation).on(recommendation.post.id.eq(post.id))
-                .groupBy(post.id, post.title, post.user.nickname, post.createdTime, post.viewCount)
+                .groupBy(post.id, post.title, post.user.nickname, post.createdTime, post.hits)
                 .fetch();
 
         return result.stream()
@@ -350,7 +396,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                         tuple -> new SearchInfo(
                                 tuple.get(post.id),
                                 tuple.get(post.createdTime),
-                                tuple.get(post.viewCount),
+                                tuple.get(post.hits),
                                 tuple.get(recommendation.id.countDistinct()))
                 ));
 
@@ -361,26 +407,84 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
         return null;
     }
 
+    @Transactional
+    public void bulkUpdateViewCounts(Map<Long, Integer> viewCountMap) {
 
-    private OrderSpecifier<?> postSort(Pageable page) {
+        if (viewCountMap.isEmpty()) return;
 
-        if (!page.getSort().isEmpty()) {
+        StringBuilder sql = new StringBuilder();
+        sql.append("UPDATE post SET hits = hits + CASE id ");
 
-            for (Sort.Order order : page.getSort()) {
+        for (Long postId : viewCountMap.keySet()) {
+            sql.append(" WHEN ")
+                    .append(postId)
+                    .append(" THEN ")
+                    .append(viewCountMap.get(postId));
+        }
+
+        sql.append(" END WHERE id IN (");
+
+        String ids = viewCountMap.keySet()
+                .stream()
+                .map(String::valueOf)
+                .collect(Collectors.joining(","));
+
+        sql.append(ids).append(")");
+
+        em.createNativeQuery(sql.toString()).executeUpdate();
+    }
 
 
-                switch (order.getProperty()){
-                    case "createdTime":
-                        return new OrderSpecifier<>(Order.DESC, post.createdTime);
-                    case "viewCount":
-                        return new OrderSpecifier<>(Order.DESC, post.viewCount);
-                    case "recommendedNumber":
-                        return new OrderSpecifier<>(Order.DESC, recommendation.count());
-                }
+//    private OrderSpecifier<?> postSort(Pageable page) {
+//
+//        if (!page.getSort().isEmpty()) {
+//
+//            for (Sort.Order order : page.getSort()) {
+//
+//
+//                switch (order.getProperty()){
+//                    case SORT_CREATED_TIME:
+//                        return new OrderSpecifier<>(Order.DESC, post.createdTime);
+//                    case SORT_HITS:
+//                        return new OrderSpecifier<>(Order.DESC, post.hits);
+//                    case SORT_RECOMMENDED_NUMBER:
+//                        return new OrderSpecifier<>(Order.DESC, recommendation.count());
+//                }
+//            }
+//        }
+//        return new OrderSpecifier<>(Order.DESC, post.createdTime);
+//    }
+
+    private OrderSpecifier<?>[] postSort(Pageable pageable) {
+        List<OrderSpecifier<?>> orders = new ArrayList<>();
+
+        if (pageable.getSort().isEmpty()) {
+            return new OrderSpecifier[]{
+                    new OrderSpecifier<>(Order.DESC, post.createdTime),
+                    new OrderSpecifier<>(Order.DESC, post.id)
+            };
+        }
+
+        for (Sort.Order sortOrder : pageable.getSort()) {
+
+            switch (sortOrder.getProperty()) {
+                case SORT_CREATED_TIME:
+                    orders.add(new OrderSpecifier<>(Order.DESC, post.createdTime));
+                    break;
+                case SORT_HITS:
+                    orders.add(new OrderSpecifier<>(Order.DESC, post.hits));
+                    break;
+                case SORT_RECOMMENDED_NUMBER:
+                    orders.add(new OrderSpecifier<>(Order.DESC, recommendation.id.count()));
+                    break;
             }
         }
-        return new OrderSpecifier<>(Order.DESC, post.createdTime);
+
+        orders.add(new OrderSpecifier<>(Order.DESC, post.id));
+        return orders.toArray(new OrderSpecifier[0]);
     }
+
+
 
 
 

@@ -10,6 +10,7 @@ import jakarta.validation.constraints.NotEmpty;
 public class PostWriteDTO {
 
 
+
     @NotNull(message = "타입을 지정해주세요.")
     private PostType postType;
 

@@ -9,7 +9,7 @@ textarea {
 
 
 .read{
-    word-wrap: break-word; /* 단어 단위로 자동 개행 */
+    word-wrap: break-word;
     overflow-wrap: break-word;
     height: auto;
     min-height: 400px;
