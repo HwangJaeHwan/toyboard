@@ -6,7 +6,7 @@
 ## 🛠 기술 스택
 
 ### Backend
-Java · Spring Boot · Spring Data JPA
+Java · Spring Boot · Spring Data JPA · 
 Elasticsearch · MySQL · Jenkins · Redis 
 
 ### Frontend
