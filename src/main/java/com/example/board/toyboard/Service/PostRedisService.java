@@ -41,7 +41,7 @@ public class PostRedisService {
         if (check != null && check == 1L) {
 
             redisTemplate.opsForHash()
-                    .increment("post:REDIS_VIEW_COUNT_KEY", String.valueOf(userId), 1);
+                    .increment(REDIS_VIEW_COUNT_KEY, String.valueOf(postId), 1);
             redisTemplate.expire(postKey, Duration.ofHours(3));
             recordPopularPostView(postId);
 
