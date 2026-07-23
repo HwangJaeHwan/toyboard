@@ -1,24 +1,12 @@
-<!DOCTYPE html>
-<html lang="en" th:fragment="layout(content)" xmlns:th="http://www.thymeleaf.org">
-
-<head>
-    <meta charset="utf-8">
-    <link href="../../static/css/bootstrap.min.css" th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
-    <link href="../../static/css/style.css" th:href="@{/css/style.css}" rel="stylesheet">
-</head>
-
-<body style="height: 100vh">
-    <div style="height: 100vh" class="flex-c justify-content-center align-items-center">
-        <h2 class="text-center" >요청하신 페이지를 찾을 수 없습니다.</h2>
-        <div class="text-center" >
-            <br><br>
-            <p>방문하시려는 페이지의 주소가 잘못 입력되었거나,<br />페이지의 주소가 변경 혹은 삭제되어 요청하신 페이지를 찾을 수 없습니다.</p>
-            <p>감사합니다.</p>
-            <br><br>
-            <a class="btn-success" href="/">메인으로</a>
+﻿<!DOCTYPE html>
+<html lang="ko" th:replace="~{layout/base :: layout(~{::content})}" xmlns:th="http://www.thymeleaf.org">
+<div th:fragment="content">
+    <div class="page-panel text-center">
+        <h1 class="page-title">페이지를 찾을 수 없습니다</h1>
+        <p class="page-subtitle">주소가 변경되었거나 삭제된 페이지입니다.</p>
+        <div class="mt-4">
+            <a class="btn btn-primary" th:href="@{/}">메인으로</a>
         </div>
     </div>
-</body>
-
-
+</div>
 </html>

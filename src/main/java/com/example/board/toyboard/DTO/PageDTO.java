@@ -3,6 +3,8 @@ package com.example.board.toyboard.DTO;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -27,7 +29,11 @@ public class PageDTO<DTO> {
         dtoList = dto.getContent();
 
 
-        pageInfo = PageHelper.makePageList(dto.getPageable(), totalPage);
+        Pageable pageable = dto.getPageable().isPaged()
+                ? dto.getPageable()
+                : PageRequest.of(0, Math.max(dto.getSize(), 1));
+
+        pageInfo = PageHelper.makePageList(pageable, totalPage);
     }
 
 }

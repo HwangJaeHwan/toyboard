@@ -1,4 +1,4 @@
-package com.example.board.toyboard.Config;
+package com.example.board.toyboard.config;
 
 import com.example.board.toyboard.interceptor.CheckUrlInterceptor;
 import com.example.board.toyboard.interceptor.LoginInterceptor;
@@ -25,7 +25,11 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addInterceptor(new LoginInterceptor())
                 .order(2)
                 .addPathPatterns("/**")
-                .excludePathPatterns("/css/**", "/*.ico", "/summernote/**", "/jquery/**", "/error", "/login", "/logout", "/register", "/post","/","/**/*.png","/home");
+                .excludePathPatterns(
+                        "/css/**", "/*.ico", "/summernote/**", "/jquery/**",
+                        "/error", "/login", "/logout", "/register", "/", "/home",
+                        "/posts", "/posts/", "/posts/search", "/posts/write",
+                        "/posts/image", "/posts/image/**", "/**/*.png");
     }
 
 

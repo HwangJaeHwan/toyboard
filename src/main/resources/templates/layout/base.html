@@ -1,73 +1,46 @@
-<!DOCTYPE html>
-<html lang="en" th:fragment="layout(content)" xmlns:th="http://www.thymeleaf.org">
-
+﻿<!DOCTYPE html>
+<html lang="ko" th:fragment="layout(content)" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Toyboard</title>
     <link href="../../static/css/bootstrap.min.css" th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
     <link href="../../static/css/style.css" th:href="@{/css/style.css}" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/summernote/summernote-lite.css}">
     <script th:src="@{/jquery/jquery.min.js}"></script>
-
-    <script  th:src="@{/summernote/summernote-lite.js}"></script>
+    <script th:src="@{/summernote/summernote-lite.js}"></script>
     <script th:src="@{/summernote/summernote-ko-KR.js}"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <link rel="stylesheet" th:href="@{/summernote/summernote-lite.css}">
-
-
-
 </head>
-
-
 <body>
-
-
-    <div th:if="${session.loginUser == null}" class="flex-box justify-content-center">
-        <div class="flex-box justify-content-end w80">
-        <a class="text-right makeBlock margin-right-10" href="#" th:href="@{/register}">회원가입</a>
-        <a class="text-right makeBlock" href="#" th:href="@{/login}">로그인</a>
+<header class="app-header">
+    <nav class="app-navbar">
+        <div class="container app-nav-container">
+            <div class="app-nav-left">
+                <a class="navbar-brand fw-bold" th:href="@{/}">Toyboard</a>
+            </div>
+            <ul class="app-nav-menu">
+                <li><a class="nav-link" th:href="@{/posts(postType='NOTICE')}">공지사항</a></li>
+                <li><a class="nav-link" th:href="@{/posts(postType='FREE')}">자유게시판</a></li>
+                <li><a class="nav-link" th:href="@{/posts(postType='INFO')}">정보게시판</a></li>
+                <li><a class="nav-link" th:href="@{/posts(postType='QNA')}">Q&amp;A</a></li>
+            </ul>
+            <div class="app-nav-actions" th:if="${session.loginUser == null}">
+                <a class="btn btn-outline-secondary btn-sm" th:href="@{/register}">회원가입</a>
+                <a class="btn btn-primary btn-sm" th:href="@{/login}">로그인</a>
+            </div>
+            <div class="app-nav-actions" th:if="${session.loginUser != null}">
+                <a class="user-chip" th:href="@{/mypage}" th:text="${session.loginUser.nickname}">사용자</a>
+                <a class="btn btn-outline-secondary btn-sm" th:href="@{/logout}">로그아웃</a>
+            </div>
         </div>
-    </div>
+    </nav>
+</header>
 
-    <div th:if="${session.loginUser != null}" class="flex-box justify-content-center">
-        <div class="flex-box justify-content-end w80">
-            <a class="text-right makeBlock margin-right-10" href="#" th:href="@{/mypage}" th:text="${session.loginUser.nickname}">닉네임</a>
-            <a class="text-right makeBlock" href="#" th:href="@{/logout}">로그아웃</a>
-        </div>
-    </div>
-
-
-
-    <br>
-        <div class="flex-box justify-content-center">
-
-                <a class="w20 text-center makeBlock btn-info" href="/posts?postType=NOTICE">공지사항</a>
-                <a class="w20 text-center makeBlock btn-info" href="/posts?postType=FREE">자유 게시판</a>
-                <a  class="w20 text-center makeBlock btn-info" href="/posts?postType=INFO">정보 게시판</a>
-                <a  class="w20 text-center makeBlock btn-info" href="/posts?postType=QNA">Q&A</a>
-
-        </div>
-
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-
+<main class="container app-main">
     <div th:replace="${content}">
-        <span>내용</span>
+        <span>content</span>
     </div>
-
-
-
+</main>
 </body>
-
-
-
-
-
-
-
-
 </html>

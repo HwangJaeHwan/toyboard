@@ -1,0 +1,12 @@
+﻿<!DOCTYPE html>
+<html lang="ko" th:replace="~{layout/base :: layout(~{::content})}" xmlns:th="http://www.thymeleaf.org">
+<div th:fragment="content">
+    <div class="page-panel text-center">
+        <h1 class="page-title">요청을 처리할 수 없습니다</h1>
+        <p class="page-subtitle" th:text="${message != null ? message : '잘못된 요청입니다.'}">잘못된 요청입니다.</p>
+        <div class="mt-4">
+            <a class="btn btn-primary" th:href="@{/}">메인으로</a>
+        </div>
+    </div>
+</div>
+</html>

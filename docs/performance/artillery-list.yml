@@ -1,0 +1,53 @@
+config:
+  target: "http://localhost:8080"
+  phases:
+    - name: warm-up
+      duration: 60
+      arrivalRate: 2
+      rampTo: 5
+    - name: steady-list-load
+      duration: 180
+      arrivalRate: 10
+  http:
+    timeout: 10
+  variables:
+    postTypes:
+      - FREE
+      - NOTICE
+      - INFO
+      - QNA
+  ensure:
+    thresholds:
+      - http.response_time.p95: 1200
+      - http.response_time.p99: 2500
+      - http.codes.5xx: 0
+
+scenarios:
+  - name: "Latest post list"
+    weight: 70
+    flow:
+      - get:
+          name: "list: latest posts using indexed pagination"
+          url: "/posts"
+          qs:
+            postType: "{{ postTypes }}"
+            sort: "createdTime"
+            page: "{{ $randomNumber(1, 20) }}"
+          expect:
+            - statusCode: 200
+      - think: 1
+
+  - name: "Popular-by-hit post list"
+    weight: 30
+    flow:
+      - get:
+          name: "list: hit sorted posts"
+          url: "/posts"
+          qs:
+            postType: "{{ postTypes }}"
+            sort: "hits"
+            page: "{{ $randomNumber(1, 20) }}"
+          expect:
+            - statusCode: 200
+      - think: 1
+

@@ -1,80 +1,62 @@
-<!DOCTYPE html>
-<html lang="en" th:replace="~{layout/base :: layout(~{::content})}" xmlns:th="http://www.thymeleaf.org">
-
-
-<div class="flex-box justify-content-center" th:fragment="content">
-
-    <form action th:object="${post}" method="post" class="flex-c w80 align-items-center">
-
-        <select th:field="*{postType}" class="form-control">
-            <option th:each="postCode: ${postCodes}" th:value="${postCode.postType}"th:text="${postCode.displayName}" ></option>
-        </select>
-        <br>
-
-        <input type="text" class="form-control" placeholder="제목을 입력해주세요." th:field="*{title}">
-        <br>
-
-        <textarea id="summernote" placeholder="내용을 입력해주세요." th:field="*{content}">
-
-        </textarea>
-        <div>
-            <button href="#" class="w-300 btn btn-success" type="submit">수정</button>
-            <a th:href="@{/post/{postId}(postId = ${post.id})}" class="w-300 btn btn-danger">취소</a>
-        </div>
-
-    </form>
-
+﻿<!DOCTYPE html>
+<html lang="ko" th:replace="~{layout/base :: layout(~{::content})}" xmlns:th="http://www.thymeleaf.org">
+<div th:fragment="content">
+    <section class="page-panel form-shell">
+        <h1 class="page-title mb-4">게시글 수정</h1>
+        <form th:object="${post}" method="post">
+            <div class="mb-3">
+                <label class="form-label">게시판</label>
+                <select th:field="*{postType}" class="form-select">
+                    <option th:each="postCode : ${postCodes}" th:value="${postCode.postType}" th:text="${postCode.displayName}"></option>
+                </select>
+                <p th:errors="*{postType}" class="field-error">게시판 오류</p>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">제목</label>
+                <input type="text" class="form-control" th:field="*{title}" placeholder="제목을 입력하세요">
+                <p th:errors="*{title}" class="field-error">제목 오류</p>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">내용</label>
+                <textarea id="summernote" th:field="*{content}"></textarea>
+                <p th:errors="*{content}" class="field-error">내용 오류</p>
+            </div>
+            <div class="d-flex justify-content-end gap-2">
+                <a class="btn btn-outline-secondary" th:href="@{/posts/{id}(id=${post.id})}">취소</a>
+                <button class="btn btn-primary" type="submit">수정</button>
+            </div>
+        </form>
+    </section>
 
     <script>
-
         $(document).ready(function() {
-            //여기 아래 부분
             $('#summernote').summernote({
                 width: '100%',
-                height: 500,                 // 에디터 높이
-                lang: "ko-KR",					// 한글 설정
-                callbacks : {
+                height: 420,
+                lang: 'ko-KR',
+                callbacks: {
                     onImageUpload: function(files) {
-                        uploadSummernoteImageFile(files[0],this);
-                    },
-
+                        uploadSummernoteImageFile(files[0], this);
+                    }
                 },
-                placeholder: '최대 2048자까지 쓸 수 있습니다'	//placeholder 설정
-
+                placeholder: '내용을 입력하세요'
             });
         });
 
         function uploadSummernoteImageFile(file, editor) {
-
-            let data = new FormData();
-            data.append("file", file);
-
+            const data = new FormData();
+            data.append('file', file);
             $.ajax({
-                data : data,
-                type : "POST",
-                url : "/posts/image",
-                contentType : false,
-                processData : false,
-                success : function(data) {
-                    //항상 업로드된 파일의 url이 있어야 한다.
-                    console.log(data);
-                    $(editor).summernote('insertImage', data);
+                data: data,
+                type: 'POST',
+                url: '/posts/image',
+                contentType: false,
+                processData: false,
+                success: function(url) {
+                    $(editor).summernote('insertImage', url);
                 }
             });
         }
-
-
     </script>
-
-
-
 </div>
-
-
-
-
-
-
-
-
 </html>

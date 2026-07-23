@@ -36,7 +36,8 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'org.springframework.security:spring-security-core'
-	compileOnly 'org.projectlombok:lombok'
+    testImplementation 'junit:junit:4.13.1'
+    compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'com.h2database:h2'
 //	 https://mvnrepository.com/artifact/com.mysql/mysql-connector-j
 	implementation 'com.mysql:mysql-connector-j'

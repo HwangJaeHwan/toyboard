@@ -1,5 +1,6 @@
 package com.example.board.toyboard.resolver;
 
+import com.example.board.toyboard.exception.AuthException;
 import com.example.board.toyboard.session.SessionConst;
 import com.example.board.toyboard.session.UserSession;
 import jakarta.servlet.http.HttpServletRequest;
@@ -26,13 +27,13 @@ public class LoginResolver implements HandlerMethodArgumentResolver {
         HttpSession session = request.getSession(false);
 
         if (session == null) {
-            throw new RuntimeException("세션이 존재하지 않습니다.");
+            throw new AuthException();
         }
 
         Object loginUser = session.getAttribute(SessionConst.LOGIN_USER);
 
         if (loginUser == null) {
-            throw new RuntimeException("로그인 사용자가 없습니다.");
+            throw new AuthException();
         }
 
         return loginUser;

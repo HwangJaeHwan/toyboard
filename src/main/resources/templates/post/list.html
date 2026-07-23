@@ -1,127 +1,87 @@
-<!DOCTYPE html>
-<html lang="en" th:replace="~{layout/base :: layout(~{::content})}" xmlns:th="http://www.thymeleaf.org">
-
-<div class="flex-c align-items-center" th:fragment="content">
-
-
-    <div class="flex-box w80 justify-content-space-between">
-
-        <!-- 정렬 -->
-        <div>
-
-            <a th:if="${#strings.isEmpty(searchDTO.content)}"
-               th:href="@{/posts(postType=${postType},sort='createTime')}">최신순</a>
-            <a th:unless="${#strings.isEmpty(searchDTO.content)}"
-               th:href="@{/search(type=${searchDTO.type},content=${searchDTO.content},postType=${postType},sort='createTime')}">최신순</a>
-
-            <a th:if="${#strings.isEmpty(searchDTO.content)}"
-               th:href="@{/posts(postType=${postType},sort='viewCount')}">조회순</a>
-            <a th:unless="${#strings.isEmpty(searchDTO.content)}"
-               th:href="@{/search(type=${searchDTO.type},content=${searchDTO.content},postType=${postType},sort='viewCount')}">조회순</a>
-
-            <a th:if="${#strings.isEmpty(searchDTO.content)}"
-               th:href="@{/posts(postType=${postType},sort='recommendedNumber')}">추천순</a>
-            <a th:unless="${#strings.isEmpty(searchDTO.content)}"
-               th:href="@{/search(type=${searchDTO.type},content=${searchDTO.content},postType=${postType},sort='recommendedNumber')}">추천순</a>
-
+﻿<!DOCTYPE html>
+<html lang="ko" th:replace="~{layout/base :: layout(~{::content})}" xmlns:th="http://www.thymeleaf.org">
+<div th:fragment="content" class="board-page">
+    <section class="page-panel board-head-panel">
+        <div class="toolbar">
+            <div>
+                <span class="eyebrow">Board</span>
+                <h1 class="page-title" th:text="${postType} + ' 게시판'">게시판</h1>
+                <p class="page-subtitle">게시글을 검색하고 정렬할 수 있습니다.</p>
+            </div>
+            <a class="btn btn-primary btn-write" th:href="@{/posts/write}">글쓰기</a>
         </div>
 
-        <!-- 검색 폼 -->
-        <form class="flex-box" th:action="@{/post/search}" method="get">
-            <div style="vertical-align: bottom" class="text-center">
-                <label class="radio-inline">
-                    <input type="radio" name="type" value="TITLE"
-                           th:checked="${searchDTO != null and searchDTO.type == 'TITLE'}"> 제목
-                </label>
-
-                <label class="radio-inline">
-                    <input type="radio" name="type" value="NICKNAME"
-                           th:checked="${searchDTO != null and searchDTO.type == 'NICKNAME'}"> 작성자
-                </label>
-
-                <label class="radio-inline">
-                    <input type="radio" name="type" value="CONTENT"
-                           th:checked="${searchDTO != null and searchDTO.type == 'CONTENT'}"> 내용
-                </label>
-
-                <label class="radio-inline">
-                    <input type="radio" name="type" value="TITLE_CONTENT"
-                           th:checked="${searchDTO != null and searchDTO.type == 'TITLE_CONTENT'}"> 제목+내용
-                </label>
+        <div class="toolbar">
+            <div class="sort-tabs">
+                <a th:href="@{/posts(postType=${postType},sort='createdTime')}" th:if="${searchDTO == null or #strings.isEmpty(searchDTO.content)}">최신순</a>
+                <a th:href="@{/posts/search(type=${searchDTO.type},content=${searchDTO.content},postType=${postType},sort='createdTime')}" th:unless="${searchDTO == null or #strings.isEmpty(searchDTO.content)}">최신순</a>
+                <a th:href="@{/posts(postType=${postType},sort='hits')}" th:if="${searchDTO == null or #strings.isEmpty(searchDTO.content)}">조회순</a>
+                <a th:href="@{/posts/search(type=${searchDTO.type},content=${searchDTO.content},postType=${postType},sort='hits')}" th:unless="${searchDTO == null or #strings.isEmpty(searchDTO.content)}">조회순</a>
+                <a th:href="@{/posts(postType=${postType},sort='recommendedNumber')}" th:if="${searchDTO == null or #strings.isEmpty(searchDTO.content)}">추천순</a>
+                <a th:href="@{/posts/search(type=${searchDTO.type},content=${searchDTO.content},postType=${postType},sort='recommendedNumber')}" th:unless="${searchDTO == null or #strings.isEmpty(searchDTO.content)}">추천순</a>
             </div>
 
-            <input type="text" class="w20 form-control" name="content"
-                   th:value="${searchDTO != null ? searchDTO.content : ''}" placeholder="검색어 입력">
-            <input type="hidden" name="postType" th:value="${postType}">
-            <button class="col-md-1 btn btn-primary" type="submit">검색</button>
-        </form>
-    </div>
+            <form class="search-form" th:action="@{/posts/search}" method="get">
+                <select class="form-select form-select-sm" name="type" style="width: 150px;">
+                    <option value="TITLE" th:selected="${searchDTO != null and searchDTO.type != null and searchDTO.type.name() == 'TITLE'}">제목</option>
+                    <option value="CONTENT" th:selected="${searchDTO != null and searchDTO.type != null and searchDTO.type.name() == 'CONTENT'}">내용</option>
+                    <option value="NICKNAME" th:selected="${searchDTO != null and searchDTO.type != null and searchDTO.type.name() == 'NICKNAME'}">작성자</option>
+                    <option value="TITLE_CONTENT" th:selected="${searchDTO != null and searchDTO.type != null and searchDTO.type.name() == 'TITLE_CONTENT'}">제목+내용</option>
+                </select>
+                <input type="text" class="form-control form-control-sm" name="content" th:value="${searchDTO != null ? searchDTO.content : ''}" placeholder="검색어" style="width: 220px;">
+                <input type="hidden" name="postType" th:value="${postType}">
+                <input type="hidden" name="sort" th:value="${sort}">
+                <button class="btn btn-outline-primary btn-sm" type="submit">검색</button>
+            </form>
+        </div>
+    </section>
 
-    <!-- 게시판 테이블 -->
-    <table class="table table-bordered w80">
-        <thead>
-        <tr>
-            <th scope="col" class="col-md-6 text-center">제목</th>
-            <th scope="col" class="col-md-2 text-center">글쓴이</th>
-            <th scope="col" class="col-md-2 text-center">날짜</th>
-            <th scope="col" class="col-md-1 text-center">조회수</th>
-            <th scope="col" class="col-md-1 text-center">추천</th>
-        </tr>
-        </thead>
+    <section class="page-panel table-card community-table-card">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle community-table">
+                <thead>
+                <tr>
+                    <th class="text-center post-id-col">번호</th>
+                    <th>제목</th>
+                    <th class="text-center">작성자</th>
+                    <th class="text-center">작성일</th>
+                    <th class="text-center">조회</th>
+                    <th class="text-center">추천</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="post : ${posts.dtoList}">
+                    <td class="text-center post-id-col" th:text="${post.id}">1</td>
+                    <td>
+                        <a class="post-title-link" th:href="@{/posts/{id}(id=${post.id})}" th:utext="${post.title}">제목</a>
+                        <span class="comment-count" th:if="${post.commentNum != 0}" th:text="|[${post.commentNum}]|"></span>
+                    </td>
+                    <td class="text-center" th:text="${post.nickname}">작성자</td>
+                    <td class="text-center" th:text="${#temporals.format(post.createdTime, 'yyyy/MM/dd HH:mm')}">2026/07/07</td>
+                    <td class="text-center" th:text="${post.hits}">0</td>
+                    <td class="text-center" th:text="${post.recommendedNumber}">0</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="empty-state" th:if="${#lists.isEmpty(posts.dtoList)}">게시글이 없습니다.</div>
+    </section>
 
-        <tbody class="text-center">
-        <tr th:each="post : ${posts.getDtoList()}">
-            <td class="text-left">
-                <a th:href="@{/post/{id}(id=${post.id})}"
-                   th:utext="${post.title}">제목</a>
-                <span th:if="${post.commentNum != 0}"> [[${post.commentNum}]]</span>
-            </td>
-            <td th:text="${post.nickname}">작성자</td>
-            <td th:text="${#temporals.format(post.getCreatedTime, 'yyyy/MM/dd HH:mm')}">2025-01-01</td>
-            <td th:text="${post.viewCount}">1</td>
-            <td th:text="${post.recommendedNumber}">0</td>
-        </tr>
-        </tbody>
-    </table>
-
-    <!-- 글쓰기 버튼 -->
-    <div class="flex-box justify-content-end w80">
-        <a class="btn btn-default" th:href="@{/posts/write}">글쓰기</a>
-    </div>
-
-    <!-- 페이지네이션 -->
-    <nav>
+    <nav class="mt-4" th:if="${posts.pageInfo != null}">
         <ul class="pagination">
             <li th:if="${posts.pageInfo.prev}">
-
-                <a th:if="${#strings.isEmpty(searchDTO.content)}"
-                   th:href="@{/posts(page=${posts.pageInfo.start - 1},postType=${postType},sort=${sort})}" th:text="${num}">&laquo;</a>
-                <a th:unless="${#strings.isEmpty(searchDTO.content)}"
-                   th:href="@{/search(page=${posts.pageInfo.start - 1},type=${searchDTO.type},content=${searchDTO.content},postType=${postType},sort=${sort})}" th:text="${num}">&laquo;</a>
-
-
-            <li th:class="${posts.pageInfo.now == num ? 'active':''}" th:each="num: ${posts.pageInfo.pageList}">
-                <a th:if="${#strings.isEmpty(searchDTO.content)}"
-                   th:href="@{/posts(page=${num},postType=${postType},sort=${sort})}" th:text="${num}"></a>
-                <a th:unless="${#strings.isEmpty(searchDTO.content)}"
-                   th:href="@{/search(page=${num},type=${searchDTO.type},content=${searchDTO.content},postType=${postType},sort=${sort})}" th:text="${num}"></a>
+                <a th:href="@{/posts(page=${posts.pageInfo.start - 1},postType=${postType},sort=${sort})}" th:if="${searchDTO == null or #strings.isEmpty(searchDTO.content)}">&lt;</a>
+                <a th:href="@{/posts/search(page=${posts.pageInfo.start - 1},type=${searchDTO.type},content=${searchDTO.content},postType=${postType},sort=${sort})}" th:unless="${searchDTO == null or #strings.isEmpty(searchDTO.content)}">&lt;</a>
             </li>
-
+            <li th:class="${posts.pageInfo.now == num ? 'active' : ''}" th:each="num : ${posts.pageInfo.pageList}">
+                <a th:href="@{/posts(page=${num},postType=${postType},sort=${sort})}" th:if="${searchDTO == null or #strings.isEmpty(searchDTO.content)}" th:text="${num}">1</a>
+                <a th:href="@{/posts/search(page=${num},type=${searchDTO.type},content=${searchDTO.content},postType=${postType},sort=${sort})}" th:unless="${searchDTO == null or #strings.isEmpty(searchDTO.content)}" th:text="${num}">1</a>
+            </li>
             <li th:if="${posts.pageInfo.next}">
-
-                <a th:if="${#strings.isEmpty(searchDTO.content)}"
-                   th:href="@{/posts(page=${posts.pageInfo.end + 1},postType=${postType},sort=${sort})}"th:text="${num}">&raquo;</a>
-                <a th:unless="${#strings.isEmpty(searchDTO.content)}"
-                   th:href="@{/search(page=${posts.pageInfo.end + 1},type=${searchDTO.type},content=${searchDTO.content},postType=${postType},sort=${sort})}" th:text="${num}">&raquo;</a>
-
-                <a th:if="${#strings.isEmpty(searchDTO.content)}"
-                   th:href="@{/posts(page=${posts.pageInfo.end + 1},postType=${postType},sort=${sort})}" th:text="${num}"></a>
-                <a th:unless="${#strings.isEmpty(searchDTO.content)}"
-                   th:href="@{/posts(page=${posts.pageInfo.end + 1},type=${searchDTO.type},content=${searchDTO.content},postType=${postType},sort=${sort})}" th:text="${num}"></a>
-
+                <a th:href="@{/posts(page=${posts.pageInfo.end + 1},postType=${postType},sort=${sort})}" th:if="${searchDTO == null or #strings.isEmpty(searchDTO.content)}">&gt;</a>
+                <a th:href="@{/posts/search(page=${posts.pageInfo.end + 1},type=${searchDTO.type},content=${searchDTO.content},postType=${postType},sort=${sort})}" th:unless="${searchDTO == null or #strings.isEmpty(searchDTO.content)}">&gt;</a>
             </li>
         </ul>
     </nav>
-
 </div>
 </html>

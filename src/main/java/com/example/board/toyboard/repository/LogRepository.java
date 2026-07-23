@@ -1,0 +1,43 @@
+package com.example.board.toyboard.repository;
+
+import com.example.board.toyboard.entity.Comment;
+import com.example.board.toyboard.entity.post.Post;
+import com.example.board.toyboard.entity.User;
+import com.example.board.toyboard.entity.log.Log;
+import com.example.board.toyboard.entity.log.LogType;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
+import java.util.Optional;
+
+public interface LogRepository extends JpaRepository<Log, Long> {
+
+    @Query(value = "select l from Log l join fetch l.post left join fetch l.comment where l.user = :user order by l.createdTime desc",
+            countQuery = "select count(l) from Log l where l.user = :user")
+    Page<Log> findLogsByUser(@Param("user") User user, Pageable pageable);
+
+    @Query(value = "select l from Log l join l.post where l.user = :user and l.logType = :logType order by l.createdTime desc")
+    Page<Log> findPostLogsByUser(@Param("user") User user, @Param("logType") LogType logType, Pageable pageable);
+
+    Optional<Log> findLogByUserAndCommentAndLogType(User user, Comment comment, LogType type);
+
+    Optional<Log> findLogByUserAndPostAndLogType(User user, Post post,LogType logType);
+
+    void deleteLogByUserAndPostAndLogType(User user, Post post,LogType logType);
+
+    long countLogsByUserId(Long userId);
+
+    long countByUserIdAndLogType(Long userId, LogType logType);
+
+    @Modifying
+    @Query("delete from Log l where l.post = :post")
+    void deleteAllByPost(@Param("post") Post post);
+
+    void deleteAllByComment(Comment comment);
+
+
+}

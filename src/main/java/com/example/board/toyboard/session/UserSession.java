@@ -1,6 +1,6 @@
 package com.example.board.toyboard.session;
 
-import com.example.board.toyboard.Entity.UserType;
+import com.example.board.toyboard.entity.UserType;
 import lombok.Builder;
 import lombok.Getter;
 

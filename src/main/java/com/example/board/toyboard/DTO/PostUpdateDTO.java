@@ -1,7 +1,7 @@
 package com.example.board.toyboard.DTO;
 
-import com.example.board.toyboard.Entity.Post.Post;
-import com.example.board.toyboard.Entity.Post.PostType;
+import com.example.board.toyboard.entity.post.Post;
+import com.example.board.toyboard.entity.post.PostType;
 import lombok.*;
 
 import jakarta.validation.constraints.NotEmpty;
@@ -12,7 +12,6 @@ import jakarta.validation.constraints.NotNull;
 public class PostUpdateDTO {
 
 
-    @NotNull
     private Long id;
 
     @NotNull

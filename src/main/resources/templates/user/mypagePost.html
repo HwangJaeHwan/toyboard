@@ -1,80 +1,40 @@
-<!DOCTYPE html>
-<html lang="en" th:replace="~{layout/base :: layout(~{::content})}" xmlns:th="http://www.thymeleaf.org">
+﻿<!DOCTYPE html>
+<html lang="ko" th:replace="~{layout/base :: layout(~{::content})}" xmlns:th="http://www.thymeleaf.org">
+<div th:fragment="content">
+    <section class="page-panel">
+        <div class="toolbar">
+            <div>
+                <h1 class="page-title" th:text="${myPage.nickname}">닉네임</h1>
+                <p class="page-subtitle">작성 게시글 <strong th:text="${myPage.postNum}">0</strong>개</p>
+            </div>
+            <a class="btn btn-sm btn-light" th:href="@{/mypage/{id}(id=${myPage.userId})}">전체 활동 보기</a>
+        </div>
+    </section>
 
+    <section class="page-panel table-card">
+        <h2 class="section-title">작성글 로그</h2>
+        <table class="table table-hover align-middle">
+            <tbody>
+            <tr th:each="log : ${myPage.logs.dtoList}">
+                <td>
+                    <span th:text="${log.message}">메시지</span>
+                    <div class="text-muted small" th:text="${#temporals.format(log.createTime, 'yyyy/MM/dd HH:mm')}">날짜</div>
+                    <a class="post-title-link" th:href="@{/posts/{id}(id=${log.postId})}" th:text="${log.postTitle}">게시글</a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        <div class="empty-state" th:if="${#lists.isEmpty(myPage.logs.dtoList)}">작성글 로그가 없습니다.</div>
+    </section>
 
-<body>
-
-<div class="flex-c align-items-center" th:fragment="content">
-
-
-
-    <h1 class="margin-bottom-30" th:text="${nickname}"></h1>
-
-    <div class="flex-c text-center margin-bottom-30">
-        <h3>내가 쓴 게시물</h3>
-        <a class="text-size-40" th:href="@{/mypage/{id}/posts(id = ${userId})}" th:text="${postNum}"></a>
-    </div>
-
-    <div class="flex-box justify-content-end w80" th:if="${session.loginUser.equals(nickname)}">
-        <a th:href="@{/mypage/edit}" class="btn btn-info">정보수정</a>
-        <a th:href="@{/mypage/passwordChange}" class="btn btn-success">비밀번호 변경</a>
-    </div>
-
-
-    <table class="table table-bordered w80">
-
-        <tbody class="text-center">
-
-        <tr th:each="log : ${logs.getDtoList()}">
-            <td>
-
-                <div th:if="${log.commentCheck}">
-
-                    <a th:href="@{/mypage/{id}(id=${log.commentWriterId})}" th:text="${log.commentWriter}"></a>
-                    <span th:text="${log.getMessage()}"></span>
-                    <span class="text-size-5 color-grey" th:text="${#temporals.format(log.createTime, 'yyyy/MM/dd HH:mm')}"></span>
-
-                </div>
-                <div th:unless="${log.commentCheck}">
-
-                    <span th:text="${log.getMessage()}"></span>
-                    <span class="text-size-5 color-grey" th:text="${#temporals.format(log.createTime, 'yyyy/MM/dd HH:mm')}"></span>
-
-                </div>
-
-
-                <a th:href="@{/post/{id}(id=${log.postId})}" th:text="${log.getPostTitle}"></a>
-            </td>
-
-
-        </tr>
-        </tbody>
-
-
-
-    </table>
-
-    <nav>
+    <nav class="mt-4" th:if="${myPage.logs.pageInfo != null}">
         <ul class="pagination">
-            <li th:if="${logs.pageInfo.prev}">
-                <a th:href="@{/mypage/{id}/posts(page=${logs.start - 1}, id =${userId})}"><</a>
+            <li th:if="${myPage.logs.pageInfo.prev}"><a th:href="@{/mypage/{id}/posts(id=${myPage.userId},page=${myPage.logs.pageInfo.start - 1})}">&lt;</a></li>
+            <li th:class="${myPage.logs.pageInfo.now == num ? 'active' : ''}" th:each="num : ${myPage.logs.pageInfo.pageList}">
+                <a th:href="@{/mypage/{id}/posts(id=${myPage.userId},page=${num})}" th:text="${num}">1</a>
             </li>
-            <li th:class="${logs.pageInfo.now == num ? 'active':''}" th:each="num: ${logs.pageInfo.pageList}" >
-
-                <a th:href="@{/mypage/{id}/posts(page=${num}, id = ${userId})}" th:text="${num}"></a>
-            </li>
-
-
-            <li th:if="${logs.pageInfo.next}">
-                <a th:href="@{/mypage/{id}/posts(page=${logs.end + 1},id=${userId})}">></a>
-            </li>
+            <li th:if="${myPage.logs.pageInfo.next}"><a th:href="@{/mypage/{id}/posts(id=${myPage.userId},page=${myPage.logs.pageInfo.end + 1})}">&gt;</a></li>
         </ul>
     </nav>
-
-
-
 </div>
-
-
-</body>
 </html>

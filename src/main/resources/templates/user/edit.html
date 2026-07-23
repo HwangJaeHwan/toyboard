@@ -1,31 +1,16 @@
-<!DOCTYPE html>
-<html lang="en" th:replace="~{layout/base :: layout(~{::content})}" xmlns:th="http://www.thymeleaf.org">
-
-
-
-<div class="flex-box justify-content-center align-items-center" th:fragment="content">
-
-    <div class="flex-c h-800 justify-content-center align-items-center">
-
-        <h2>닉네임 변경</h2>
-        <br>
-
-
-        <form action method="post" th:object="${user}">
-            <div class="w-300">
-                <input class="login-input" type="text" placeholder="닉네임" th:field="*{nickname}">
+﻿<!DOCTYPE html>
+<html lang="ko" th:replace="~{layout/base :: layout(~{::content})}" xmlns:th="http://www.thymeleaf.org">
+<div th:fragment="content">
+    <section class="page-panel auth-shell">
+        <h1 class="page-title mb-4">닉네임 변경</h1>
+        <form method="post" th:object="${user}">
+            <div class="mb-4">
+                <label class="form-label">닉네임</label>
+                <input class="form-control" type="text" th:field="*{nickname}" placeholder="새 닉네임">
                 <p th:errors="*{nickname}" class="field-error">닉네임 오류</p>
             </div>
-            <br>
-            <br>
-
-
-            <button class="w-300 btn btn-primary" type="submit">닉네임 변경</button>
+            <button class="btn btn-primary w-100" type="submit">변경하기</button>
         </form>
-
-    </div>
+    </section>
 </div>
-
-
-
 </html>

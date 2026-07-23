@@ -1,0 +1,50 @@
+# Run this only after Elasticsearch has been indexed with the same post data.
+# The SQL seed inserts directly into MySQL, so it does not automatically create ES documents.
+config:
+  target: "http://localhost:8080"
+  phases:
+    - name: warm-up
+      duration: 60
+      arrivalRate: 1
+      rampTo: 3
+    - name: steady-search-load
+      duration: 180
+      arrivalRate: 5
+  http:
+    timeout: 10
+  variables:
+    postTypes:
+      - FREE
+      - NOTICE
+      - INFO
+      - QNA
+    keywords:
+      - "performance"
+      - "spring"
+      - "querydsl"
+      - "redis"
+      - "elasticsearch"
+      - "board"
+  ensure:
+    thresholds:
+      - http.response_time.p95: 1500
+      - http.response_time.p99: 3000
+      - http.codes.5xx: 0
+
+scenarios:
+  - name: "Search posts"
+    weight: 100
+    flow:
+      - get:
+          name: "search: keyword posts"
+          url: "/posts/search"
+          qs:
+            postType: "{{ postTypes }}"
+            sort: "createdTime"
+            page: "{{ $randomNumber(1, 10) }}"
+            type: "TITLE_CONTENT"
+            content: "{{ keywords }}"
+          expect:
+            - statusCode: 200
+      - think: 1
+

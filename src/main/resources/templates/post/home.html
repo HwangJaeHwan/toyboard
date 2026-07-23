@@ -1,86 +1,88 @@
-<!DOCTYPE html>
-<html lang="en" th:replace="~{layout/base :: layout(~{::content})}" xmlns:th="http://www.thymeleaf.org">
-
-<div class="flex-c align-items-center" th:fragment="content">
-
-    <div class="row w80">
-
-        <!-- 메인 게시판들 (공지, 자유, 정보, Q&A) -->
-        <div class="col-md-8">
-
-            <!-- 공지사항 -->
-            <table class="table table-hover">
-                <thead>
-                <tr>
-                    <th scope="col" class="text-center">공지사항</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr th:each="post : ${latestPosts.notice}">
-                    <td><a th:href="@{/posts/{id}(id=${post.id})}" th:text="${post.title}"></a></td>
-                </tr>
-                </tbody>
-            </table>
-
-            <!-- 자유게시판 -->
-            <table class="table table-hover">
-                <thead>
-                <tr>
-                    <th scope="col" class="text-center">자유게시판</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr th:each="post : ${latestPosts.free}">
-                    <td><a th:href="@{/posts/{id}(id=${post.id})}" th:text="${post.title}"></a></td>
-                </tr>
-                </tbody>
-            </table>
-
-            <!-- 정보게시판 -->
-            <table class="table table-hover">
-                <thead>
-                <tr>
-                    <th scope="col" class="text-center">정보게시판</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr th:each="post : ${latestPosts.info}">
-                    <td><a th:href="@{/posts/{id}(id=${post.id})}" th:text="${post.title}"></a></td>
-                </tr>
-                </tbody>
-            </table>
-
-            <!-- Q&A -->
-            <table class="table table-hover">
-                <thead>
-                <tr>
-                    <th scope="col" class="text-center">Q&A</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr th:each="post : ${latestPosts.qna}">
-                    <td><a th:href="@{/posts/{id}(id=${post.id})}" th:text="${post.title}"></a></td>
-                </tr>
-                </tbody>
-            </table>
+﻿<!DOCTYPE html>
+<html lang="ko" th:replace="~{layout/base :: layout(~{::content})}" xmlns:th="http://www.thymeleaf.org">
+<div th:fragment="content" class="home-layout">
+    <section class="page-panel hero-panel">
+        <div class="toolbar hero-toolbar">
+            <div>
+                <span class="eyebrow">Toyboard Community</span>
+                <h1 class="page-title">오늘 올라온 이야기</h1>
+                <p class="page-subtitle">공지, 자유, 정보, Q&amp;A를 한 화면에서 빠르게 확인하세요.</p>
+            </div>
+            <a class="btn btn-primary btn-write" th:href="@{/posts/write}">글쓰기</a>
         </div>
 
-        <!-- 인기 게시판 -->
-        <div class="col-md-4">
-            <table class="table table-hover">
-                <thead>
-                <tr>
-                    <th scope="col" class="text-center">인기 게시판</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr th:each="post : ${popularPost}">
-                    <td><a th:href="@{/posts/{id}(id=${post.id})}" th:text="${post.title}"></a></td>
-                </tr>
-                </tbody>
-            </table>
+        <div class="board-grid">
+            <section class="board-card board-card-notice">
+                <div class="board-card-header">
+                    <h2 class="section-title">공지사항</h2>
+                    <a th:href="@{/posts(postType='NOTICE')}">더보기</a>
+                </div>
+                <ul class="post-list compact-post-list" th:if="${!#lists.isEmpty(latestPosts.noticeList)}">
+                    <li th:each="post : ${latestPosts.noticeList}">
+                        <a th:href="@{/posts/{id}(id=${post.id})}" th:text="${post.title}">제목</a>
+                        <span th:text="|#${post.id}|">#1</span>
+                    </li>
+                </ul>
+                <div class="empty-state" th:if="${#lists.isEmpty(latestPosts.noticeList)}">게시글이 없습니다.</div>
+            </section>
+
+            <section class="board-card">
+                <div class="board-card-header">
+                    <h2 class="section-title">자유게시판</h2>
+                    <a th:href="@{/posts(postType='FREE')}">더보기</a>
+                </div>
+                <ul class="post-list compact-post-list" th:if="${!#lists.isEmpty(latestPosts.freeList)}">
+                    <li th:each="post : ${latestPosts.freeList}">
+                        <a th:href="@{/posts/{id}(id=${post.id})}" th:text="${post.title}">제목</a>
+                        <span th:text="|#${post.id}|">#1</span>
+                    </li>
+                </ul>
+                <div class="empty-state" th:if="${#lists.isEmpty(latestPosts.freeList)}">게시글이 없습니다.</div>
+            </section>
+
+            <section class="board-card">
+                <div class="board-card-header">
+                    <h2 class="section-title">정보게시판</h2>
+                    <a th:href="@{/posts(postType='INFO')}">더보기</a>
+                </div>
+                <ul class="post-list compact-post-list" th:if="${!#lists.isEmpty(latestPosts.infoList)}">
+                    <li th:each="post : ${latestPosts.infoList}">
+                        <a th:href="@{/posts/{id}(id=${post.id})}" th:text="${post.title}">제목</a>
+                        <span th:text="|#${post.id}|">#1</span>
+                    </li>
+                </ul>
+                <div class="empty-state" th:if="${#lists.isEmpty(latestPosts.infoList)}">게시글이 없습니다.</div>
+            </section>
+
+            <section class="board-card">
+                <div class="board-card-header">
+                    <h2 class="section-title">Q&amp;A</h2>
+                    <a th:href="@{/posts(postType='QNA')}">더보기</a>
+                </div>
+                <ul class="post-list compact-post-list" th:if="${!#lists.isEmpty(latestPosts.qnaList)}">
+                    <li th:each="post : ${latestPosts.qnaList}">
+                        <a th:href="@{/posts/{id}(id=${post.id})}" th:text="${post.title}">제목</a>
+                        <span th:text="|#${post.id}|">#1</span>
+                    </li>
+                </ul>
+                <div class="empty-state" th:if="${#lists.isEmpty(latestPosts.qnaList)}">게시글이 없습니다.</div>
+            </section>
         </div>
-    </div>
+    </section>
+
+    <aside class="page-panel ranking-panel">
+        <div class="ranking-header">
+            <span class="eyebrow">Hot Now</span>
+            <h2 class="section-title">인기 게시글</h2>
+            <p>조회 반응이 높은 글을 모았어요.</p>
+        </div>
+        <ol class="rank-list popular-rank-list" th:if="${popularPost != null and !#lists.isEmpty(popularPost)}">
+            <li th:each="post : ${popularPost}">
+                <a class="rank-title" th:href="@{/posts/{id}(id=${post.id})}" th:title="${post.title}" th:text="${post.title}">제목</a>
+                <span class="rank-id" th:text="|#${post.id}|">#1</span>
+            </li>
+        </ol>
+        <div class="empty-state" th:if="${popularPost == null or #lists.isEmpty(popularPost)}">집계된 인기 게시글이 없습니다.</div>
+    </aside>
 </div>
-
 </html>

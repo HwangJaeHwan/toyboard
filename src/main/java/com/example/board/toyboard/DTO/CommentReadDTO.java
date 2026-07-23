@@ -1,6 +1,5 @@
 package com.example.board.toyboard.DTO;
 
-import com.example.board.toyboard.Entity.Comment;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

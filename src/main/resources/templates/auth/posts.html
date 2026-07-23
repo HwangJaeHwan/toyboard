@@ -1,55 +1,43 @@
-<!DOCTYPE html>
-<html lang="en" th:replace="~{layout/base :: layout(~{::content})}" xmlns:th="http://www.thymeleaf.org">
+﻿<!DOCTYPE html>
+<html lang="ko" th:replace="~{layout/base :: layout(~{::content})}" xmlns:th="http://www.thymeleaf.org">
+<div th:fragment="content">
+    <section class="page-panel">
+        <h1 class="page-title">신고 게시글</h1>
+        <p class="page-subtitle">신고 기준을 넘은 게시글 목록입니다.</p>
+    </section>
 
+    <section class="page-panel table-card">
+        <table class="table table-hover align-middle">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>제목</th>
+                <th>로그인 ID</th>
+                <th>닉네임</th>
+                <th class="text-center">신고 수</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="post : ${data.dtoList}">
+                <td th:text="${post.id}">1</td>
+                <td><a class="post-title-link" th:href="@{/posts/{id}(id=${post.id})}" th:text="${post.title}">제목</a></td>
+                <td th:text="${post.userLoginId}">loginId</td>
+                <td th:text="${post.nickname}">nickname</td>
+                <td class="text-center" th:text="${post.reposts}">0</td>
+            </tr>
+            </tbody>
+        </table>
+        <div class="empty-state" th:if="${#lists.isEmpty(data.dtoList)}">신고 게시글이 없습니다.</div>
+    </section>
 
-<div class="flex-c align-items-center" th:fragment="content">
-
-
-
-    <table class="table table-bordered w80">
-        <thead>
-        <tr>
-            <th scope="col" class="col-md-1 text-center">ID</th>
-            <th scope="col" class="col-md-6 text-center">제목</th>
-            <th scope="col" class="col-md-2 text-center">유저 ID</th>
-            <th scope="col" class="col-md-2 text-center">닉네임</th>
-            <th scope="col" class="col-md-1 text-center">신고수</th>
-        </tr>
-        </thead>
-
-        <tbody class="text-center">
-        <tr th:each="post : ${data.getDtoList()}">
-            <td class="text-left" th:text="${post.id}">1</td>
-            <td class="text-left"><a th:href="@{/posts/{id}(id=${post.id})}" th:text="${post.title}"></a> </td>
-            <td th:text="${post.userLoginId}">김갑인</td>
-            <td th:text="${post.nickname}">김갑인</td>
-            <td th:text="${post.reposts}">이메일</td>
-        </tr>
-        </tbody>
-
-    </table>
-
-
-    <nav>
+    <nav class="mt-4" th:if="${data.pageInfo != null}">
         <ul class="pagination">
-            <li th:if="${data.pageInfo.prev}">
-                <a th:if="${#strings.isEmpty(searchDTO.content)}" th:href="@{/auth/posts(page=${data.pageInfo.start - 1})}" th:text="${num}"></a>
-                <a th:unless="${#strings.isEmpty(searchDTO.content)}" th:href="@{/auth/posts(page=${data.pageInfo.start - 1},type=${searchDTO.type},content=${searchDTO.content})}" th:text="${num}"></a>
+            <li th:if="${data.pageInfo.prev}"><a th:href="@{/auth/posts(page=${data.pageInfo.start - 1})}">&lt;</a></li>
+            <li th:class="${data.pageInfo.now == num ? 'active' : ''}" th:each="num : ${data.pageInfo.pageList}">
+                <a th:href="@{/auth/posts(page=${num})}" th:text="${num}">1</a>
             </li>
-            <li th:class="${data.pageInfo.now == num ? 'active':''}" th:each="num: ${data.pageInfo.pageList}" >
-
-                <a th:if="${#strings.isEmpty(searchDTO.content)}" th:href="@{/auth/posts(page=${num})}" th:text="${num}"></a>
-                <a th:unless="${#strings.isEmpty(searchDTO.content)}" th:href="@{/auth/posts(page=${num},type=${searchDTO.type},content=${searchDTO.content})}" th:text="${num}"></a>
-            </li>
-
-
-            <li th:if="${data.pageInfo.next}">
-                <a th:if="${#strings.isEmpty(searchDTO.content)}" th:href="@{/auth/posts(page=${data.pageInfo.end + 1})}" th:text="${num}"></a>
-                <a th:unless="${#strings.isEmpty(searchDTO.content)}" th:href="@{/auth/posts(page=${data.pageInfo.end + 1},type=${searchDTO.type},content=${searchDTO.content})}" th:text="${num}"></a>
-            </li>
+            <li th:if="${data.pageInfo.next}"><a th:href="@{/auth/posts(page=${data.pageInfo.end + 1})}">&gt;</a></li>
         </ul>
     </nav>
-
 </div>
-
 </html>

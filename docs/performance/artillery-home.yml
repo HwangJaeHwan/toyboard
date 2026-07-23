@@ -1,0 +1,29 @@
+config:
+  target: "http://localhost:8080"
+  phases:
+    - name: warm-up
+      duration: 60
+      arrivalRate: 2
+      rampTo: 5
+    - name: steady-home-load
+      duration: 180
+      arrivalRate: 10
+  http:
+    timeout: 10
+  ensure:
+    thresholds:
+      - http.response_time.p95: 1000
+      - http.response_time.p99: 2000
+      - http.codes.5xx: 0
+
+scenarios:
+  - name: "Home latest and popular posts"
+    weight: 100
+    flow:
+      - get:
+          name: "home: redis popular + latest posts"
+          url: "/"
+          expect:
+            - statusCode: 200
+      - think: 1
+

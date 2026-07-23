@@ -1,0 +1,12 @@
+﻿<!DOCTYPE html>
+<html lang="ko" th:replace="~{layout/base :: layout(~{::content})}" xmlns:th="http://www.thymeleaf.org">
+<div th:fragment="content">
+    <div class="page-panel text-center">
+        <h1 class="page-title">서버 오류가 발생했습니다</h1>
+        <p class="page-subtitle">잠시 후 다시 시도해 주세요.</p>
+        <div class="mt-4">
+            <a class="btn btn-primary" th:href="@{/}">메인으로</a>
+        </div>
+    </div>
+</div>
+</html>

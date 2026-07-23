@@ -1,6 +1,6 @@
 package com.example.board.toyboard.DTO;
 
-import com.example.board.toyboard.Entity.User;
+import com.example.board.toyboard.entity.User;
 import lombok.Getter;
 
 @Getter

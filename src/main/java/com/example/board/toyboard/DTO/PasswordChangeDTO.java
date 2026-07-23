@@ -1,10 +1,12 @@
 package com.example.board.toyboard.DTO;
 
+import lombok.Builder;
 import lombok.Data;
 
 import jakarta.validation.constraints.NotEmpty;
 
 @Data
+@Builder
 public class PasswordChangeDTO {
 
     @NotEmpty( message = "현재 비밀번호를 입력해주세요")

@@ -1,6 +1,5 @@
 package com.example.board.toyboard.DTO;
 
-import com.example.board.toyboard.Entity.User;
 import lombok.Data;
 
 import jakarta.validation.constraints.NotEmpty;

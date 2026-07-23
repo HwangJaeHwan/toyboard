@@ -1,7 +1,7 @@
 package com.example.board.toyboard.DTO;
 
-import com.example.board.toyboard.Entity.log.Log;
-import com.example.board.toyboard.Entity.log.LogType;
+import com.example.board.toyboard.entity.log.Log;
+import com.example.board.toyboard.entity.log.LogType;
 import lombok.Data;
 
 import java.time.LocalDateTime;

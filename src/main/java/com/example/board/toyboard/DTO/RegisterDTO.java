@@ -1,12 +1,15 @@
 package com.example.board.toyboard.DTO;
 
 import jakarta.validation.constraints.Pattern;
+import lombok.Builder;
 import lombok.Data;
 
 import jakarta.validation.constraints.NotEmpty;
 
 @Data
+@Builder
 public class RegisterDTO {
+
 
     @NotEmpty(message = "아이디를 입력해주세요")
     @Pattern(regexp="^(?=.*[a-zA-Z0-9]).{5,20}$"
