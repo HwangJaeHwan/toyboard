@@ -263,15 +263,14 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
         }
 
         return queryFactory
-                .select(post.id, comment.id.count())
+                .select(comment.post.id, comment.id.count())
                 .from(comment)
-                .join(comment.post, post)
-                .where(post.id.in(ids))
-                .groupBy(post.id)
+                .where(comment.post.id.in(ids))
+                .groupBy(comment.post.id)
                 .fetch()
                 .stream()
                 .collect(Collectors.toMap(
-                        tuple -> tuple.get(post.id),
+                        tuple -> tuple.get(comment.post.id),
                         tuple -> tuple.get(comment.id.count())
                 ));
     }
@@ -284,15 +283,14 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
         }
 
         return queryFactory
-                .select(post.id, recommendation.id.count())
+                .select(recommendation.post.id, recommendation.id.count())
                 .from(recommendation)
-                .join(recommendation.post, post)
-                .where(post.id.in(ids))
-                .groupBy(post.id)
+                .where(recommendation.post.id.in(ids))
+                .groupBy(recommendation.post.id)
                 .fetch()
                 .stream()
                 .collect(Collectors.toMap(
-                        tuple -> tuple.get(post.id),
+                        tuple -> tuple.get(recommendation.post.id),
                         tuple -> tuple.get(recommendation.id.count())
                 ));
     }
